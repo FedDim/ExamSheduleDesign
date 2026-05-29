@@ -9,13 +9,25 @@ namespace ExamSheduleDesign.Views
         public NavigationBar()
         {
             InitializeComponent();
-            NavListBox.SelectionChanged += OnSelectionChanged;
+
+            // Подписываемся на события выбора всех трёх списков
+            NavListBoxMain.SelectionChanged += OnSelectionChanged;
+            NavListBoxData.SelectionChanged += OnSelectionChanged;
+            NavListBoxService.SelectionChanged += OnSelectionChanged;
         }
 
         private void OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (NavListBox.SelectedItem is ListBoxItem item && item.Tag is string tag)
+            var sourceListBox = sender as ListBox;
+            if (sourceListBox?.SelectedItem is ListBoxItem selectedItem && selectedItem.Tag is string tag)
             {
+
+                // Синхронизация: снимаем выделение в других списках
+                if (sourceListBox != NavListBoxMain) NavListBoxMain.SelectedItem = null;
+                if (sourceListBox != NavListBoxData) NavListBoxData.SelectedItem = null;
+                if (sourceListBox != NavListBoxService) NavListBoxService.SelectedItem = null;
+
+                // Выполняем команду навигации, если ViewModel доступна
                 if (Application.Current.MainWindow.DataContext is MainWindowViewModel vm)
                 {
                     switch (tag)

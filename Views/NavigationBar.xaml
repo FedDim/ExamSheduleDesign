@@ -11,33 +11,137 @@
             <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="Foreground" Value="#5C5C5C"/>
             <Setter Property="Margin" Value="12,0,0,0"/>
+            <Setter Property="IsHitTestVisible" Value="False"/>
+            <Setter Property="Focusable" Value="False"/>
         </Style>
 
-        <!-- Стиль для элементов ListBox (активный пункт, наведение) -->
+        <!-- Стиль элемента навигации с анимациями -->
         <Style x:Key="NavListBoxItemStyle" TargetType="ListBoxItem">
             <Setter Property="Padding" Value="8,8,8,8"/>
             <Setter Property="Margin" Value="0,2,0,2"/>
             <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FontWeight" Value="Normal"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ListBoxItem">
-                        <Border Background="{TemplateBinding Background}"
-                        BorderBrush="{TemplateBinding BorderBrush}"
-                        BorderThickness="{TemplateBinding BorderThickness}"
-                        CornerRadius="6"
-                        Padding="{TemplateBinding Padding}">
-                            <ContentPresenter />
-                        </Border>
+                        <Grid ClipToBounds="False">
+                            <!-- Индикатор (полоска слева) -->
+                            <Border x:Name="ActiveIndicator"
+                                    Width="3" Height="18"
+                                    Background="#0078D4"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center"
+                                    CornerRadius="2"
+                                    Visibility="Collapsed"
+                                    RenderTransformOrigin="0.5,0.5">
+                                <Border.RenderTransform>
+                                    <ScaleTransform ScaleX="0"/>
+                                </Border.RenderTransform>
+                            </Border>
+
+                            <!-- Основной блок элемента -->
+                            <Border x:Name="Border"
+                                    Margin="6,0,0,0"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="6"
+                                    Padding="{TemplateBinding Padding}">
+                                <ContentPresenter x:Name="Content"
+                                                  VerticalAlignment="Center"
+                                                  TextElement.FontWeight="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=FontWeight}"/>
+                            </Border>
+                        </Grid>
+
                         <ControlTemplate.Triggers>
+                            <!-- АНИМАЦИЯ НАВЕДЕНИЯ -->
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#F0F0F0"/>
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <ColorAnimation Storyboard.TargetName="Border"
+                                                            Storyboard.TargetProperty="Background.Color"
+                                                            To="#D1E5F5"
+                                                            Duration="0:0:0.2">
+                                                <ColorAnimation.EasingFunction>
+                                                    <PowerEase EasingMode="EaseInOut" Power="2"/>
+                                                </ColorAnimation.EasingFunction>
+                                            </ColorAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <ColorAnimation Storyboard.TargetName="Border"
+                                                            Storyboard.TargetProperty="Background.Color"
+                                                            To="Transparent"
+                                                            Duration="0:0:0.1">
+                                                <ColorAnimation.EasingFunction>
+                                                    <PowerEase EasingMode="EaseInOut" Power="2"/>
+                                                </ColorAnimation.EasingFunction>
+                                            </ColorAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
                             </Trigger>
+
+                            <!-- АНИМАЦИЯ ВЫБОРА (активный пункт) -->
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter Property="Background" Value="#E6F2FB"/>
-                                <Setter Property="BorderThickness" Value="0,0,0,0"/>
-                                <Setter Property="BorderBrush" Value="Transparent"/>
+                                <Setter TargetName="Border" Property="Background" Value="#D1E5F5"/>
+                                <Setter TargetName="ActiveIndicator" Property="Visibility" Value="Visible"/>
+                                <Setter Property="FontWeight" Value="SemiBold"/>
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <!-- Плавное появление индикатора -->
+                                            <DoubleAnimation Storyboard.TargetName="ActiveIndicator"
+                                                             Storyboard.TargetProperty="(Border.RenderTransform).(ScaleTransform.ScaleX)"
+                                                             From="0" To="1"
+                                                             Duration="0:0:0.3">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <PowerEase EasingMode="EaseInOut" Power="2"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                            <!-- Плавное изменение фона -->
+                                            <ColorAnimation Storyboard.TargetName="Border"
+                                                            Storyboard.TargetProperty="Background.Color"
+                                                            To="#D1E5F5"
+                                                            Duration="0:0:0.3">
+                                                <ColorAnimation.EasingFunction>
+                                                    <PowerEase EasingMode="EaseInOut" Power="2"/>
+                                                </ColorAnimation.EasingFunction>
+                                            </ColorAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <!-- Плавное сворачивание индикатора (затухание) -->
+                                            <DoubleAnimation Storyboard.TargetName="ActiveIndicator"
+                                                             Storyboard.TargetProperty="(Border.RenderTransform).(ScaleTransform.ScaleX)"
+                                                             From="1" To="0"
+                                                             Duration="0:0:0.5">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <PowerEase EasingMode="EaseInOut" Power="2"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                            <!-- Плавное исчезновение фона -->
+                                            <ColorAnimation Storyboard.TargetName="Border"
+                                                            Storyboard.TargetProperty="Background.Color"
+                                                            To="Transparent"
+                                                            Duration="0:0:0.5">
+                                                <ColorAnimation.EasingFunction>
+                                                    <PowerEase EasingMode="EaseInOut" Power="2"/>
+                                                </ColorAnimation.EasingFunction>
+                                            </ColorAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -52,62 +156,68 @@
             BorderThickness="0,0,1,0"
             BorderBrush="#E0E0E0">
         <StackPanel Margin="16,24,16,24">
-            
+
+            <!-- Логотип -->
             <StackPanel Orientation="Horizontal">
                 <iconPacks:PackIconModern Kind="Calendar" Width="36" Height="36"
                               Foreground="#0078D4"
                               VerticalAlignment="Center"/>
                 <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
                     <TextBlock Text="Расписание" FontSize="14" FontWeight="SemiBold"
-                   Foreground="#1A1A1A"/>
+                               Foreground="#1A1A1A"/>
                     <TextBlock Text="Экзамены v2.0" FontSize="11"
-                   Foreground="#5C5C5C"/>
+                               Foreground="#5C5C5C"/>
                 </StackPanel>
             </StackPanel>
 
             <Separator Margin="0,8" Height="1" Background="#E0E0E0"/>
 
-            <ListBox x:Name="NavListBox" SelectedValuePath="Tag"
+            <!-- Раздел: Основное -->
+            <TextBlock Text="ОСНОВНОЕ" Style="{StaticResource SectionHeaderStyle}" Margin="0,8,0,4"/>
+
+            <ListBox x:Name="NavListBoxMain" SelectedValuePath="Tag"
                      Background="Transparent" BorderThickness="0"
                      ItemContainerStyle="{StaticResource NavListBoxItemStyle}">
-
-                <!-- Раздел: Основное -->
-                <TextBlock Text="ОСНОВНОЕ" Style="{StaticResource SectionHeaderStyle}" Margin="0,8,0,4"/>
-
                 <ListBoxItem Tag="Main">
                     <StackPanel Orientation="Horizontal">
                         <iconPacks:PackIconModern Kind="Home" Width="20" Height="20" VerticalAlignment="Center"/>
                         <TextBlock Text="Главная" Margin="12,0,0,0" VerticalAlignment="Center"/>
                     </StackPanel>
                 </ListBoxItem>
-
                 <ListBoxItem Tag="Schedule">
                     <StackPanel Orientation="Horizontal">
                         <iconPacks:PackIconModern Kind="CalendarWeek" Width="20" Height="20" VerticalAlignment="Center"/>
                         <TextBlock Text="Таблица расписания" Margin="12,0,0,0" VerticalAlignment="Center"/>
                     </StackPanel>
                 </ListBoxItem>
+            </ListBox>
 
-                <!-- Раздел: Данные -->
-                <TextBlock Text="ДАННЫЕ" Style="{StaticResource SectionHeaderStyle}" Margin="0,8,0,4"/>
+            <!-- Раздел: Данные -->
+            <TextBlock Text="ДАННЫЕ" Style="{StaticResource SectionHeaderStyle}" Margin="0,8,0,4"/>
 
+            <ListBox x:Name="NavListBoxData" SelectedValuePath="Tag"
+                     Background="Transparent" BorderThickness="0"
+                     ItemContainerStyle="{StaticResource NavListBoxItemStyle}">
                 <ListBoxItem Tag="Add">
                     <StackPanel Orientation="Horizontal">
                         <iconPacks:PackIconModern Kind="Add" Width="20" Height="20" VerticalAlignment="Center"/>
                         <TextBlock Text="Добавление" Margin="12,0,0,0" VerticalAlignment="Center"/>
                     </StackPanel>
                 </ListBoxItem>
-
                 <ListBoxItem Tag="Edit">
                     <StackPanel Orientation="Horizontal">
                         <iconPacks:PackIconModern Kind="Edit" Width="20" Height="20" VerticalAlignment="Center"/>
                         <TextBlock Text="Редактирование" Margin="12,0,0,0" VerticalAlignment="Center"/>
                     </StackPanel>
                 </ListBoxItem>
+            </ListBox>
 
-                <!-- Раздел: Сервис -->
-                <TextBlock Text="СЕРВИС" Style="{StaticResource SectionHeaderStyle}" Margin="0,8,0,4"/>
+            <!-- Раздел: Сервис -->
+            <TextBlock Text="СЕРВИС" Style="{StaticResource SectionHeaderStyle}" Margin="0,8,0,4"/>
 
+            <ListBox x:Name="NavListBoxService" SelectedValuePath="Tag"
+                     Background="Transparent" BorderThickness="0"
+                     ItemContainerStyle="{StaticResource NavListBoxItemStyle}">
                 <ListBoxItem Tag="Dev">
                     <StackPanel Orientation="Horizontal">
                         <iconPacks:PackIconModern Kind="CodeXml" Width="20" Height="20" VerticalAlignment="Center"/>
@@ -117,4 +227,5 @@
             </ListBox>
         </StackPanel>
     </Border>
+    
 </UserControl>
