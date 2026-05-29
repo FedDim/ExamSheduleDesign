@@ -125,7 +125,7 @@
                                             <DoubleAnimation Storyboard.TargetName="ActiveIndicator"
                                                              Storyboard.TargetProperty="(Border.RenderTransform).(ScaleTransform.ScaleX)"
                                                              From="1" To="0"
-                                                             Duration="0:0:0.5">
+                                                             Duration="0:0:0.4">
                                                 <DoubleAnimation.EasingFunction>
                                                     <PowerEase EasingMode="EaseInOut" Power="2"/>
                                                 </DoubleAnimation.EasingFunction>
@@ -134,7 +134,7 @@
                                             <ColorAnimation Storyboard.TargetName="Border"
                                                             Storyboard.TargetProperty="Background.Color"
                                                             To="Transparent"
-                                                            Duration="0:0:0.5">
+                                                            Duration="0:0:0.4">
                                                 <ColorAnimation.EasingFunction>
                                                     <PowerEase EasingMode="EaseInOut" Power="2"/>
                                                 </ColorAnimation.EasingFunction>
