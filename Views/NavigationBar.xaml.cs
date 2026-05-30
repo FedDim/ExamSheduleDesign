@@ -14,6 +14,12 @@ namespace ExamSheduleDesign.Views
             NavListBoxMain.SelectionChanged += OnSelectionChanged;
             NavListBoxData.SelectionChanged += OnSelectionChanged;
             NavListBoxService.SelectionChanged += OnSelectionChanged;
+
+            Loaded += (s, e) =>
+            {
+                if (NavListBoxMain.Items.Count > 0)
+                    NavListBoxMain.SelectedItem = NavListBoxMain.Items[0];
+            };
         }
 
         private void OnSelectionChanged(object sender, SelectionChangedEventArgs e)
