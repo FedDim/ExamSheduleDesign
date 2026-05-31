@@ -51,14 +51,14 @@
                     <StackPanel>
                         <TextBlock Style="{StaticResource CardHeaderStyle}">Управление данными</TextBlock>
                         <TextBlock FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource SecondaryTextBrush}" Margin="0,0,0,8">Добавить</TextBlock>
-                        <Button Content="Добавить преподавателя" Margin="0,0,0,6" Style="{StaticResource LeftAlignedSecondaryButton}" Click="AddTeacherBtn_Click"/>
-                        <Button Content="Добавить дисциплину" Margin="0,0,0,6" Style="{StaticResource LeftAlignedSecondaryButton}" Click="AddDisciplineBtn_Click"/>
-                        <Button Content="Добавить группу" Margin="0,0,0,6" Style="{StaticResource LeftAlignedSecondaryButton}" Click="AddGroupBtn_Click"/>
+                        <Button Content="Добавить преподавателя" Margin="0,0,0,6" Style="{StaticResource LeftAlignedSecondaryButton}" Command="{Binding AddTeacherCommand}"/>
+                        <Button Content="Добавить дисциплину" Margin="0,0,0,6" Style="{StaticResource LeftAlignedSecondaryButton}" Command="{Binding AddDisciplineCommand}"/>
+                        <Button Content="Добавить группу" Margin="0,0,0,6" Style="{StaticResource LeftAlignedSecondaryButton}" Command="{Binding AddGroupCommand}"/>
                         <Separator Margin="0,12,0,12"/>
                         <TextBlock FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource SecondaryTextBrush}" Margin="0,0,0,8">Редактировать</TextBlock>
-                        <Button Content="Редактировать преподавателей" Margin="0,0,0,6" Style="{StaticResource LeftAlignedSecondaryButton}" Click="EditTeachersBtn_Click"/>
-                        <Button Content="Редактировать дисциплины" Margin="0,0,0,6" Style="{StaticResource LeftAlignedSecondaryButton}" Click="EditDisciplinesBtn_Click"/>
-                        <Button Content="Редактировать группы" Margin="0,0,0,6" Style="{StaticResource LeftAlignedSecondaryButton}" Click="EditGroupsBtn_Click"/>
+                        <Button Content="Редактировать преподавателей" Margin="0,0,0,6" Style="{StaticResource LeftAlignedSecondaryButton}" Command="{Binding EditTeachersCommand}"/>
+                        <Button Content="Редактировать дисциплины" Margin="0,0,0,6" Style="{StaticResource LeftAlignedSecondaryButton}" Command="{Binding EditDisciplinesCommand}"/>
+                        <Button Content="Редактировать группы" Margin="0,0,0,6" Style="{StaticResource LeftAlignedSecondaryButton}" Command="{Binding EditGroupsCommand}"/>
                     </StackPanel>
                 </Border>
 

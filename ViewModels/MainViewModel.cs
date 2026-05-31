@@ -102,13 +102,47 @@ namespace ExamSheduleDesign.ViewModels
             }
         }
 
-        // Заглушки для остальных кнопок (можно потом перенести в отдельные команды)
-        public void AddTeacher() => MessageBox.Show("Добавление преподавателя (будет реализовано)");
-        public void AddDiscipline() => MessageBox.Show("Добавление дисциплины (будет реализовано)");
-        public void AddGroup() => MessageBox.Show("Добавление группы (будет реализовано)");
-        public void EditTeachers() => MessageBox.Show("Редактирование преподавателей (будет реализовано)");
-        public void EditDisciplines() => MessageBox.Show("Редактирование дисциплин (будет реализовано)");
-        public void EditGroups() => MessageBox.Show("Редактирование групп (будет реализовано)");
+        [RelayCommand]
+        private void AddTeacher()
+        {
+            if (Application.Current.MainWindow.DataContext is MainWindowViewModel mainVm)
+                mainVm.NavigateToAddWithParamCommand.Execute("Teacher");
+        }
+
+        [RelayCommand]
+        private void AddDiscipline()
+        {
+            if (Application.Current.MainWindow.DataContext is MainWindowViewModel mainVm)
+                mainVm.NavigateToAddWithParamCommand.Execute("Discipline");
+        }
+
+        [RelayCommand]
+        private void AddGroup()
+        {
+            if (Application.Current.MainWindow.DataContext is MainWindowViewModel mainVm)
+                mainVm.NavigateToAddWithParamCommand.Execute("Group");
+        }
+
+        [RelayCommand]
+        private void EditTeachers()
+        {
+            if (Application.Current.MainWindow.DataContext is MainWindowViewModel mainVm)
+                mainVm.NavigateToEditWithParamCommand.Execute("Teacher");
+        }
+
+        [RelayCommand]
+        private void EditDisciplines()
+        {
+            if (Application.Current.MainWindow.DataContext is MainWindowViewModel mainVm)
+                mainVm.NavigateToEditWithParamCommand.Execute("Discipline");
+        }
+
+        [RelayCommand]
+        private void EditGroups()
+        {
+            if (Application.Current.MainWindow.DataContext is MainWindowViewModel mainVm)
+                mainVm.NavigateToEditWithParamCommand.Execute("Group");
+        }
         public void SaveBuffer() => MessageBox.Show("Сохранение буфера (будет реализовано)");
         public void LoadBuffer() => MessageBox.Show("Загрузка буфера (будет реализовано)");
         public void ClearBuffer() => MessageBox.Show("Очистка буфера (будет реализовано)");

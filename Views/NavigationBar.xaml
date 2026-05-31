@@ -212,19 +212,33 @@
                 </ListBoxItem>
             </ListBox>
 
-            <!-- Раздел: Сервис -->
-            <TextBlock Text="СЕРВИС" Style="{StaticResource SectionHeaderStyle}" Margin="0,8,0,4"/>
-
-            <ListBox x:Name="NavListBoxService" SelectedValuePath="Tag"
-                     Background="Transparent" BorderThickness="0"
-                     ItemContainerStyle="{StaticResource NavListBoxItemStyle}">
-                <ListBoxItem Tag="Dev">
+            <!-- Раздел: Система -->
+            <TextBlock Text="СИСТЕМА" Style="{StaticResource SectionHeaderStyle}" Margin="0,8,0,4"/>
+            <ListBox x:Name="NavListBoxSystem" SelectedValuePath="Tag"
+         Background="Transparent" BorderThickness="0"
+         ItemContainerStyle="{StaticResource NavListBoxItemStyle}">
+                <ListBoxItem Tag="Settings">
                     <StackPanel Orientation="Horizontal">
-                        <iconPacks:PackIconModern Kind="CodeXml" Width="20" Height="20" VerticalAlignment="Center"/>
-                        <TextBlock Text="Разработчик" Margin="12,0,0,0" VerticalAlignment="Center"/>
+                        <iconPacks:PackIconModern Kind="Settings" Width="20" Height="20" VerticalAlignment="Center"/>
+                        <TextBlock Text="Настройки" Margin="12,0,0,0" VerticalAlignment="Center"/>
                     </StackPanel>
                 </ListBoxItem>
             </ListBox>
+
+            <!-- Раздел: Сервис -->
+            <StackPanel x:Name="ServiceSection" Visibility="{Binding IsDevMode, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <TextBlock Text="СЕРВИС" Style="{StaticResource SectionHeaderStyle}" Margin="0,8,0,4"/>
+                <ListBox x:Name="NavListBoxService" SelectedValuePath="Tag"
+             Background="Transparent" BorderThickness="0"
+             ItemContainerStyle="{StaticResource NavListBoxItemStyle}">
+                    <ListBoxItem Tag="Dev">
+                        <StackPanel Orientation="Horizontal">
+                            <iconPacks:PackIconModern Kind="CodeXml" Width="20" Height="20" VerticalAlignment="Center"/>
+                            <TextBlock Text="Разработчик" Margin="12,0,0,0" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </ListBoxItem>
+                </ListBox>
+            </StackPanel>
         </StackPanel>
     </Border>
     

@@ -21,17 +21,30 @@
     </metro:MetroWindow.Resources>
 
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="260"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
         <!-- Навигация -->
-        <views:NavigationBar Grid.Column="0" x:Name="NavigationBarControl"/>
+        <views:NavigationBar Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" x:Name="NavigationBarControl"/>
+
+        <!-- Хлебные крошки (вместо поиска) -->
+        <Border Grid.Column="1" Grid.Row="0" Background="{StaticResource CardBackgroundBrush}" Padding="12,8" CornerRadius="12,12,0,0"
+                BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Расписание экзаменов / " Foreground="{StaticResource SecondaryTextBrush}"/>
+                <TextBlock Text="{Binding Breadcrumb}" Foreground="{StaticResource PrimaryTextBrush}" FontWeight="SemiBold"/>
+            </StackPanel>
+        </Border>
 
         <!-- Контентная область -->
         <Border x:Name="ContentBorder"
-                Grid.Column="1"
+                Grid.Column="1" Grid.Row="1"
                 Background="{StaticResource CardBackgroundBrush}"
                 CornerRadius="{StaticResource ContentAreaCornerRadius}"
                 Margin="2,0,0,0">
