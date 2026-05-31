@@ -16,6 +16,9 @@ namespace ExamSheduleDesign.Services
         void UpdateTeachers(IEnumerable<Teacher> updatedTeachers);
         void UpdateDisciplines(IEnumerable<Discipline> updatedDisciplines);
         void UpdateGroups(IEnumerable<Group> updatedGroups);
+        void GenerateExams(int count);
+        void ClearGeneratedExams();
+        int GetGeneratedExamsCount();
         List<Exam> GetExams();
     }
 }
