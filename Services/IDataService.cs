@@ -13,6 +13,9 @@ namespace ExamSheduleDesign.Services
         void AddTeacher(Teacher teacher);
         void AddDiscipline(Discipline discipline);
         void AddGroup(Group group);
+        void UpdateTeachers(IEnumerable<Teacher> updatedTeachers);
+        void UpdateDisciplines(IEnumerable<Discipline> updatedDisciplines);
+        void UpdateGroups(IEnumerable<Group> updatedGroups);
         List<Exam> GetExams();
     }
 }

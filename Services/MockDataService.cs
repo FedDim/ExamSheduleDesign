@@ -79,6 +79,21 @@ namespace ExamSheduleDesign.Services
             _groups.Add(group);
         }
 
+        public void UpdateTeachers(IEnumerable<Teacher> updatedTeachers)
+        {
+            _teachers = updatedTeachers.ToList();
+        }
+
+        public void UpdateDisciplines(IEnumerable<Discipline> updatedDisciplines)
+        {
+            _disciplines = updatedDisciplines.ToList();
+        }
+
+        public void UpdateGroups(IEnumerable<Group> updatedGroups)
+        {
+            _groups = updatedGroups.ToList();
+        }
+
         public List<Exam> GetExams() => _exams;
     }
 }

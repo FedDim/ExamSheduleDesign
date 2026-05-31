@@ -1,8 +1,138 @@
 ﻿<UserControl x:Class="ExamSheduleDesign.Views.EditDataView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <Grid>
-        <TextBlock Text="Редактирование (будет наполнена позже)" FontSize="20"
-                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:converters="clr-namespace:ExamSheduleDesign.Converters"
+             xmlns:viewmodels="clr-namespace:ExamSheduleDesign.ViewModels"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=viewmodels:EditDataViewModel}">
+
+    <UserControl.Resources>
+        <converters:RadioButtonConverter x:Key="RadioButtonConverter"/>
+        <converters:TabVisibilityConverter x:Key="TabVisibilityConverter"/>
+
+        <!-- Стиль для кнопок-вкладок -->
+        <Style x:Key="TabButtonStyle" TargetType="ToggleButton">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Padding" Value="16,8"/>
+            <Setter Property="Margin" Value="0,0,8,0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1,1,1,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6,6,0,0"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter Property="Background" Value="{StaticResource CardBackgroundBrush}"/>
+                                <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+                                <Setter Property="BorderThickness" Value="2,2,2,0"/>
+                                <Setter Property="FontWeight" Value="SemiBold"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="{StaticResource HoverBackgroundBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Вкладки -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,16">
+            <ToggleButton Style="{StaticResource TabButtonStyle}" 
+                          IsChecked="{Binding CurrentTab, Converter={StaticResource RadioButtonConverter}, ConverterParameter=Teacher}"
+                          Command="{Binding SwitchTabCommand}" CommandParameter="Teacher">
+                Преподаватели
+            </ToggleButton>
+            <ToggleButton Style="{StaticResource TabButtonStyle}" 
+                          IsChecked="{Binding CurrentTab, Converter={StaticResource RadioButtonConverter}, ConverterParameter=Discipline}"
+                          Command="{Binding SwitchTabCommand}" CommandParameter="Discipline">
+                Дисциплины
+            </ToggleButton>
+            <ToggleButton Style="{StaticResource TabButtonStyle}" 
+                          IsChecked="{Binding CurrentTab, Converter={StaticResource RadioButtonConverter}, ConverterParameter=Group}"
+                          Command="{Binding SwitchTabCommand}" CommandParameter="Group">
+                Группы
+            </ToggleButton>
+        </StackPanel>
+
+        <!-- Контентная область (таблица) -->
+        <Border Grid.Row="1" Style="{StaticResource CardStyle}">
+            <Grid>
+                <!-- Таблица преподавателей -->
+                <DataGrid ItemsSource="{Binding Teachers}" AutoGenerateColumns="False" HeadersVisibility="Column" RowHeight="35"
+                          Visibility="{Binding CurrentTab, Converter={StaticResource TabVisibilityConverter}, ConverterParameter=Teacher}"
+                          Style="{StaticResource DataGridStyle}" CanUserAddRows="False" CanUserDeleteRows="False">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="ID" Width="50" Binding="{Binding Id}" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="ФИО" Width="*" Binding="{Binding FullName}" IsReadOnly="False">
+                            <DataGridTextColumn.EditingElementStyle>
+                                <Style TargetType="TextBox">
+                                    <Setter Property="Margin" Value="4,0"/>
+                                </Style>
+                            </DataGridTextColumn.EditingElementStyle>
+                        </DataGridTextColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <!-- Таблица дисциплин -->
+                <DataGrid ItemsSource="{Binding Disciplines}" AutoGenerateColumns="False" HeadersVisibility="Column" RowHeight="35"
+                          Visibility="{Binding CurrentTab, Converter={StaticResource TabVisibilityConverter}, ConverterParameter=Discipline}"
+                          Style="{StaticResource DataGridStyle}" CanUserAddRows="False" CanUserDeleteRows="False">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="ID" Width="50" Binding="{Binding Id}" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Название" Width="*" Binding="{Binding Name}" IsReadOnly="False">
+                            <DataGridTextColumn.EditingElementStyle>
+                                <Style TargetType="TextBox">
+                                    <Setter Property="Margin" Value="4,0"/>
+                                </Style>
+                            </DataGridTextColumn.EditingElementStyle>
+                        </DataGridTextColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <!-- Таблица групп -->
+                <DataGrid ItemsSource="{Binding Groups}" AutoGenerateColumns="False" HeadersVisibility="Column" RowHeight="35"
+                          Visibility="{Binding CurrentTab, Converter={StaticResource TabVisibilityConverter}, ConverterParameter=Group}"
+                          Style="{StaticResource DataGridStyle}" CanUserAddRows="False" CanUserDeleteRows="False">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="ID" Width="50" Binding="{Binding Id}" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Название" Width="120" Binding="{Binding Name}" IsReadOnly="False"/>
+                        <DataGridTextColumn Header="Отделение" Width="*" Binding="{Binding Department}" IsReadOnly="False">
+                            <DataGridTextColumn.EditingElementStyle>
+                                <Style TargetType="TextBox">
+                                    <Setter Property="Margin" Value="4,0"/>
+                                </Style>
+                            </DataGridTextColumn.EditingElementStyle>
+                        </DataGridTextColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </Border>
+
+        <!-- Нижняя панель с кнопкой сохранения -->
+        <Border Grid.Row="2" Style="{StaticResource CardStyle}" Padding="12,12" Margin="0,16,0,0">
+            <StackPanel HorizontalAlignment="Right">
+                <Button Content="Сохранить изменения" Command="{Binding SaveCurrentCommand}" Style="{StaticResource PrimaryButtonStyle}" Width="200" Height="36"/>
+            </StackPanel>
+        </Border>
     </Grid>
 </UserControl>
