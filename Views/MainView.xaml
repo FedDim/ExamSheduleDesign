@@ -1,8 +1,134 @@
 ﻿<UserControl x:Class="ExamSheduleDesign.Views.MainView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <Grid>
-        <TextBlock Text="Главная страница (будет наполнена позже)" FontSize="20"
-                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
-    </Grid>
+
+    <UserControl.Resources>
+        <!-- Стиль для карточек -->
+        <Style x:Key="CardStyle" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource CardBackgroundBrush}"/>
+            <Setter Property="CornerRadius" Value="{StaticResource CardCornerRadius}"/>
+            <Setter Property="Effect" Value="{StaticResource CardShadow}"/>
+            <Setter Property="Padding" Value="16"/>
+        </Style>
+
+        <!-- Стиль для заголовка карточки -->
+        <Style x:Key="CardHeaderStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
+            <Setter Property="Margin" Value="0,0,0,12"/>
+        </Style>
+
+        <!-- Стиль для группы полей -->
+        <Style x:Key="FormGroupStyle" TargetType="StackPanel">
+            <Setter Property="Margin" Value="0,0,0,12"/>
+        </Style>
+
+        <Style x:Key="FormLabelStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
+            <Setter Property="Margin" Value="0,0,0,4"/>
+        </Style>
+
+        <!-- Стиль для кнопок с выравниванием влево -->
+        <Style x:Key="LeftAlignedSecondaryButton" TargetType="Button" BasedOn="{StaticResource SecondaryButtonStyle}">
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        </Style>
+    </UserControl.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <Grid Margin="20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- ЛЕВАЯ КОЛОНКА (кнопки с командами, пока через code-behind, но для чистоты можно RelayCommand) -->
+            <StackPanel Grid.Column="0" Margin="0,0,12,0">
+                <!-- Карточка Управление данными -->
+                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,20">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource CardHeaderStyle}">Управление данными</TextBlock>
+                        <TextBlock FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource SecondaryTextBrush}" Margin="0,0,0,8">Добавить</TextBlock>
+                        <Button Content="Добавить преподавателя" Margin="0,0,0,6" Style="{StaticResource LeftAlignedSecondaryButton}" Click="AddTeacherBtn_Click"/>
+                        <Button Content="Добавить дисциплину" Margin="0,0,0,6" Style="{StaticResource LeftAlignedSecondaryButton}" Click="AddDisciplineBtn_Click"/>
+                        <Button Content="Добавить группу" Margin="0,0,0,6" Style="{StaticResource LeftAlignedSecondaryButton}" Click="AddGroupBtn_Click"/>
+                        <Separator Margin="0,12,0,12"/>
+                        <TextBlock FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource SecondaryTextBrush}" Margin="0,0,0,8">Редактировать</TextBlock>
+                        <Button Content="Редактировать преподавателей" Margin="0,0,0,6" Style="{StaticResource LeftAlignedSecondaryButton}" Click="EditTeachersBtn_Click"/>
+                        <Button Content="Редактировать дисциплины" Margin="0,0,0,6" Style="{StaticResource LeftAlignedSecondaryButton}" Click="EditDisciplinesBtn_Click"/>
+                        <Button Content="Редактировать группы" Margin="0,0,0,6" Style="{StaticResource LeftAlignedSecondaryButton}" Click="EditGroupsBtn_Click"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Карточка Управление буфером -->
+                <Border Style="{StaticResource CardStyle}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource CardHeaderStyle}">Управление буфером</TextBlock>
+                        <Button Content="Сохранить буфер в файл" Margin="0,0,0,8" Style="{StaticResource SecondaryButtonStyle}" Click="SaveBufferBtn_Click"/>
+                        <Button Content="Загрузить буфер из файла" Margin="0,0,0,8" Style="{StaticResource SecondaryButtonStyle}" Click="LoadBufferBtn_Click"/>
+                        <Button Content="Очистить буфер" Style="{StaticResource DangerButtonStyle}" Click="ClearBufferBtn_Click"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+
+            <!-- ПРАВАЯ КОЛОНКА: Создание расписания (привязка к MainViewModel) -->
+            <Border Grid.Column="1" Style="{StaticResource CardStyle}">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource CardHeaderStyle}">Создание расписания</TextBlock>
+
+                    <StackPanel Style="{StaticResource FormGroupStyle}">
+                        <TextBlock Style="{StaticResource FormLabelStyle}">Дата экзамена</TextBlock>
+                        <DatePicker SelectedDate="{Binding SelectedDate}" Width="200" HorizontalAlignment="Left"/>
+                    </StackPanel>
+
+                    <StackPanel Style="{StaticResource FormGroupStyle}">
+                        <TextBlock Style="{StaticResource FormLabelStyle}">Преподаватель</TextBlock>
+                        <ComboBox ItemsSource="{Binding TeacherListForCombo}" SelectedItem="{Binding SelectedTeacher1}" DisplayMemberPath="FullName" Width="250" HorizontalAlignment="Left"/>
+                    </StackPanel>
+
+                    <StackPanel Style="{StaticResource FormGroupStyle}">
+                        <TextBlock Style="{StaticResource FormLabelStyle}">Преподаватель 2</TextBlock>
+                        <ComboBox ItemsSource="{Binding TeacherListForCombo}" SelectedItem="{Binding SelectedTeacher2}" DisplayMemberPath="FullName" Width="250" HorizontalAlignment="Left"/>
+                    </StackPanel>
+
+                    <StackPanel Style="{StaticResource FormGroupStyle}">
+                        <TextBlock Style="{StaticResource FormLabelStyle}">Дисциплина</TextBlock>
+                        <ComboBox ItemsSource="{Binding Disciplines}" SelectedItem="{Binding SelectedDiscipline}" DisplayMemberPath="Name" Width="250" HorizontalAlignment="Left"/>
+                    </StackPanel>
+
+                    <StackPanel Style="{StaticResource FormGroupStyle}">
+                        <TextBlock Style="{StaticResource FormLabelStyle}">Группа</TextBlock>
+                        <ComboBox ItemsSource="{Binding Groups}" SelectedItem="{Binding SelectedGroup}" DisplayMemberPath="Name" Width="250" HorizontalAlignment="Left"/>
+                    </StackPanel>
+
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Margin="0,0,8,0">
+                            <TextBlock Style="{StaticResource FormLabelStyle}">Время</TextBlock>
+                            <ComboBox ItemsSource="{Binding TimeOptions}" SelectedItem="{Binding SelectedTime}" Width="120" HorizontalAlignment="Left"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Style="{StaticResource FormLabelStyle}">Аудитория</TextBlock>
+                            <TextBox Text="{Binding Classroom}" Width="120" HorizontalAlignment="Left"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <StackPanel Style="{StaticResource FormGroupStyle}">
+                        <TextBlock Style="{StaticResource FormLabelStyle}">Тип</TextBlock>
+                        <ComboBox ItemsSource="{Binding TypeOptions}" SelectedItem="{Binding SelectedType}" Width="150" HorizontalAlignment="Left"/>
+                    </StackPanel>
+
+                    <Separator Margin="0,12,0,12"/>
+
+                    <Button Content="Добавить экзамен / консультацию" Style="{StaticResource PrimaryButtonStyle}" Height="36" Command="{Binding AddExamCommand}"/>
+                    <Button Content="Показать таблицу расписания" Margin="0,12,0,0" Style="{StaticResource SecondaryButtonStyle}" Command="{Binding ShowScheduleCommand}"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </ScrollViewer>
 </UserControl>

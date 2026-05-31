@@ -19,9 +19,6 @@
 
   <!-- Пустые папки, чтобы они отображались в решении -->
   <ItemGroup>
-    <Folder Include="Helpers\" />
-    <Folder Include="Models\" />
-    <Folder Include="Services\" />
     <Folder Include="Converters\" />
   </ItemGroup>
 </Project>
