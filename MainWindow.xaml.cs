@@ -14,7 +14,7 @@ namespace ExamSheduleDesign
 
         protected override void OnPreviewKeyDown(KeyEventArgs e)
         {
-            if (e.Key == Key.Z && Keyboard.Modifiers == ModifierKeys.Control)
+            if (e.Key == Key.OemTilde && Keyboard.Modifiers == ModifierKeys.Control)
             {
                 if (DataContext is MainWindowViewModel vm)
                 {
