@@ -11,7 +11,7 @@ namespace ExamSheduleDesign.Views
         public MainView()
         {
             InitializeComponent();
-            this.DataContext = new ViewModels.MainViewModel();
+            this.DataContext = new ViewModels.MainViewModel(App.DataService);
         }
 
         // Обработчики для левых кнопок (пока вызывают методы ViewModel)

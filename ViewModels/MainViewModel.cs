@@ -47,14 +47,13 @@ namespace ExamSheduleDesign.ViewModels
         public List<string> TypeOptions { get; } = new List<string> { "Экзамен", "Консультация" };
         public List<Teacher> TeacherListForCombo { get; }
 
-        public MainViewModel()
+        public MainViewModel(IDataService dataService)
         {
-            _dataService = new MockDataService();
+            _dataService = dataService;
             Teachers = new ObservableCollection<Teacher>(_dataService.GetTeachers());
             Disciplines = new ObservableCollection<Discipline>(_dataService.GetDisciplines());
             Groups = new ObservableCollection<Group>(_dataService.GetGroups());
 
-            // Для ComboBox удобно иметь список с null-элементом "Не указан"
             var teacherList = _dataService.GetTeachers();
             TeacherListForCombo = new List<Teacher> { null };
             TeacherListForCombo.AddRange(teacherList);

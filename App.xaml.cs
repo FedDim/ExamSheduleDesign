@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using ExamSheduleDesign.Services;
 using System.Windows;
 
 namespace ExamSheduleDesign
@@ -13,5 +8,6 @@ namespace ExamSheduleDesign
     /// </summary>
     public partial class App : Application
     {
+        public static IDataService DataService { get; } = new MockDataService();
     }
 }

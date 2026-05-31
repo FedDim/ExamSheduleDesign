@@ -13,7 +13,6 @@
                 <!-- Наши стили -->
                 <ResourceDictionary Source="/Styles/ThemeStyles.xaml" />
                 <ResourceDictionary Source="/Styles/ButtonStyles.xaml" />
-                <ResourceDictionary Source="Styles/DataGridStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

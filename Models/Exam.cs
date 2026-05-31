@@ -4,6 +4,13 @@ namespace ExamSheduleDesign.Models
 {
     public class Exam
     {
+        private bool _isSelected;
+        public bool IsSelected
+        {
+            get => _isSelected;
+            set => _isSelected = value;
+        }
+
         public int Id { get; set; }
         public DateTime Date { get; set; }
         public string Time { get; set; }

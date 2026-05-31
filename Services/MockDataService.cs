@@ -1,5 +1,6 @@
 ﻿using ExamSheduleDesign.Models;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ExamSheduleDesign.Services
 {
@@ -52,6 +53,12 @@ namespace ExamSheduleDesign.Services
         {
             exam.Id = _exams.Count + 1;
             _exams.Add(exam);
+        }
+
+        public void RemoveExams(IEnumerable<Exam> exams)
+        {
+            foreach (var exam in exams.ToList())
+                _exams.Remove(exam);
         }
 
         public List<Exam> GetExams() => _exams;

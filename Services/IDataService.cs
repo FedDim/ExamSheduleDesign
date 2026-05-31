@@ -9,6 +9,7 @@ namespace ExamSheduleDesign.Services
         List<Discipline> GetDisciplines();
         List<Group> GetGroups();
         void AddExam(Exam exam);
+        void RemoveExams(IEnumerable<Exam> exams);
         List<Exam> GetExams();
     }
 }

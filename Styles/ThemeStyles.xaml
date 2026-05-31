@@ -30,4 +30,39 @@
     <CornerRadius x:Key="NavBarCornerRadius">0,12,12,0</CornerRadius>
     <CornerRadius x:Key="ContentAreaCornerRadius">12,0,0,12</CornerRadius>
 
+    <!-- Кисть акцентного цвета -->
+    <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource AccentColor}"/>
+
+    <!-- Стиль карточки -->
+    <Style x:Key="CardStyle" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource CardBackgroundBrush}"/>
+        <Setter Property="CornerRadius" Value="{StaticResource CardCornerRadius}"/>
+        <Setter Property="Effect" Value="{StaticResource CardShadow}"/>
+        <Setter Property="Padding" Value="16"/>
+    </Style>
+
+    <!-- Стиль DataGrid (базовый) -->
+    <Style x:Key="DataGridStyle" TargetType="DataGrid">
+        <Setter Property="AutoGenerateColumns" Value="False"/>
+        <Setter Property="HeadersVisibility" Value="Column"/>
+        <Setter Property="GridLinesVisibility" Value="None"/>
+        <Setter Property="RowBackground" Value="Transparent"/>
+        <Setter Property="AlternatingRowBackground" Value="#F9F9F9"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="RowHeight" Value="40"/>
+        <Setter Property="CanUserAddRows" Value="False"/>
+        <Setter Property="CanUserDeleteRows" Value="False"/>
+        <Setter Property="SelectionMode" Value="Single"/>
+        <Setter Property="SelectionUnit" Value="FullRow"/>
+    </Style>
+
+    <!-- Стиль ячейки DataGrid -->
+    <Style x:Key="DataGridCellStyle" TargetType="DataGridCell">
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="8,4"/>
+    </Style>
+    
+
 </ResourceDictionary>
