@@ -6,7 +6,7 @@
                    xmlns:views="clr-namespace:ExamSheduleDesign.Views"
                    Title="Генератор расписания экзаменов"
                    Width="1200" Height="800"
-                   MinWidth="800" MinHeight="600"
+                   MinWidth="800" MinHeight="700"
                    WindowStartupLocation="CenterScreen"
                    Background="{StaticResource WindowBackgroundBrush}"
                    GlowBrush="{DynamicResource MahApps.Brushes.Accent}">

@@ -61,6 +61,24 @@ namespace ExamSheduleDesign.Services
                 _exams.Remove(exam);
         }
 
+        public void AddTeacher(Teacher teacher)
+        {
+            teacher.Id = _teachers.Max(t => t.Id) + 1;
+            _teachers.Add(teacher);
+        }
+
+        public void AddDiscipline(Discipline discipline)
+        {
+            discipline.Id = _disciplines.Max(d => d.Id) + 1;
+            _disciplines.Add(discipline);
+        }
+
+        public void AddGroup(Group group)
+        {
+            group.Id = _groups.Max(g => g.Id) + 1;
+            _groups.Add(group);
+        }
+
         public List<Exam> GetExams() => _exams;
     }
 }

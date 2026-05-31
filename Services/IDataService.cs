@@ -10,6 +10,9 @@ namespace ExamSheduleDesign.Services
         List<Group> GetGroups();
         void AddExam(Exam exam);
         void RemoveExams(IEnumerable<Exam> exams);
+        void AddTeacher(Teacher teacher);
+        void AddDiscipline(Discipline discipline);
+        void AddGroup(Group group);
         List<Exam> GetExams();
     }
 }
