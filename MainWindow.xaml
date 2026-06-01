@@ -4,6 +4,7 @@
                    xmlns:metro="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
                    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
                    xmlns:views="clr-namespace:ExamSheduleDesign.Views"
+                   xmlns:controls="clr-namespace:ExamSheduleDesign.Controls"
                    Title="Генератор расписания экзаменов"
                    Width="1200" Height="800"
                    MinWidth="800" MinHeight="700"
@@ -41,6 +42,12 @@
                 <TextBlock Text="{Binding Breadcrumb}" Foreground="{StaticResource PrimaryTextBrush}" FontWeight="SemiBold"/>
             </StackPanel>
         </Border>
+
+        <controls:NotificationControl x:Name="NotificationToast"
+                              HorizontalAlignment="Right"
+                              VerticalAlignment="Top"
+                              Margin="0,60,20,0"
+                              Visibility="Collapsed"/>
 
         <!-- Контентная область -->
         <Border x:Name="ContentBorder"

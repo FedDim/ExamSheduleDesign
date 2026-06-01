@@ -31,7 +31,7 @@
         <StackPanel Orientation="Horizontal">
             <!-- Иконка в зависимости от типа (пока заглушка) -->
             <iconPacks:PackIconModern Kind="Information" Width="20" Height="20" Foreground="{StaticResource AccentBrush}" Margin="0,0,12,0"/>
-            <TextBlock x:Name="MessageText" Text="{Binding Message}" Foreground="{StaticResource PrimaryTextBrush}" FontSize="13" TextWrapping="Wrap"/>
+            <TextBlock x:Name="MessageText" Foreground="{StaticResource PrimaryTextBrush}" FontSize="13" TextWrapping="Wrap"/>
         </StackPanel>
     </Border>
 </UserControl>

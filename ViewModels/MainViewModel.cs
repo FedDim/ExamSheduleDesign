@@ -64,7 +64,7 @@ namespace ExamSheduleDesign.ViewModels
         {
             if (SelectedTeacher1 == null || SelectedDiscipline == null || SelectedGroup == null)
             {
-                MessageBox.Show("Заполните обязательные поля: преподаватель, дисциплина, группа.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                App.NotificationService.Show("Заполните обязательные поля: преподаватель, дисциплина, группа.");
                 return;
             }
 
@@ -81,7 +81,7 @@ namespace ExamSheduleDesign.ViewModels
             };
 
             _dataService.AddExam(exam);
-            MessageBox.Show($"Экзамен добавлен!\n{SelectedDiscipline.Name}, {SelectedGroup.Name}, {SelectedDate:dd.MM.yyyy}", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+            App.NotificationService.Show($"Экзамен добавлен!\n{SelectedDiscipline.Name}, {SelectedGroup.Name}, {SelectedDate:dd.MM.yyyy}");
 
             // Очистка формы (опционально)
             SelectedTeacher1 = null;
@@ -143,8 +143,8 @@ namespace ExamSheduleDesign.ViewModels
             if (Application.Current.MainWindow.DataContext is MainWindowViewModel mainVm)
                 mainVm.NavigateToEditWithParamCommand.Execute("Group");
         }
-        public void SaveBuffer() => MessageBox.Show("Сохранение буфера (будет реализовано)");
-        public void LoadBuffer() => MessageBox.Show("Загрузка буфера (будет реализовано)");
-        public void ClearBuffer() => MessageBox.Show("Очистка буфера (будет реализовано)");
+        public void SaveBuffer() => App.NotificationService.Show("Сохранение буфера (будет реализовано)");
+        public void LoadBuffer() => App.NotificationService.Show("Загрузка буфера (будет реализовано)");
+        public void ClearBuffer() => App.NotificationService.Show("Очистка буфера (будет реализовано)");
     }
 }

@@ -69,7 +69,7 @@ namespace ExamSheduleDesign.ViewModels
             _dataService.AddTeacher(teacher);
             Teachers.Add(teacher);
             NewTeacherFullName = "";
-            MessageBox.Show("Преподаватель добавлен.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+            App.NotificationService.Show("Преподаватель добавлен.");
         }
 
         [RelayCommand]
@@ -77,14 +77,14 @@ namespace ExamSheduleDesign.ViewModels
         {
             if (string.IsNullOrWhiteSpace(NewDisciplineName))
             {
-                MessageBox.Show("Введите название дисциплины.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                App.NotificationService.Show("Введите название дисциплины.");
                 return;
             }
             var discipline = new Discipline { Name = NewDisciplineName.Trim() };
             _dataService.AddDiscipline(discipline);
             Disciplines.Add(discipline);
             NewDisciplineName = "";
-            MessageBox.Show("Дисциплина добавлена.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+            App.NotificationService.Show("Дисциплина добавлена.");
         }
 
         [RelayCommand]
@@ -92,7 +92,7 @@ namespace ExamSheduleDesign.ViewModels
         {
             if (string.IsNullOrWhiteSpace(NewGroupName))
             {
-                MessageBox.Show("Введите название группы.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                App.NotificationService.Show("Введите название группы.");
                 return;
             }
             var group = new Group { Name = NewGroupName.Trim(), Department = NewGroupDepartment };
@@ -100,7 +100,7 @@ namespace ExamSheduleDesign.ViewModels
             Groups.Add(group);
             NewGroupName = "";
             NewGroupDepartment = "Информатика";
-            MessageBox.Show("Группа добавлена.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+            App.NotificationService.Show("Группа добавлена.");
         }
     }
 }

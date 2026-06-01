@@ -1,4 +1,5 @@
-﻿using ExamSheduleDesign.ViewModels;
+﻿using ExamSheduleDesign.Services;
+using ExamSheduleDesign.ViewModels;
 using MahApps.Metro.Controls;
 using System.Windows.Input;
 
@@ -10,6 +11,7 @@ namespace ExamSheduleDesign
         {
             InitializeComponent();
             this.DataContext = new MainWindowViewModel();
+            App.NotificationService = new NotificationService(NotificationToast);
         }
 
         protected override void OnPreviewKeyDown(KeyEventArgs e)

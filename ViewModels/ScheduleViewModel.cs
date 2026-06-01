@@ -103,7 +103,7 @@ namespace ExamSheduleDesign.ViewModels
         [RelayCommand]
         private void CreateScheduleFile()
         {
-            System.Windows.MessageBox.Show("Создание файла расписания (будет реализовано позже)");
+            App.NotificationService.Show("Создание файла расписания (будет реализовано позже)");
         }
     }
 }

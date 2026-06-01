@@ -9,5 +9,6 @@ namespace ExamSheduleDesign
     public partial class App : Application
     {
         public static IDataService DataService { get; } = new MockDataService();
+        public static INotificationService NotificationService { get; set; }
     }
 }
