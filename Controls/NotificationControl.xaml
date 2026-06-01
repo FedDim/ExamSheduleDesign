@@ -5,20 +5,18 @@
              Width="300" Height="Auto">
     <UserControl.Resources>
         <Storyboard x:Key="ShowAnimation">
-            <ThicknessAnimation Storyboard.TargetProperty="Margin"
-                                From="0,0,-320,0" To="0,0,0,0"
-                                Duration="0:0:0.3"
-                                DecelerationRatio="0.8"/>
+            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
+                             From="320" To="0" Duration="0:0:0.25"
+                             DecelerationRatio="0.8"/>
         </Storyboard>
         <Storyboard x:Key="HideAnimation">
-            <ThicknessAnimation Storyboard.TargetProperty="Margin"
-                                From="0,0,0,0" To="0,0,-320,0"
-                                Duration="0:0:0.3"
-                                DecelerationRatio="0.8">
-                <ThicknessAnimation.EasingFunction>
+            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
+                             From="0" To="320" Duration="0:0:0.25"
+                             DecelerationRatio="0.8">
+                <DoubleAnimation.EasingFunction>
                     <CubicEase EasingMode="EaseIn"/>
-                </ThicknessAnimation.EasingFunction>
-            </ThicknessAnimation>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
         </Storyboard>
     </UserControl.Resources>
 
@@ -29,7 +27,6 @@
             Effect="{StaticResource CardShadow}"
             Padding="12,8">
         <StackPanel Orientation="Horizontal">
-            <!-- Иконка в зависимости от типа (пока заглушка) -->
             <iconPacks:PackIconModern Kind="Information" Width="20" Height="20" Foreground="{StaticResource AccentBrush}" Margin="0,0,12,0"/>
             <TextBlock x:Name="MessageText" Foreground="{StaticResource PrimaryTextBrush}" FontSize="13" TextWrapping="Wrap"/>
         </StackPanel>

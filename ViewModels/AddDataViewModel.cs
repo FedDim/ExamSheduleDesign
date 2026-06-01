@@ -4,7 +4,6 @@ using ExamSheduleDesign.Models;
 using ExamSheduleDesign.Services;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Windows;
 
 namespace ExamSheduleDesign.ViewModels
 {
@@ -62,7 +61,7 @@ namespace ExamSheduleDesign.ViewModels
         {
             if (string.IsNullOrWhiteSpace(NewTeacherFullName))
             {
-                MessageBox.Show("Введите ФИО преподавателя.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                App.NotificationService.Show("Введите ФИО преподавателя.");
                 return;
             }
             var teacher = new Teacher { FullName = NewTeacherFullName.Trim() };

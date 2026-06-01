@@ -21,52 +21,60 @@
         </Storyboard>
     </metro:MetroWindow.Resources>
 
+    <!-- Единый корневой Grid -->
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="260"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
+        <!-- Основная сетка с колонками и рядами -->
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="260"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
 
-        <!-- Навигация -->
-        <views:NavigationBar Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" x:Name="NavigationBarControl"/>
+            <!-- Навигация -->
+            <views:NavigationBar Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" x:Name="NavigationBarControl"/>
 
-        <!-- Хлебные крошки (вместо поиска) -->
-        <Border Grid.Column="1" Grid.Row="0" Background="{StaticResource CardBackgroundBrush}" Padding="12,8" CornerRadius="12,12,0,0"
-                BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Text="Расписание экзаменов / " Foreground="{StaticResource SecondaryTextBrush}"/>
-                <TextBlock Text="{Binding Breadcrumb}" Foreground="{StaticResource PrimaryTextBrush}" FontWeight="SemiBold"/>
-            </StackPanel>
-        </Border>
+            <!-- Хлебные крошки -->
+            <Border Grid.Column="1" Grid.Row="0" Background="{StaticResource CardBackgroundBrush}" Padding="12,8" CornerRadius="12,12,0,0"
+                    BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Расписание экзаменов / " Foreground="{StaticResource SecondaryTextBrush}"/>
+                    <TextBlock Text="{Binding Breadcrumb}" Foreground="{StaticResource PrimaryTextBrush}" FontWeight="SemiBold"/>
+                </StackPanel>
+            </Border>
 
-        <controls:NotificationControl x:Name="NotificationToast"
-                              HorizontalAlignment="Right"
-                              VerticalAlignment="Top"
-                              Margin="0,60,20,0"
-                              Visibility="Collapsed"/>
+            <!-- Контентная область -->
+            <Border x:Name="ContentBorder"
+                    Grid.Column="1" Grid.Row="1"
+                    Background="{StaticResource CardBackgroundBrush}"
+                    CornerRadius="{StaticResource ContentAreaCornerRadius}"
+                    Margin="2,0,0,0">
+                <Grid>
+                    <ContentControl x:Name="MainContentArea" Content="{Binding CurrentPage}">
+                        <ContentControl.RenderTransform>
+                            <TranslateTransform X="0"/>
+                        </ContentControl.RenderTransform>
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="ContentChanged">
+                                <i:ControlStoryboardAction Storyboard="{StaticResource PageTransition}"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </ContentControl>
+                </Grid>
+            </Border>
+        </Grid>
 
-        <!-- Контентная область -->
-        <Border x:Name="ContentBorder"
-                Grid.Column="1" Grid.Row="1"
-                Background="{StaticResource CardBackgroundBrush}"
-                CornerRadius="{StaticResource ContentAreaCornerRadius}"
-                Margin="2,0,0,0">
-            <Grid>
-                <ContentControl x:Name="MainContentArea" Content="{Binding CurrentPage}">
-                    <ContentControl.RenderTransform>
-                        <TranslateTransform X="0"/>
-                    </ContentControl.RenderTransform>
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="ContentChanged">
-                            <i:ControlStoryboardAction Storyboard="{StaticResource PageTransition}"/>
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
-                </ContentControl>
-            </Grid>
-        </Border>
+        <!-- Canvas для уведомлений (поверх основной сетки) -->
+        <Canvas>
+            <controls:NotificationControl x:Name="NotificationToast"
+                                          HorizontalAlignment="Right"
+                                          VerticalAlignment="Top"
+                                          Canvas.Right="9"
+                                          Canvas.Top="14"
+                                          Visibility="Collapsed"/>
+        </Canvas>
     </Grid>
 </metro:MetroWindow>
