@@ -1,4 +1,6 @@
 ﻿using ExamSheduleDesign.Services;
+using ExamSheduleDesign.Services.Interfaces;
+using ExamSheduleDesign.Services.Logging;
 using ExamSheduleDesign.ViewModels;
 using ExamSheduleDesign.Views;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,6 +22,9 @@ namespace ExamSheduleDesign
             // Сервисы
             services.AddSingleton<IDataService, MockDataService>();
             services.AddSingleton<INotificationService, NotificationService>();
+
+            services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>();
+            services.AddSingleton<IAppLogger, FileLogger>();
 
             // ViewModels
             services.AddTransient<MainWindowViewModel>();
