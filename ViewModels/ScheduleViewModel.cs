@@ -2,9 +2,11 @@
 using CommunityToolkit.Mvvm.Input;
 using ExamSheduleDesign.Models;
 using ExamSheduleDesign.Services;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace ExamSheduleDesign.ViewModels
@@ -12,10 +14,11 @@ namespace ExamSheduleDesign.ViewModels
     public partial class ScheduleViewModel : ObservableObject
     {
         private readonly IDataService _dataService;
+        private readonly SqlDataService _sqlDataService;
         private readonly INotificationService _notificationService;
 
         [ObservableProperty]
-        private ObservableCollection<Exam> _exams;
+        private ObservableCollection<Exam> _exams = new();
 
         [ObservableProperty]
         private int _selectedCount;
@@ -24,7 +27,7 @@ namespace ExamSheduleDesign.ViewModels
         private string _sortColumn = "Date";
 
         [ObservableProperty]
-        private bool _isSortAscending = true;   // новое имя свойства
+        private bool _isSortAscending = true;
 
         public List<string> SortColumns { get; } = new()
         {
@@ -34,20 +37,29 @@ namespace ExamSheduleDesign.ViewModels
         public ICommand SortAscendingCommand { get; }
         public ICommand SortDescendingCommand { get; }
 
-        public ScheduleViewModel(IDataService dataService, INotificationService notificationService)
+        public ScheduleViewModel(IDataService dataService, SqlDataService sqlDataService, INotificationService notificationService)
         {
             _dataService = dataService;
+            _sqlDataService = sqlDataService;
             _notificationService = notificationService;
-            LoadExams();
 
             SortAscendingCommand = new RelayCommand(() => { IsSortAscending = true; ApplySort(); });
             SortDescendingCommand = new RelayCommand(() => { IsSortAscending = false; ApplySort(); });
         }
 
-        private void LoadExams()
+        public async Task LoadExamsAsync()
         {
-            Exams = new ObservableCollection<Exam>(_dataService.GetExams());
-            UpdateSelectedCount();
+            try
+            {
+                var exams = await _sqlDataService.GetExamsAsync();
+                Exams = new ObservableCollection<Exam>(exams);
+                UpdateSelectedCount();
+                ApplySort();
+            }
+            catch (Exception ex)
+            {
+                _notificationService.Show($"Ошибка загрузки экзаменов: {ex.Message}");
+            }
         }
 
         private void UpdateSelectedCount()
@@ -60,7 +72,7 @@ namespace ExamSheduleDesign.ViewModels
 
         private void ApplySort()
         {
-            if (Exams == null) return;
+            if (Exams == null || Exams.Count == 0) return;
 
             var sorted = SortColumn switch
             {
@@ -98,7 +110,7 @@ namespace ExamSheduleDesign.ViewModels
             if (toDelete.Any())
             {
                 _dataService.RemoveExams(toDelete);
-                LoadExams();
+                _ = LoadExamsAsync();
             }
         }
 

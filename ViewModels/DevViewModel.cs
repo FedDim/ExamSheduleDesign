@@ -13,7 +13,6 @@ namespace ExamSheduleDesign.ViewModels
     public partial class DevViewModel : ObservableObject
     {
         private readonly IDataService _dataService;
-
         private readonly SqlDataService _sqlDataService;
         private readonly INotificationService _notificationService;
 
@@ -27,30 +26,45 @@ namespace ExamSheduleDesign.ViewModels
         private bool _isGenerating;
 
         [ObservableProperty]
-        private ObservableCollection<Exam> _generatedExams;
+        private ObservableCollection<Exam> _generatedExams = new();
 
         public DevViewModel(IDataService dataService, SqlDataService sqlDataService, INotificationService notificationService)
         {
             _dataService = dataService;
-            RefreshGeneratedList();
             _sqlDataService = sqlDataService;
             _notificationService = notificationService;
         }
 
-        private void RefreshGeneratedList()
+        public async Task LoadDataAsync()
         {
-            var allExams = _dataService.GetExams();
-            // Берём последние 50 экзаменов (или все, если их меньше)
+            await RefreshGeneratedListAsync();
+            await UpdateCountsAsync();
+        }
+
+        private async Task RefreshGeneratedListAsync()
+        {
+            var allExams = await _sqlDataService.GetExamsAsync();
             var lastExams = allExams.Skip(Math.Max(0, allExams.Count - 50)).ToList();
             GeneratedExams = new ObservableCollection<Exam>(lastExams);
         }
+
+        private async Task UpdateCountsAsync()
+        {
+            OnPropertyChanged(nameof(TeachersCount));
+            OnPropertyChanged(nameof(DisciplinesCount));
+            OnPropertyChanged(nameof(GroupsCount));
+        }
+
+        public int TeachersCount => _dataService.GetTeachers().Count;
+        public int DisciplinesCount => _dataService.GetDisciplines().Count;
+        public int GroupsCount => _dataService.GetGroups().Count;
 
         [RelayCommand]
         private async Task TestLoadExamsAsync()
         {
             try
             {
-                var exams = await _sqlDataService.GetAllExamsWithDetailsAsync();
+                var exams = await _sqlDataService.GetExamsAsync();
                 _notificationService.Show($"Загружено экзаменов: {exams.Count}");
             }
             catch (Exception ex)
@@ -59,7 +73,6 @@ namespace ExamSheduleDesign.ViewModels
             }
         }
 
-
         [RelayCommand]
         private async Task GenerateAsync()
         {
@@ -67,30 +80,23 @@ namespace ExamSheduleDesign.ViewModels
             IsGenerating = true;
             StatusText = "Генерация...";
 
-            await Task.Run(() =>
-            {
-                _dataService.GenerateExams(GenerationCount);
-            });
+            await Task.Run(() => _dataService.GenerateExams(GenerationCount));
 
-            RefreshGeneratedList();
+            await RefreshGeneratedListAsync();
             StatusText = $"Сгенерировано {GenerationCount} экзаменов";
             IsGenerating = false;
         }
 
         [RelayCommand]
-        private void ClearGenerated()
+        private async Task ClearGeneratedAsync()
         {
             if (MessageBox.Show("Удалить все сгенерированные экзамены?", "Подтверждение",
                 MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
                 _dataService.ClearGeneratedExams();
-                RefreshGeneratedList();
+                await RefreshGeneratedListAsync();
                 StatusText = "Сгенерированные экзамены удалены";
             }
         }
-
-        public int TeachersCount => _dataService.GetTeachers().Count;
-        public int DisciplinesCount => _dataService.GetDisciplines().Count;
-        public int GroupsCount => _dataService.GetGroups().Count;
     }
 }

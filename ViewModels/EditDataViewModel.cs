@@ -2,41 +2,56 @@
 using CommunityToolkit.Mvvm.Input;
 using ExamSheduleDesign.Models;
 using ExamSheduleDesign.Services;
+using System;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 
 namespace ExamSheduleDesign.ViewModels
 {
     public partial class EditDataViewModel : ObservableObject
     {
         private readonly IDataService _dataService;
+        private readonly SqlDataService _sqlDataService;
         private readonly INotificationService _notificationService;
 
         [ObservableProperty]
         private string _currentTab = "Teacher";
 
-        public ObservableCollection<Teacher> Teachers { get; set; }
-        public ObservableCollection<Discipline> Disciplines { get; set; }
-        public ObservableCollection<Group> Groups { get; set; }
+        public ObservableCollection<Teacher> Teachers { get; set; } = new();
+        public ObservableCollection<Discipline> Disciplines { get; set; } = new();
+        public ObservableCollection<Group> Groups { get; set; } = new();
 
-        public EditDataViewModel(IDataService dataService, INotificationService notificationService)
+        public EditDataViewModel(IDataService dataService, SqlDataService sqlDataService, INotificationService notificationService)
         {
             _dataService = dataService;
+            _sqlDataService = sqlDataService;
             _notificationService = notificationService;
-            LoadData();
         }
 
-        private void LoadData()
+        public async Task LoadDataAsync()
         {
-            Teachers = new ObservableCollection<Teacher>(_dataService.GetTeachers());
-            Disciplines = new ObservableCollection<Discipline>(_dataService.GetDisciplines());
-            Groups = new ObservableCollection<Group>(_dataService.GetGroups());
+            try
+            {
+                var teachers = await _sqlDataService.GetTeachersAsync();
+                var disciplines = await _sqlDataService.GetDisciplinesAsync();
+                var groups = await _sqlDataService.GetGroupsAsync();
+
+                Teachers.Clear();
+                Disciplines.Clear();
+                Groups.Clear();
+
+                foreach (var t in teachers) Teachers.Add(t);
+                foreach (var d in disciplines) Disciplines.Add(d);
+                foreach (var g in groups) Groups.Add(g);
+            }
+            catch (Exception ex)
+            {
+                _notificationService.Show($"Ошибка загрузки справочников: {ex.Message}");
+            }
         }
 
         [RelayCommand]
-        private void SwitchTab(string tab)
-        {
-            CurrentTab = tab;
-        }
+        private void SwitchTab(string tab) => CurrentTab = tab;
 
         [RelayCommand]
         private void SaveTeachers()
@@ -59,7 +74,6 @@ namespace ExamSheduleDesign.ViewModels
             _notificationService.Show("Изменения групп сохранены.");
         }
 
-        // Команда сохранения, которая вызывает нужный метод в зависимости от вкладки
         [RelayCommand]
         private void SaveCurrent()
         {

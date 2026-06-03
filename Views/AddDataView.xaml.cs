@@ -5,10 +5,14 @@ namespace ExamSheduleDesign.Views
 {
     public partial class AddDataView : UserControl
     {
+        private readonly AddDataViewModel _viewModel;
+
         public AddDataView(AddDataViewModel viewModel)
         {
             InitializeComponent();
-            DataContext = viewModel;
+            _viewModel = viewModel;
+            DataContext = _viewModel;
+            Loaded += async (s, e) => await _viewModel.LoadDataAsync();
         }
     }
 }

@@ -12,6 +12,8 @@ namespace ExamSheduleDesign.Views
             InitializeComponent();
             _viewModel = viewModel;
             DataContext = _viewModel;
+
+            Loaded += async (s, e) => await _viewModel.LoadDataAsync();
         }
 
         // Обработчики кнопок буфера теперь вызывают методы ViewModel

@@ -2,29 +2,28 @@
 using CommunityToolkit.Mvvm.Input;
 using ExamSheduleDesign.Models;
 using ExamSheduleDesign.Services;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 
 namespace ExamSheduleDesign.ViewModels
 {
     public partial class AddDataViewModel : ObservableObject
     {
         private readonly IDataService _dataService;
+        private readonly SqlDataService _sqlDataService;
         private readonly INotificationService _notificationService;
 
-        // Текущая вкладка: "Teacher", "Discipline", "Group"
         [ObservableProperty]
         private string _currentTab = "Teacher";
 
-        // Поля для добавления преподавателя
         [ObservableProperty]
         private string _newTeacherFullName = "";
 
-        // Поля для добавления дисциплины
         [ObservableProperty]
         private string _newDisciplineName = "";
 
-        // Поля для добавления группы
         [ObservableProperty]
         private string _newGroupName = "";
 
@@ -33,30 +32,41 @@ namespace ExamSheduleDesign.ViewModels
 
         public List<string> DepartmentOptions { get; } = new() { "Информатика", "Экономика", "Гуманитарное" };
 
-        // Коллекции для таблиц
-        public ObservableCollection<Teacher> Teachers { get; set; }
-        public ObservableCollection<Discipline> Disciplines { get; set; }
-        public ObservableCollection<Group> Groups { get; set; }
+        public ObservableCollection<Teacher> Teachers { get; set; } = new();
+        public ObservableCollection<Discipline> Disciplines { get; set; } = new();
+        public ObservableCollection<Group> Groups { get; set; } = new();
 
-        public AddDataViewModel(IDataService dataService, INotificationService notificationService)
+        public AddDataViewModel(IDataService dataService, SqlDataService sqlDataService, INotificationService notificationService)
         {
             _dataService = dataService;
+            _sqlDataService = sqlDataService;
             _notificationService = notificationService;
-            LoadData();
         }
 
-        private void LoadData()
+        public async Task LoadDataAsync()
         {
-            Teachers = new ObservableCollection<Teacher>(_dataService.GetTeachers());
-            Disciplines = new ObservableCollection<Discipline>(_dataService.GetDisciplines());
-            Groups = new ObservableCollection<Group>(_dataService.GetGroups());
+            try
+            {
+                var teachers = await _sqlDataService.GetTeachersAsync();
+                var disciplines = await _sqlDataService.GetDisciplinesAsync();
+                var groups = await _sqlDataService.GetGroupsAsync();
+
+                Teachers.Clear();
+                Disciplines.Clear();
+                Groups.Clear();
+
+                foreach (var t in teachers) Teachers.Add(t);
+                foreach (var d in disciplines) Disciplines.Add(d);
+                foreach (var g in groups) Groups.Add(g);
+            }
+            catch (Exception ex)
+            {
+                _notificationService.Show($"Ошибка загрузки справочников: {ex.Message}");
+            }
         }
 
         [RelayCommand]
-        private void SwitchTab(string tab)
-        {
-            CurrentTab = tab;
-        }
+        private void SwitchTab(string tab) => CurrentTab = tab;
 
         [RelayCommand]
         private void AddTeacher()
