@@ -12,6 +12,7 @@ namespace ExamSheduleDesign.ViewModels
     public partial class MainViewModel : ObservableObject
     {
         private readonly IDataService _dataService;
+        private readonly INotificationService _notificationService;
 
         [ObservableProperty]
         private DateTime _selectedDate = DateTime.Parse("2026-06-15");
@@ -47,9 +48,11 @@ namespace ExamSheduleDesign.ViewModels
         public List<string> TypeOptions { get; } = new List<string> { "Экзамен", "Консультация" };
         public List<Teacher> TeacherListForCombo { get; }
 
-        public MainViewModel(IDataService dataService)
+        public MainViewModel(IDataService dataService, INotificationService notificationService)
         {
             _dataService = dataService;
+            _notificationService = notificationService;
+
             Teachers = new ObservableCollection<Teacher>(_dataService.GetTeachers());
             Disciplines = new ObservableCollection<Discipline>(_dataService.GetDisciplines());
             Groups = new ObservableCollection<Group>(_dataService.GetGroups());
@@ -64,7 +67,7 @@ namespace ExamSheduleDesign.ViewModels
         {
             if (SelectedTeacher1 == null || SelectedDiscipline == null || SelectedGroup == null)
             {
-                App.NotificationService.Show("Заполните обязательные поля: преподаватель, дисциплина, группа.");
+                _notificationService.Show("Заполните обязательные поля: преподаватель, дисциплина, группа.");
                 return;
             }
 
@@ -81,7 +84,7 @@ namespace ExamSheduleDesign.ViewModels
             };
 
             _dataService.AddExam(exam);
-            App.NotificationService.Show($"Экзамен добавлен!\n{SelectedDiscipline.Name}, {SelectedGroup.Name}, {SelectedDate:dd.MM.yyyy}");
+            _notificationService.Show($"Экзамен добавлен!\n{SelectedDiscipline.Name}, {SelectedGroup.Name}, {SelectedDate:dd.MM.yyyy}");
 
             // Очистка формы (опционально)
             SelectedTeacher1 = null;
@@ -143,8 +146,8 @@ namespace ExamSheduleDesign.ViewModels
             if (Application.Current.MainWindow.DataContext is MainWindowViewModel mainVm)
                 mainVm.NavigateToEditWithParamCommand.Execute("Group");
         }
-        public void SaveBuffer() => App.NotificationService.Show("Сохранение буфера (будет реализовано)");
-        public void LoadBuffer() => App.NotificationService.Show("Загрузка буфера (будет реализовано)");
-        public void ClearBuffer() => App.NotificationService.Show("Очистка буфера (будет реализовано)");
+        public void SaveBuffer() => _notificationService.Show("Сохранение буфера (будет реализовано)");
+        public void LoadBuffer() => _notificationService.Show("Загрузка буфера (будет реализовано)");
+        public void ClearBuffer() => _notificationService.Show("Очистка буфера (будет реализовано)");
     }
 }

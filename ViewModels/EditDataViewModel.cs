@@ -9,6 +9,7 @@ namespace ExamSheduleDesign.ViewModels
     public partial class EditDataViewModel : ObservableObject
     {
         private readonly IDataService _dataService;
+        private readonly INotificationService _notificationService;
 
         [ObservableProperty]
         private string _currentTab = "Teacher";
@@ -17,9 +18,10 @@ namespace ExamSheduleDesign.ViewModels
         public ObservableCollection<Discipline> Disciplines { get; set; }
         public ObservableCollection<Group> Groups { get; set; }
 
-        public EditDataViewModel(IDataService dataService)
+        public EditDataViewModel(IDataService dataService, INotificationService notificationService)
         {
             _dataService = dataService;
+            _notificationService = notificationService;
             LoadData();
         }
 
@@ -40,21 +42,21 @@ namespace ExamSheduleDesign.ViewModels
         private void SaveTeachers()
         {
             _dataService.UpdateTeachers(Teachers);
-            App.NotificationService.Show("Изменения преподавателей сохранены.");
+            _notificationService.Show("Изменения преподавателей сохранены.");
         }
 
         [RelayCommand]
         private void SaveDisciplines()
         {
             _dataService.UpdateDisciplines(Disciplines);
-            App.NotificationService.Show("Изменения дисциплин сохранены.");
+            _notificationService.Show("Изменения дисциплин сохранены.");
         }
 
         [RelayCommand]
         private void SaveGroups()
         {
             _dataService.UpdateGroups(Groups);
-            App.NotificationService.Show("Изменения групп сохранены.");
+            _notificationService.Show("Изменения групп сохранены.");
         }
 
         // Команда сохранения, которая вызывает нужный метод в зависимости от вкладки

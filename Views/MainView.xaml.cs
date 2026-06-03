@@ -1,22 +1,22 @@
-﻿using System.Windows;
+﻿using ExamSheduleDesign.ViewModels;
 using System.Windows.Controls;
 
 namespace ExamSheduleDesign.Views
 {
-    /// <summary>
-    /// Логика взаимодействия для MainView.xaml
-    /// </summary>
     public partial class MainView : UserControl
     {
-        public MainView()
+        private readonly MainViewModel _viewModel;
+
+        public MainView(MainViewModel viewModel)
         {
             InitializeComponent();
-            this.DataContext = new ViewModels.MainViewModel(App.DataService);
+            _viewModel = viewModel;
+            DataContext = _viewModel;
         }
 
-        // Обработчики для левых кнопок (пока вызывают методы ViewModel)
-        private void SaveBufferBtn_Click(object sender, RoutedEventArgs e) => ((ViewModels.MainViewModel)DataContext).SaveBuffer();
-        private void LoadBufferBtn_Click(object sender, RoutedEventArgs e) => ((ViewModels.MainViewModel)DataContext).LoadBuffer();
-        private void ClearBufferBtn_Click(object sender, RoutedEventArgs e) => ((ViewModels.MainViewModel)DataContext).ClearBuffer();
+        // Обработчики кнопок буфера теперь вызывают методы ViewModel
+        private void SaveBufferBtn_Click(object sender, System.Windows.RoutedEventArgs e) => _viewModel.SaveBuffer();
+        private void LoadBufferBtn_Click(object sender, System.Windows.RoutedEventArgs e) => _viewModel.LoadBuffer();
+        private void ClearBufferBtn_Click(object sender, System.Windows.RoutedEventArgs e) => _viewModel.ClearBuffer();
     }
 }

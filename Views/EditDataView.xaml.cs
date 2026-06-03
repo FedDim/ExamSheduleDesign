@@ -3,15 +3,12 @@ using System.Windows.Controls;
 
 namespace ExamSheduleDesign.Views
 {
-    /// <summary>
-    /// Логика взаимодействия для EditDataView.xaml
-    /// </summary>
     public partial class EditDataView : UserControl
     {
-        public EditDataView()
+        public EditDataView(EditDataViewModel viewModel)
         {
             InitializeComponent();
-            this.DataContext = new EditDataViewModel(App.DataService);
+            DataContext = viewModel;
         }
     }
 }

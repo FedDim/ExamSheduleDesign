@@ -5,9 +5,9 @@ namespace ExamSheduleDesign.Services
 {
     public class NotificationService : INotificationService
     {
-        private readonly NotificationControl _notificationControl;
+        private NotificationControl _notificationControl;
 
-        public NotificationService(NotificationControl notificationControl)
+        public void Initialize(NotificationControl notificationControl)
         {
             _notificationControl = notificationControl;
         }
@@ -16,7 +16,10 @@ namespace ExamSheduleDesign.Services
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
-                _notificationControl.Show(message);
+                if (_notificationControl != null)
+                    _notificationControl.Show(message);
+                else
+                    MessageBox.Show(message); // fallback
             });
         }
     }

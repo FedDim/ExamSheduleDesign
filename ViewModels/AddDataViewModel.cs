@@ -10,6 +10,7 @@ namespace ExamSheduleDesign.ViewModels
     public partial class AddDataViewModel : ObservableObject
     {
         private readonly IDataService _dataService;
+        private readonly INotificationService _notificationService;
 
         // Текущая вкладка: "Teacher", "Discipline", "Group"
         [ObservableProperty]
@@ -37,9 +38,10 @@ namespace ExamSheduleDesign.ViewModels
         public ObservableCollection<Discipline> Disciplines { get; set; }
         public ObservableCollection<Group> Groups { get; set; }
 
-        public AddDataViewModel(IDataService dataService)
+        public AddDataViewModel(IDataService dataService, INotificationService notificationService)
         {
             _dataService = dataService;
+            _notificationService = notificationService;
             LoadData();
         }
 
@@ -61,14 +63,14 @@ namespace ExamSheduleDesign.ViewModels
         {
             if (string.IsNullOrWhiteSpace(NewTeacherFullName))
             {
-                App.NotificationService.Show("Введите ФИО преподавателя.");
+                _notificationService.Show("Введите ФИО преподавателя.");
                 return;
             }
             var teacher = new Teacher { FullName = NewTeacherFullName.Trim() };
             _dataService.AddTeacher(teacher);
             Teachers.Add(teacher);
             NewTeacherFullName = "";
-            App.NotificationService.Show("Преподаватель добавлен.");
+            _notificationService.Show("Преподаватель добавлен.");
         }
 
         [RelayCommand]
@@ -76,14 +78,14 @@ namespace ExamSheduleDesign.ViewModels
         {
             if (string.IsNullOrWhiteSpace(NewDisciplineName))
             {
-                App.NotificationService.Show("Введите название дисциплины.");
+                _notificationService.Show("Введите название дисциплины.");
                 return;
             }
             var discipline = new Discipline { Name = NewDisciplineName.Trim() };
             _dataService.AddDiscipline(discipline);
             Disciplines.Add(discipline);
             NewDisciplineName = "";
-            App.NotificationService.Show("Дисциплина добавлена.");
+            _notificationService.Show("Дисциплина добавлена.");
         }
 
         [RelayCommand]
@@ -91,7 +93,7 @@ namespace ExamSheduleDesign.ViewModels
         {
             if (string.IsNullOrWhiteSpace(NewGroupName))
             {
-                App.NotificationService.Show("Введите название группы.");
+                _notificationService.Show("Введите название группы.");
                 return;
             }
             var group = new Group { Name = NewGroupName.Trim(), Department = NewGroupDepartment };
@@ -99,7 +101,7 @@ namespace ExamSheduleDesign.ViewModels
             Groups.Add(group);
             NewGroupName = "";
             NewGroupDepartment = "Информатика";
-            App.NotificationService.Show("Группа добавлена.");
+            _notificationService.Show("Группа добавлена.");
         }
     }
 }

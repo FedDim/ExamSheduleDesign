@@ -7,21 +7,23 @@ namespace ExamSheduleDesign
 {
     public partial class MainWindow : MetroWindow
     {
-        public MainWindow()
+        private readonly MainWindowViewModel _viewModel;
+
+        public MainWindow(MainWindowViewModel viewModel, INotificationService notificationService)
         {
             InitializeComponent();
-            this.DataContext = new MainWindowViewModel();
-            App.NotificationService = new NotificationService(NotificationToast);
+            _viewModel = viewModel;
+            DataContext = _viewModel;
+
+            // Передаём контрол уведомлений в сервис
+            notificationService.Initialize(NotificationToast);
         }
 
         protected override void OnPreviewKeyDown(KeyEventArgs e)
         {
             if (e.Key == Key.OemTilde && Keyboard.Modifiers == ModifierKeys.Control)
             {
-                if (DataContext is MainWindowViewModel vm)
-                {
-                    vm.IsDevMode = !vm.IsDevMode;
-                }
+                _viewModel.IsDevMode = !_viewModel.IsDevMode;
                 e.Handled = true;
             }
             base.OnPreviewKeyDown(e);

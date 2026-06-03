@@ -24,8 +24,10 @@ namespace ExamSheduleDesign.Controls
             MessageText.Text = message;
             Visibility = Visibility.Visible;
             _showStoryboard.Begin(this);
-            var timer = new System.Windows.Threading.DispatcherTimer();
-            timer.Interval = System.TimeSpan.FromSeconds(3);
+            var timer = new System.Windows.Threading.DispatcherTimer
+            {
+                Interval = System.TimeSpan.FromSeconds(3)
+            };
             timer.Tick += (s, e) =>
             {
                 timer.Stop();

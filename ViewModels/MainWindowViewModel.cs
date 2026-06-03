@@ -1,12 +1,18 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using ExamSheduleDesign.Services;
 using ExamSheduleDesign.Views;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Windows.Controls;
 
 namespace ExamSheduleDesign.ViewModels
 {
     public partial class MainWindowViewModel : ObservableObject
     {
+        private readonly IServiceProvider _serviceProvider;
+        private readonly INotificationService _notificationService;
+
         [ObservableProperty]
         private UserControl _currentPage;
 
@@ -19,12 +25,13 @@ namespace ExamSheduleDesign.ViewModels
         [ObservableProperty]
         private string _currentPageTag = "Main";
 
-        // Храним последнюю выбранную вкладку для Add и Edit
         private string _addDataTab = "Teacher";
         private string _editDataTab = "Teacher";
 
-        public MainWindowViewModel()
+        public MainWindowViewModel(IServiceProvider serviceProvider, INotificationService notificationService)
         {
+            _serviceProvider = serviceProvider;
+            _notificationService = notificationService;
             NavigateToMain();
         }
 
@@ -38,19 +45,21 @@ namespace ExamSheduleDesign.ViewModels
         [RelayCommand]
         private void NavigateToMain()
         {
-            Navigate("Main", new MainView(), "Главная");
+            var view = _serviceProvider.GetRequiredService<MainView>();
+            Navigate("Main", view, "Главная");
         }
 
         [RelayCommand]
         private void NavigateToSchedule()
         {
-            Navigate("Schedule", new ScheduleView(), "Таблица расписания");
+            var view = _serviceProvider.GetRequiredService<ScheduleView>();
+            Navigate("Schedule", view, "Таблица расписания");
         }
 
         [RelayCommand]
         private void NavigateToAdd()
         {
-            var view = new AddDataView();
+            var view = _serviceProvider.GetRequiredService<AddDataView>();
             if (view.DataContext is AddDataViewModel vm)
                 vm.CurrentTab = _addDataTab;
             Navigate("Add", view, "Добавление данных");
@@ -66,7 +75,7 @@ namespace ExamSheduleDesign.ViewModels
         [RelayCommand]
         private void NavigateToEdit()
         {
-            var view = new EditDataView();
+            var view = _serviceProvider.GetRequiredService<EditDataView>();
             if (view.DataContext is EditDataViewModel vm)
                 vm.CurrentTab = _editDataTab;
             Navigate("Edit", view, "Редактирование данных");
@@ -82,13 +91,15 @@ namespace ExamSheduleDesign.ViewModels
         [RelayCommand]
         private void NavigateToDev()
         {
-            Navigate("Dev", new DevView(), "Окно разработчика");
+            var view = _serviceProvider.GetRequiredService<DevView>();
+            Navigate("Dev", view, "Окно разработчика");
         }
 
         [RelayCommand]
         private void NavigateToSettings()
         {
-            Navigate("Settings", new SettingsView(), "Настройки");
+            var view = _serviceProvider.GetRequiredService<SettingsView>();
+            Navigate("Settings", view, "Настройки");
         }
     }
 }

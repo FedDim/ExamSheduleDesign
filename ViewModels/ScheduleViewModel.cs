@@ -12,6 +12,7 @@ namespace ExamSheduleDesign.ViewModels
     public partial class ScheduleViewModel : ObservableObject
     {
         private readonly IDataService _dataService;
+        private readonly INotificationService _notificationService;
 
         [ObservableProperty]
         private ObservableCollection<Exam> _exams;
@@ -33,9 +34,10 @@ namespace ExamSheduleDesign.ViewModels
         public ICommand SortAscendingCommand { get; }
         public ICommand SortDescendingCommand { get; }
 
-        public ScheduleViewModel(IDataService dataService)
+        public ScheduleViewModel(IDataService dataService, INotificationService notificationService)
         {
             _dataService = dataService;
+            _notificationService = notificationService;
             LoadExams();
 
             SortAscendingCommand = new RelayCommand(() => { IsSortAscending = true; ApplySort(); });
@@ -103,7 +105,7 @@ namespace ExamSheduleDesign.ViewModels
         [RelayCommand]
         private void CreateScheduleFile()
         {
-            App.NotificationService.Show("Создание файла расписания (будет реализовано позже)");
+            _notificationService.Show("Создание файла расписания (будет реализовано позже)");
         }
     }
 }
