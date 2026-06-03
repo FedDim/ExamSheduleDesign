@@ -85,12 +85,12 @@
 
                     <StackPanel Style="{StaticResource FormGroupStyle}">
                         <TextBlock Style="{StaticResource FormLabelStyle}">Преподаватель</TextBlock>
-                        <ComboBox ItemsSource="{Binding TeacherListForCombo}" SelectedItem="{Binding SelectedTeacher1}" DisplayMemberPath="FullName" Width="250" HorizontalAlignment="Left"/>
+                        <ComboBox ItemsSource="{Binding TeacherListForCombo}" SelectedItem="{Binding SelectedTeacher1}" DisplayMemberPath="Name" Width="250" HorizontalAlignment="Left"/>
                     </StackPanel>
 
                     <StackPanel Style="{StaticResource FormGroupStyle}">
                         <TextBlock Style="{StaticResource FormLabelStyle}">Преподаватель 2</TextBlock>
-                        <ComboBox ItemsSource="{Binding TeacherListForCombo}" SelectedItem="{Binding SelectedTeacher2}" DisplayMemberPath="FullName" Width="250" HorizontalAlignment="Left"/>
+                        <ComboBox ItemsSource="{Binding TeacherListForCombo}" SelectedItem="{Binding SelectedTeacher2}" DisplayMemberPath="Name" Width="250" HorizontalAlignment="Left"/>
                     </StackPanel>
 
                     <StackPanel Style="{StaticResource FormGroupStyle}">

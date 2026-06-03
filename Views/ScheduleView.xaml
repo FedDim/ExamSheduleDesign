@@ -62,8 +62,8 @@
                     </DataGridCheckBoxColumn.ElementStyle>
                 </DataGridCheckBoxColumn>
 
-                <DataGridTextColumn Header="Преподаватель 1" Width="150" Binding="{Binding Teacher1.FullName}" CellStyle="{StaticResource DataGridCellStyle}"/>
-                <DataGridTextColumn Header="Преподаватель 2" Width="150" Binding="{Binding Teacher2.FullName}" CellStyle="{StaticResource DataGridCellStyle}"/>
+                <DataGridTextColumn Header="Преподаватель 1" Width="150" Binding="{Binding Teacher1.Name}" CellStyle="{StaticResource DataGridCellStyle}"/>
+                <DataGridTextColumn Header="Преподаватель 2" Width="150" Binding="{Binding Teacher2.Name}" CellStyle="{StaticResource DataGridCellStyle}"/>
                 <DataGridTextColumn Header="Дата" Width="100" Binding="{Binding Date, StringFormat=dd.MM.yyyy}" CellStyle="{StaticResource DataGridCellStyle}"/>
                 <DataGridTextColumn Header="Дисциплина" Width="150" Binding="{Binding Discipline.Name}" CellStyle="{StaticResource DataGridCellStyle}"/>
                 <DataGridTextColumn Header="Группа" Width="100" Binding="{Binding Group.Name}" CellStyle="{StaticResource DataGridCellStyle}"/>

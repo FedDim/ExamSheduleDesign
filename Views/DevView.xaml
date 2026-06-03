@@ -58,8 +58,8 @@
                             <GridViewColumn Header="Дата" Width="80" DisplayMemberBinding="{Binding Date, StringFormat=dd.MM.yyyy}"/>
                             <GridViewColumn Header="Время" Width="60" DisplayMemberBinding="{Binding Time}"/>
                             <GridViewColumn Header="Тип" Width="80" DisplayMemberBinding="{Binding Type}"/>
-                            <GridViewColumn Header="Преподаватель 1" Width="120" DisplayMemberBinding="{Binding Teacher1.FullName}"/>
-                            <GridViewColumn Header="Преподаватель 2" Width="120" DisplayMemberBinding="{Binding Teacher2.FullName}"/>
+                            <GridViewColumn Header="Преподаватель 1" Width="120" DisplayMemberBinding="{Binding Teacher1.Name}"/>
+                            <GridViewColumn Header="Преподаватель 2" Width="120" DisplayMemberBinding="{Binding Teacher2.Name}"/>
                             <GridViewColumn Header="Дисциплина" Width="120" DisplayMemberBinding="{Binding Discipline.Name}"/>
                             <GridViewColumn Header="Группа" Width="80" DisplayMemberBinding="{Binding Group.Name}"/>
                             <GridViewColumn Header="Аудитория" Width="70" DisplayMemberBinding="{Binding Classroom}"/>
