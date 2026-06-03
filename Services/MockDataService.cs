@@ -18,11 +18,11 @@ namespace ExamSheduleDesign.Services
             // Тестовые преподаватели
             _teachers = new List<Teacher>
             {
-                new Teacher { Id = 1, FullName = "Иванова М.С." },
-                new Teacher { Id = 2, FullName = "Петров А.В." },
-                new Teacher { Id = 3, FullName = "Сидорова Е.Н." },
-                new Teacher { Id = 4, FullName = "Козлов Д.И." },
-                new Teacher { Id = 5, FullName = "Новикова Л.П." }
+                new Teacher { Id = 1, Name = "Иванова М.С." },
+                new Teacher { Id = 2, Name = "Петров А.В." },
+                new Teacher { Id = 3, Name = "Сидорова Е.Н." },
+                new Teacher { Id = 4, Name = "Козлов Д.И." },
+                new Teacher { Id = 5, Name = "Новикова Л.П." }
             };
 
             // Тестовые дисциплины

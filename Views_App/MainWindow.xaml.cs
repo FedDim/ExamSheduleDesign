@@ -1,4 +1,5 @@
-﻿using ExamSheduleDesign.Models_App;
+﻿using ExamSheduleDesign.Models;
+using ExamSheduleDesign.Models_App;
 using ExamSheduleDesign.Utilities_App;
 using Microsoft.Win32;
 using System;
@@ -154,7 +155,7 @@ namespace ExamSheduleDesign.Views_App
             string time = TimeComboBox.SelectedItem != null ? TimeComboBox.SelectedItem.ToString().Replace("System.Windows.Controls.ComboBoxItem: ", "") : string.Empty;
             string type = TypeComboBox.SelectedItem != null ? TypeComboBox.SelectedItem.ToString().Replace("System.Windows.Controls.ComboBoxItem: ", "") : string.Empty;
 
-            string subjectName = subject?.Name;
+            string subjectName = subject?.ShortName9;
             string groupName = group?.Name;
             string cabinet = txtClassroom?.Text;
 

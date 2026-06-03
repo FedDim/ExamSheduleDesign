@@ -1,10 +1,10 @@
-﻿using ExamSheduleDesign.Models_App;
+﻿using ExamSheduleDesign.Models;
 using ExamSheduleDesign.Utilities_App;
 using System;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Input;
-using Group = ExamSheduleDesign.Models_App.Group;
+using Group = ExamSheduleDesign.Models.Group;
 
 namespace ExamSheduleDesign.Views_App
 {

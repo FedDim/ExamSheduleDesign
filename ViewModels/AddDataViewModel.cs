@@ -66,7 +66,7 @@ namespace ExamSheduleDesign.ViewModels
                 _notificationService.Show("Введите ФИО преподавателя.");
                 return;
             }
-            var teacher = new Teacher { FullName = NewTeacherFullName.Trim() };
+            var teacher = new Teacher { Name = NewTeacherFullName.Trim() };
             _dataService.AddTeacher(teacher);
             Teachers.Add(teacher);
             NewTeacherFullName = "";

@@ -64,8 +64,8 @@ namespace ExamSheduleDesign.ViewModels
 
             var sorted = SortColumn switch
             {
-                "Teacher1" => IsSortAscending ? Exams.OrderBy(e => e.Teacher1?.FullName) : Exams.OrderByDescending(e => e.Teacher1?.FullName),
-                "Teacher2" => IsSortAscending ? Exams.OrderBy(e => e.Teacher2?.FullName) : Exams.OrderByDescending(e => e.Teacher2?.FullName),
+                "Teacher1" => IsSortAscending ? Exams.OrderBy(e => e.Teacher1?.Name) : Exams.OrderByDescending(e => e.Teacher1?.Name),
+                "Teacher2" => IsSortAscending ? Exams.OrderBy(e => e.Teacher2?.Name) : Exams.OrderByDescending(e => e.Teacher2?.Name),
                 "Date" => IsSortAscending ? Exams.OrderBy(e => e.Date) : Exams.OrderByDescending(e => e.Date),
                 "Discipline" => IsSortAscending ? Exams.OrderBy(e => e.Discipline?.Name) : Exams.OrderByDescending(e => e.Discipline?.Name),
                 "Group" => IsSortAscending ? Exams.OrderBy(e => e.Group?.Name) : Exams.OrderByDescending(e => e.Group?.Name),
