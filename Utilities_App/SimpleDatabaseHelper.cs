@@ -7,7 +7,7 @@ using System.Data.SQLite;
 using System.IO;
 using System.Windows;
 
-namespace ExamScheduleApp.Utilities_App
+namespace ExamSheduleDesign.Utilities_App
 {
     public class SimpleDatabaseHelper
     {
