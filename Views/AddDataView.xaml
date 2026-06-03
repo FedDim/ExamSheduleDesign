@@ -157,7 +157,7 @@
                               Style="{StaticResource DataGridStyle}" Margin="0,0,0,12">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="ID" Width="50" Binding="{Binding Id}" IsReadOnly="True"/>
-                            <DataGridTextColumn Header="Название" Width="*" Binding="{Binding Name}" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="Название" Width="*" Binding="{Binding FullName}" IsReadOnly="True"/>
                         </DataGrid.Columns>
                     </DataGrid>
 

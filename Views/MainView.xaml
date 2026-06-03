@@ -95,7 +95,7 @@
 
                     <StackPanel Style="{StaticResource FormGroupStyle}">
                         <TextBlock Style="{StaticResource FormLabelStyle}">Дисциплина</TextBlock>
-                        <ComboBox ItemsSource="{Binding Disciplines}" SelectedItem="{Binding SelectedDiscipline}" DisplayMemberPath="Name" Width="250" HorizontalAlignment="Left"/>
+                        <ComboBox ItemsSource="{Binding Disciplines}" SelectedItem="{Binding SelectedDiscipline}" DisplayMemberPath="FullName" Width="250" HorizontalAlignment="Left"/>
                     </StackPanel>
 
                     <StackPanel Style="{StaticResource FormGroupStyle}">

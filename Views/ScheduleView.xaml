@@ -65,7 +65,7 @@
                 <DataGridTextColumn Header="Преподаватель 1" Width="150" Binding="{Binding Teacher1.Name}" CellStyle="{StaticResource DataGridCellStyle}"/>
                 <DataGridTextColumn Header="Преподаватель 2" Width="150" Binding="{Binding Teacher2.Name}" CellStyle="{StaticResource DataGridCellStyle}"/>
                 <DataGridTextColumn Header="Дата" Width="100" Binding="{Binding Date, StringFormat=dd.MM.yyyy}" CellStyle="{StaticResource DataGridCellStyle}"/>
-                <DataGridTextColumn Header="Дисциплина" Width="150" Binding="{Binding Discipline.Name}" CellStyle="{StaticResource DataGridCellStyle}"/>
+                <DataGridTextColumn Header="Дисциплина" Width="150" Binding="{Binding Discipline.FullName}" CellStyle="{StaticResource DataGridCellStyle}"/>
                 <DataGridTextColumn Header="Группа" Width="100" Binding="{Binding Group.Name}" CellStyle="{StaticResource DataGridCellStyle}"/>
                 <DataGridTextColumn Header="Отделение" Width="100" Binding="{Binding Group.Department}" CellStyle="{StaticResource DataGridCellStyle}"/>
                 <DataGridTextColumn Header="Время" Width="80" Binding="{Binding Time}" CellStyle="{StaticResource DataGridCellStyle}"/>
