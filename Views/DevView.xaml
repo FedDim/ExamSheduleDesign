@@ -45,6 +45,10 @@
                 <TextBlock>Преподавателей: <Run Text="{Binding TeachersCount, Mode=OneWay}"/></TextBlock>
                 <TextBlock>Дисциплин: <Run Text="{Binding DisciplinesCount, Mode=OneWay}"/></TextBlock>
                 <TextBlock>Групп: <Run Text="{Binding GroupsCount, Mode=OneWay}"/></TextBlock>
+
+                <Button Content="Тест загрузки экзаменов" Command="{Binding TestLoadExamsCommand}" 
+        Style="{StaticResource SecondaryButtonStyle}" Margin="0,12,0,0"/>
+                
             </StackPanel>
         </Border>
 

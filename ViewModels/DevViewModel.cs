@@ -14,6 +14,9 @@ namespace ExamSheduleDesign.ViewModels
     {
         private readonly IDataService _dataService;
 
+        private readonly SqlDataService _sqlDataService;
+        private readonly INotificationService _notificationService;
+
         [ObservableProperty]
         private int _generationCount = 10;
 
@@ -26,10 +29,12 @@ namespace ExamSheduleDesign.ViewModels
         [ObservableProperty]
         private ObservableCollection<Exam> _generatedExams;
 
-        public DevViewModel(IDataService dataService)
+        public DevViewModel(IDataService dataService, SqlDataService sqlDataService, INotificationService notificationService)
         {
             _dataService = dataService;
             RefreshGeneratedList();
+            _sqlDataService = sqlDataService;
+            _notificationService = notificationService;
         }
 
         private void RefreshGeneratedList()
@@ -39,6 +44,21 @@ namespace ExamSheduleDesign.ViewModels
             var lastExams = allExams.Skip(Math.Max(0, allExams.Count - 50)).ToList();
             GeneratedExams = new ObservableCollection<Exam>(lastExams);
         }
+
+        [RelayCommand]
+        private async Task TestLoadExamsAsync()
+        {
+            try
+            {
+                var exams = await _sqlDataService.GetAllExamsWithDetailsAsync();
+                _notificationService.Show($"Загружено экзаменов: {exams.Count}");
+            }
+            catch (Exception ex)
+            {
+                _notificationService.Show($"Ошибка: {ex.Message}");
+            }
+        }
+
 
         [RelayCommand]
         private async Task GenerateAsync()

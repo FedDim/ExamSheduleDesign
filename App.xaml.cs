@@ -31,6 +31,9 @@ namespace ExamSheduleDesign
             services.AddSingleton<IDisciplineRepository, DisciplineRepository>();
             services.AddSingleton<IGroupRepository, GroupRepository>();
 
+            services.AddSingleton<IExamRepository, ExamRepository>();
+            services.AddSingleton<SqlDataService>();
+
             // ViewModels
             services.AddTransient<MainWindowViewModel>();
             services.AddTransient<MainViewModel>();
