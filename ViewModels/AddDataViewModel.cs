@@ -81,7 +81,7 @@ namespace ExamSheduleDesign.ViewModels
                 _notificationService.Show("Введите название дисциплины.");
                 return;
             }
-            var discipline = new Discipline { Name = NewDisciplineName.Trim() };
+            var discipline = new Discipline { FullName = NewDisciplineName.Trim() };
             _dataService.AddDiscipline(discipline);
             Disciplines.Add(discipline);
             NewDisciplineName = "";

@@ -26,7 +26,7 @@ namespace ExamSheduleDesign.Views_App
 
             switch (_dataType)
             {
-                case DataType.SUBJECT:
+                case DataType.DISCIPLINE:
                     AddTextBlock.Text = $"Введите Предмет";
                     break;
                 case DataType.GROUP:
@@ -78,7 +78,7 @@ namespace ExamSheduleDesign.Views_App
             {
                 switch (_dataType)
                 {
-                    case DataType.SUBJECT:
+                    case DataType.DISCIPLINE:
                         if (dbHelper.SubjectExists(data))
                         {
                             MessageBox.Show("Такая дисциплина уже существует!", "Информация",
@@ -86,12 +86,12 @@ namespace ExamSheduleDesign.Views_App
                             return;
                         }
 
-                        Subject subject = new()
+                        Discipline subject = new()
                         {
                             ShortName9 = data.Trim()
                             // Остальные поля заполнятся автоматически в методе AddSubject
                         };
-                        dbHelper.AddSubject(subject);
+                        dbHelper.AddDiscipline(subject);
                         break;
 
                     case DataType.GROUP:
@@ -191,7 +191,7 @@ namespace ExamSheduleDesign.Views_App
                 case DataType.GROUP:
                     return "групп";
 
-                case DataType.SUBJECT:
+                case DataType.DISCIPLINE:
                     return "дисциплин";
 
                 default:

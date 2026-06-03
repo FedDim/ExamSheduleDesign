@@ -19,7 +19,7 @@ namespace ExamSheduleDesign.Views_App
         private SimpleDatabaseHelper _dbHelper;
 
         private ObservableCollection<Teacher> _teachers;
-        private ObservableCollection<Subject> _subjects;
+        private ObservableCollection<Discipline> _disciplines;
         private ObservableCollection<Group> _groups;
 
         public EditWindow(DataType dataType)
@@ -31,7 +31,7 @@ namespace ExamSheduleDesign.Views_App
 
             switch (_dataType)
             {
-                case DataType.SUBJECT:
+                case DataType.DISCIPLINE:
                     LoadSubjects();
                     break;
                 case DataType.GROUP:
@@ -71,8 +71,8 @@ namespace ExamSheduleDesign.Views_App
         {
             try
             {
-                var subjects = _dbHelper.GetSubjects();
-                _subjects = new ObservableCollection<Subject>(subjects);
+                var disciplines = _dbHelper.GetDisciplines();
+                _disciplines = new ObservableCollection<Discipline>(disciplines);
 
                 Width = 700;
                 Height = 400;
@@ -83,9 +83,9 @@ namespace ExamSheduleDesign.Views_App
                 CreateTextColumn("Сокр. (12)", "ShortName12", 100);
                 CreateTextColumn("Сокр. (9)", "ShortName9", 100);
                 CreateTextColumn("Сокр. (5)", "ShortName5", 80);
-                CreateActionColumn("Действия", 100, new RoutedEventHandler(DeleteSubject_Click));
+                CreateActionColumn("Действия", 100, new RoutedEventHandler(DeleteDiscipline_Click));
 
-                EditDataGrid.ItemsSource = _subjects;
+                EditDataGrid.ItemsSource = _disciplines;
             }
             catch (Exception ex)
             {
@@ -218,12 +218,12 @@ namespace ExamSheduleDesign.Views_App
             }
         }
 
-        private void DeleteSubject_Click(object sender, RoutedEventArgs e)
+        private void DeleteDiscipline_Click(object sender, RoutedEventArgs e)
         {
-            var subject = (Subject)((FrameworkElement)sender).DataContext;
+            var discipline = (Discipline)((FrameworkElement)sender).DataContext;
 
             var result = MessageBox.Show(
-                $"Вы действительно хотите удалить дисциплину {subject.ShortName9}?",
+                $"Вы действительно хотите удалить дисциплину {discipline.ShortName9}?",
                 "Подтверждение удаления",
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Question);
@@ -232,8 +232,8 @@ namespace ExamSheduleDesign.Views_App
             {
                 try
                 {
-                    _dbHelper.DeleteSubject(subject.Id);
-                    _subjects.Remove(subject);
+                    _dbHelper.DeleteSubject(discipline.Id);
+                    _disciplines.Remove(discipline);
                     MessageBox.Show("Дисциплина удалена!");
                 }
                 catch (Exception ex)
@@ -257,12 +257,12 @@ namespace ExamSheduleDesign.Views_App
         {
             switch (_dataType)
             {
-                case DataType.SUBJECT:
+                case DataType.DISCIPLINE:
                     try
                     {
-                        foreach (var subject in _subjects)
+                        foreach (var discipline in _disciplines)
                         {
-                            _dbHelper.UpdateSubject(subject);
+                            _dbHelper.UpdateDiscipline(discipline);
                         }
                         MessageBox.Show("Изменения сохранены!");
                     }

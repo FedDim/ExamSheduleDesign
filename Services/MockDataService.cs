@@ -28,10 +28,10 @@ namespace ExamSheduleDesign.Services
             // Тестовые дисциплины
             _disciplines = new List<Discipline>
             {
-                new Discipline { Id = 1, Name = "Математический анализ" },
-                new Discipline { Id = 2, Name = "Программирование" },
-                new Discipline { Id = 3, Name = "Физика" },
-                new Discipline { Id = 4, Name = "Базы данных" }
+                new Discipline { Id = 1, FullName = "Математический анализ" },
+                new Discipline { Id = 2, FullName = "Программирование" },
+                new Discipline { Id = 3, FullName = "Физика" },
+                new Discipline { Id = 4, FullName = "Базы данных" }
             };
 
             // Тестовые группы

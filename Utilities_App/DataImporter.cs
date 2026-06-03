@@ -6,14 +6,6 @@ using System.IO;
 
 namespace ExamSheduleDesign.Utilities_App
 {
-    public enum DataType
-    {
-        NULL,
-        SUBJECT,
-        GROUP,
-        TEACHER
-    }
-
     public class ImportResult
     {
         public int Added { get; set; }
@@ -70,7 +62,7 @@ namespace ExamSheduleDesign.Utilities_App
                                 case DataType.GROUP:
                                     ImportGroup(row, result);
                                     break;
-                                case DataType.SUBJECT:
+                                case DataType.DISCIPLINE:
                                     ImportSubject(row, result);
                                     break;
                             }
@@ -147,7 +139,7 @@ namespace ExamSheduleDesign.Utilities_App
                 return;
             }
 
-            var subject = new Subject
+            var subject = new Discipline
             {
                 ShortName9 = shortName9,
                 FullName = row.Cell(2).GetString().Trim(),
@@ -155,7 +147,7 @@ namespace ExamSheduleDesign.Utilities_App
                 ShortName5 = row.Cell(4).GetString().Trim()
             };
 
-            _db.AddSubject(subject);
+            _db.AddDiscipline(subject);
             result.Added++;
         }
     }

@@ -67,7 +67,7 @@ namespace ExamSheduleDesign.ViewModels
                 "Teacher1" => IsSortAscending ? Exams.OrderBy(e => e.Teacher1?.Name) : Exams.OrderByDescending(e => e.Teacher1?.Name),
                 "Teacher2" => IsSortAscending ? Exams.OrderBy(e => e.Teacher2?.Name) : Exams.OrderByDescending(e => e.Teacher2?.Name),
                 "Date" => IsSortAscending ? Exams.OrderBy(e => e.Date) : Exams.OrderByDescending(e => e.Date),
-                "Discipline" => IsSortAscending ? Exams.OrderBy(e => e.Discipline?.Name) : Exams.OrderByDescending(e => e.Discipline?.Name),
+                "Discipline" => IsSortAscending ? Exams.OrderBy(e => e.Discipline?.FullName) : Exams.OrderByDescending(e => e.Discipline?.FullName),
                 "Group" => IsSortAscending ? Exams.OrderBy(e => e.Group?.Name) : Exams.OrderByDescending(e => e.Group?.Name),
                 "Time" => IsSortAscending ? Exams.OrderBy(e => e.Time) : Exams.OrderByDescending(e => e.Time),
                 "Classroom" => IsSortAscending ? Exams.OrderBy(e => e.Classroom) : Exams.OrderByDescending(e => e.Classroom),

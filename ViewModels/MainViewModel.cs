@@ -84,7 +84,7 @@ namespace ExamSheduleDesign.ViewModels
             };
 
             _dataService.AddExam(exam);
-            _notificationService.Show($"Экзамен добавлен!\n{SelectedDiscipline.Name}, {SelectedGroup.Name}, {SelectedDate:dd.MM.yyyy}");
+            _notificationService.Show($"Экзамен добавлен!\n{SelectedDiscipline.FullName}, {SelectedGroup.Name}, {SelectedDate:dd.MM.yyyy}");
 
             // Очистка формы (опционально)
             SelectedTeacher1 = null;

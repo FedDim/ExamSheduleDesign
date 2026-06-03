@@ -162,9 +162,9 @@ namespace ExamSheduleDesign.Utilities_App
             return list;
         }
 
-        public List<Subject> GetSubjects()
+        public List<Discipline> GetDisciplines()
         {
-            var list = new List<Subject>();
+            var list = new List<Discipline>();
             try
             {
                 using (var conn = new SqlConnection(_serverConnectionString))
@@ -175,7 +175,7 @@ namespace ExamSheduleDesign.Utilities_App
                     {
                         while (r.Read())
                         {
-                            list.Add(new Subject
+                            list.Add(new Discipline
                             {
                                 Id = r.GetInt32(0),
                                 FullName = r.IsDBNull(1) ? "" : r.GetString(1),
@@ -335,7 +335,7 @@ namespace ExamSheduleDesign.Utilities_App
             catch (Exception ex) { Logger.Error($"DeleteTeacher {teacherId}", ex); }
         }
 
-        public void AddSubject(Subject subject)
+        public void AddDiscipline(Discipline subject)
         {
             try
             {
@@ -355,7 +355,7 @@ namespace ExamSheduleDesign.Utilities_App
             catch (Exception ex) { Logger.Error($"AddSubject {subject?.ShortName9}", ex); }
         }
 
-        public void UpdateSubject(Subject subject)
+        public void UpdateDiscipline(Discipline subject)
         {
             try
             {

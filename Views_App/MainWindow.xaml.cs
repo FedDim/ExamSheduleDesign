@@ -19,7 +19,7 @@ namespace ExamSheduleDesign.Views_App
     public partial class MainWindow : Window
     {
         private List<Teacher> _teachers;
-        private List<Subject> _subjects;
+        private List<Discipline> _disciplines;
         private List<Group> _groups;
         private ObservableCollection<ExamSchedule> _exams;
         public SimpleDatabaseHelper dbhelper = new SimpleDatabaseHelper();
@@ -60,7 +60,7 @@ namespace ExamSheduleDesign.Views_App
             {
                 // Загрузка данных из базы данных
                 _teachers = dbhelper.GetTeachers();
-                _subjects = dbhelper.GetSubjects();
+                _disciplines = dbhelper.GetDisciplines();
                 _groups = dbhelper.GetGroups();
 
                 // Проверяем, что данные загружены
@@ -70,10 +70,10 @@ namespace ExamSheduleDesign.Views_App
                     _teachers = new List<Teacher>();
                 }
 
-                if (_subjects == null || _subjects.Count == 0)
+                if (_disciplines == null || _disciplines.Count == 0)
                 {
                     MessageBox.Show("Не удалось загрузить дисциплины. Возможно, таблица пуста.");
-                    _subjects = new List<Subject>();
+                    _disciplines = new List<Discipline>();
                 }
 
                 if (_groups == null || _groups.Count == 0)
@@ -91,7 +91,7 @@ namespace ExamSheduleDesign.Views_App
                 SecondTeacherCB.DisplayMemberPath = "Name";
                 SecondTeacherCB.SelectedValuePath = "Id";
 
-                cbSubjects.ItemsSource = _subjects;
+                cbSubjects.ItemsSource = _disciplines;
                 cbSubjects.DisplayMemberPath = "ShortName9";
                 cbSubjects.SelectedValuePath = "Id";
 
@@ -102,7 +102,7 @@ namespace ExamSheduleDesign.Views_App
                 // Обновление ComboBox'ов
                 cbTeachers.ItemsSource = _teachers;
                 SecondTeacherCB.ItemsSource = _teachers;
-                cbSubjects.ItemsSource = _subjects;
+                cbSubjects.ItemsSource = _disciplines;
                 GroupComboBox.ItemsSource = _groups;
 
                 // Инициализация коллекции экзаменов
@@ -143,7 +143,7 @@ namespace ExamSheduleDesign.Views_App
             // Получаем объекты
             var teacher1 = (Teacher)cbTeachers.SelectedItem;
             var teacher2 = (Teacher)SecondTeacherCB.SelectedItem;
-            var subject = (Subject)cbSubjects.SelectedItem;
+            var discipline = (Discipline)cbSubjects.SelectedItem;
             var group = (Group)GroupComboBox.SelectedItem;
 
             string surname = teacher1?.Name;
@@ -155,7 +155,7 @@ namespace ExamSheduleDesign.Views_App
             string time = TimeComboBox.SelectedItem != null ? TimeComboBox.SelectedItem.ToString().Replace("System.Windows.Controls.ComboBoxItem: ", "") : string.Empty;
             string type = TypeComboBox.SelectedItem != null ? TypeComboBox.SelectedItem.ToString().Replace("System.Windows.Controls.ComboBoxItem: ", "") : string.Empty;
 
-            string subjectName = subject?.ShortName9;
+            string subjectName = discipline?.ShortName9;
             string groupName = group?.Name;
             string cabinet = txtClassroom?.Text;
 
@@ -174,7 +174,7 @@ namespace ExamSheduleDesign.Views_App
                 {
                     Teacher1Id = teacher1.Id,
                     Teacher2Id = teacher2?.Id,
-                    SubjectId = subject.Id,
+                    SubjectId = discipline.Id,
                     GroupId = group.Id,
                     Classroom = cabinet,
                     Teacher1Name = surname,
@@ -234,7 +234,7 @@ namespace ExamSheduleDesign.Views_App
 
         #region Добавление Данных в Файлы Data
         private void AddTeacher_Click(object sender, RoutedEventArgs e) => ShowAddWindow(DataType.TEACHER);
-        private void AddSubject_Click(object sender, RoutedEventArgs e) => ShowAddWindow(DataType.SUBJECT);
+        private void AddSubject_Click(object sender, RoutedEventArgs e) => ShowAddWindow(DataType.DISCIPLINE);
         private void AddGroup_Click(object sender, RoutedEventArgs e) => ShowAddWindow(DataType.GROUP);
         private void ShowAddWindow(DataType dataType)
         {
@@ -251,9 +251,9 @@ namespace ExamSheduleDesign.Views_App
                     cbTeachers.ItemsSource = _teachers;
                     SecondTeacherCB.ItemsSource = _teachers;
                     break;
-                case DataType.SUBJECT:
-                    _subjects = dbhelper.GetSubjects();
-                    cbSubjects.ItemsSource = _subjects;
+                case DataType.DISCIPLINE:
+                    _disciplines = dbhelper.GetDisciplines();
+                    cbSubjects.ItemsSource = _disciplines;
                     break;
                 case DataType.GROUP:
                     _groups = dbhelper.GetGroups();
@@ -272,8 +272,8 @@ namespace ExamSheduleDesign.Views_App
 
         private void EditSubjects_Click(object sender, RoutedEventArgs e)
         {
-            var window = new EditWindow(DataType.SUBJECT);
-            window.Closed += (s, args) => RefreshData(DataType.SUBJECT); // Обновляем данные после закрытия окна
+            var window = new EditWindow(DataType.DISCIPLINE);
+            window.Closed += (s, args) => RefreshData(DataType.DISCIPLINE); // Обновляем данные после закрытия окна
             window.ShowDialog();
         }
 
@@ -560,7 +560,7 @@ namespace ExamSheduleDesign.Views_App
                         // Ищем преподавателей, дисциплину и группу в БД
                         var teacher1 = _teachers.FirstOrDefault(t => t.Name == teacher1Name);
                         var teacher2 = string.IsNullOrEmpty(teacher2Name) ? null : _teachers.FirstOrDefault(t => t.Name == teacher2Name);
-                        var subject = _subjects.FirstOrDefault(s => s.ShortName9 == subjectName);
+                        var subject = _disciplines.FirstOrDefault(s => s.ShortName9 == subjectName);
                         var group = _groups.FirstOrDefault(g => g.Name == groupName);
 
                         // Проверяем наличие необходимых данных

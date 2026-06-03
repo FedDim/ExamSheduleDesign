@@ -1,4 +1,5 @@
-﻿using ExamSheduleDesign.Services;
+﻿using ExamSheduleDesign.Repositories;
+using ExamSheduleDesign.Services;
 using ExamSheduleDesign.Services.Interfaces;
 using ExamSheduleDesign.Services.Logging;
 using ExamSheduleDesign.ViewModels;
@@ -25,6 +26,10 @@ namespace ExamSheduleDesign
 
             services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>();
             services.AddSingleton<IAppLogger, FileLogger>();
+
+            services.AddSingleton<ITeacherRepository, TeacherRepository>();
+            services.AddSingleton<IDisciplineRepository, DisciplineRepository>();
+            services.AddSingleton<IGroupRepository, GroupRepository>();
 
             // ViewModels
             services.AddTransient<MainWindowViewModel>();

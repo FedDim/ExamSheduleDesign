@@ -39,7 +39,7 @@ namespace ExamSheduleDesign.Views_App
             {
                 // Получаем данные из базы
                 var teachers = _dbHelper.GetTeachers();
-                var subjects = _dbHelper.GetSubjects();
+                var subjects = _dbHelper.GetDisciplines();
                 var groups = _dbHelper.GetGroups();
 
                 if (teachers.Count == 0 || subjects.Count == 0 || groups.Count == 0)
