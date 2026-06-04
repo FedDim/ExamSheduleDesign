@@ -81,12 +81,16 @@ namespace ExamSheduleDesign.Repositories
             {
                 using var conn = _connectionFactory.CreateServerConnection();
                 await conn.OpenAsync();
-                const string sql = "INSERT INTO Groups (Name, Department) VALUES (@name, @dept)";
+                const string sql = @"
+            INSERT INTO Groups (Name, Department) 
+            VALUES (@name, @dept);
+            SELECT SCOPE_IDENTITY();";
                 using var cmd = new SqlCommand(sql, conn);
                 cmd.Parameters.AddWithValue("@name", group.Name);
                 cmd.Parameters.AddWithValue("@dept", group.Department ?? "");
-                await cmd.ExecuteNonQueryAsync();
-                _logger.Info($"Добавлена группа: {group.Name}");
+                var newId = Convert.ToInt32(await cmd.ExecuteScalarAsync());
+                group.Id = newId;
+                _logger.Info($"Добавлена группа: {group.Name} с ID {newId}");
             }
             catch (Exception ex)
             {

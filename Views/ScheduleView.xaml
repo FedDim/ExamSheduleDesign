@@ -88,8 +88,9 @@
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                     <TextBlock Text="Выбрано:" VerticalAlignment="Center" Margin="0,0,8,0"/>
                     <TextBlock Text="{Binding SelectedCount}" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,16,0"/>
-                    <Button Content="Удалить экзамен" Command="{Binding DeleteSelectedCommand}" Style="{StaticResource DangerButtonStyle}" 
-                            IsEnabled="{Binding SelectedCount, Converter={StaticResource BooleanConverter}}"/>
+                    <Button Content="Удалить экзамен" Command="{Binding DeleteSelectedCommand}" 
+                        Style="{StaticResource DangerButtonStyle}" 
+                        IsEnabled="{Binding SelectedCount, Converter={StaticResource BooleanConverter}}"/>
                 </StackPanel>
                 <Button Content="Создать файл расписания" Command="{Binding CreateScheduleFileCommand}" Style="{StaticResource PrimaryButtonStyle}" HorizontalAlignment="Right"/>
             </Grid>

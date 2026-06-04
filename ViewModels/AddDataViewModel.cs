@@ -12,7 +12,6 @@ namespace ExamSheduleDesign.ViewModels
     public partial class AddDataViewModel : ObservableObject
     {
         private readonly IDataService _dataService;
-        private readonly SqlDataService _sqlDataService;
         private readonly INotificationService _notificationService;
 
         [ObservableProperty]
@@ -36,10 +35,9 @@ namespace ExamSheduleDesign.ViewModels
         public ObservableCollection<Discipline> Disciplines { get; set; } = new();
         public ObservableCollection<Group> Groups { get; set; } = new();
 
-        public AddDataViewModel(IDataService dataService, SqlDataService sqlDataService, INotificationService notificationService)
+        public AddDataViewModel(IDataService dataService, INotificationService notificationService)
         {
             _dataService = dataService;
-            _sqlDataService = sqlDataService;
             _notificationService = notificationService;
         }
 
@@ -47,9 +45,9 @@ namespace ExamSheduleDesign.ViewModels
         {
             try
             {
-                var teachers = await _sqlDataService.GetTeachersAsync();
-                var disciplines = await _sqlDataService.GetDisciplinesAsync();
-                var groups = await _sqlDataService.GetGroupsAsync();
+                var teachers = await _dataService.GetTeachersAsync();
+                var disciplines = await _dataService.GetDisciplinesAsync();
+                var groups = await _dataService.GetGroupsAsync();
 
                 Teachers.Clear();
                 Disciplines.Clear();
@@ -69,7 +67,7 @@ namespace ExamSheduleDesign.ViewModels
         private void SwitchTab(string tab) => CurrentTab = tab;
 
         [RelayCommand]
-        private void AddTeacher()
+        private async Task AddTeacherAsync()
         {
             if (string.IsNullOrWhiteSpace(NewTeacherFullName))
             {
@@ -77,14 +75,14 @@ namespace ExamSheduleDesign.ViewModels
                 return;
             }
             var teacher = new Teacher { Name = NewTeacherFullName.Trim() };
-            _dataService.AddTeacher(teacher);
+            await _dataService.AddTeacherAsync(teacher);
             Teachers.Add(teacher);
             NewTeacherFullName = "";
             _notificationService.Show("Преподаватель добавлен.");
         }
 
         [RelayCommand]
-        private void AddDiscipline()
+        private async Task AddDisciplineAsync()
         {
             if (string.IsNullOrWhiteSpace(NewDisciplineName))
             {
@@ -92,14 +90,14 @@ namespace ExamSheduleDesign.ViewModels
                 return;
             }
             var discipline = new Discipline { FullName = NewDisciplineName.Trim() };
-            _dataService.AddDiscipline(discipline);
+            await _dataService.AddDisciplineAsync(discipline);
             Disciplines.Add(discipline);
             NewDisciplineName = "";
             _notificationService.Show("Дисциплина добавлена.");
         }
 
         [RelayCommand]
-        private void AddGroup()
+        private async Task AddGroupAsync()
         {
             if (string.IsNullOrWhiteSpace(NewGroupName))
             {
@@ -107,7 +105,7 @@ namespace ExamSheduleDesign.ViewModels
                 return;
             }
             var group = new Group { Name = NewGroupName.Trim(), Department = NewGroupDepartment };
-            _dataService.AddGroup(group);
+            await _dataService.AddGroupAsync(group);
             Groups.Add(group);
             NewGroupName = "";
             NewGroupDepartment = "Информатика";

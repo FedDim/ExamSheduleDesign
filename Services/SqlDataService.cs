@@ -31,7 +31,7 @@ namespace ExamSheduleDesign.Services
             _notificationService = notificationService;
         }
 
-        // ========== Асинхронные методы для вызова из ViewModel ==========
+        // Асинхронные методы
         public async Task<List<Teacher>> GetTeachersAsync()
         {
             if (_serverAvailable == false) return new List<Teacher>();
@@ -129,13 +129,7 @@ namespace ExamSheduleDesign.Services
             }
         }
 
-        // ========== Синхронные методы для IDataService (обёртки через Task.Run) ==========
-        public List<Teacher> GetTeachers() => Task.Run(GetTeachersAsync).Result;
-        public List<Discipline> GetDisciplines() => Task.Run(GetDisciplinesAsync).Result;
-        public List<Group> GetGroups() => Task.Run(GetGroupsAsync).Result;
-        public List<Exam> GetExams() => Task.Run(GetExamsAsync).Result;
-
-        public void AddExam(Exam exam)
+        public async Task AddExamAsync(Exam exam)
         {
             try
             {
@@ -151,126 +145,126 @@ namespace ExamSheduleDesign.Services
                     ExamTime = exam.Time,
                     ExamType = exam.Type
                 };
-                _examRepo.AddAsync(dto).Wait();
+                await _examRepo.AddAsync(dto);
             }
             catch (Exception ex)
             {
-                _logger.Error($"AddExam failed: {ex.Message}", ex);
+                _logger.Error($"AddExamAsync failed: {ex.Message}", ex);
                 _notificationService.Show("Ошибка при сохранении экзамена.");
             }
         }
 
-        public void RemoveExams(IEnumerable<Exam> exams)
+        public async Task RemoveExamsAsync(IEnumerable<Exam> exams)
         {
             foreach (var exam in exams)
             {
                 try
                 {
                     if (exam.Id > 0)
-                        _examRepo.DeleteAsync(exam.Id).Wait();
+                        await _examRepo.DeleteAsync(exam.Id);
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error($"RemoveExam {exam.Id} failed", ex);
+                    _logger.Error($"RemoveExamAsync {exam.Id} failed", ex);
                     _notificationService.Show("Ошибка при удалении экзамена.");
                 }
             }
         }
 
-        public void AddTeacher(Teacher teacher)
+        public async Task AddTeacherAsync(Teacher teacher)
         {
             try
             {
-                _teacherRepo.AddAsync(teacher).Wait();
+                await _teacherRepo.AddAsync(teacher);
             }
             catch (Exception ex)
             {
-                _logger.Error($"AddTeacher failed: {ex.Message}", ex);
+                _logger.Error($"AddTeacherAsync failed: {ex.Message}", ex);
                 _notificationService.Show("Ошибка при добавлении преподавателя.");
             }
         }
 
-        public void AddDiscipline(Discipline discipline)
+        public async Task AddDisciplineAsync(Discipline discipline)
         {
             try
             {
-                _disciplineRepo.AddAsync(discipline).Wait();
+                await _disciplineRepo.AddAsync(discipline);
             }
             catch (Exception ex)
             {
-                _logger.Error($"AddDiscipline failed: {ex.Message}", ex);
+                _logger.Error($"AddDisciplineAsync failed: {ex.Message}", ex);
                 _notificationService.Show("Ошибка при добавлении дисциплины.");
             }
         }
 
-        public void AddGroup(Group group)
+        public async Task AddGroupAsync(Group group)
         {
             try
             {
-                _groupRepo.AddAsync(group).Wait();
+                await _groupRepo.AddAsync(group);
             }
             catch (Exception ex)
             {
-                _logger.Error($"AddGroup failed: {ex.Message}", ex);
+                _logger.Error($"AddGroupAsync failed: {ex.Message}", ex);
                 _notificationService.Show("Ошибка при добавлении группы.");
             }
         }
 
-        public void UpdateTeachers(IEnumerable<Teacher> updatedTeachers)
+        public async Task UpdateTeachersAsync(IEnumerable<Teacher> updatedTeachers)
         {
             foreach (var teacher in updatedTeachers)
             {
                 try
                 {
-                    _teacherRepo.UpdateAsync(teacher).Wait();
+                    await _teacherRepo.UpdateAsync(teacher);
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error($"UpdateTeacher {teacher.Id} failed", ex);
+                    _logger.Error($"UpdateTeacherAsync {teacher.Id} failed", ex);
                     _notificationService.Show("Ошибка при обновлении преподавателя.");
                 }
             }
         }
 
-        public void UpdateDisciplines(IEnumerable<Discipline> updatedDisciplines)
+        public async Task UpdateDisciplinesAsync(IEnumerable<Discipline> updatedDisciplines)
         {
             foreach (var discipline in updatedDisciplines)
             {
                 try
                 {
-                    _disciplineRepo.UpdateAsync(discipline).Wait();
+                    await _disciplineRepo.UpdateAsync(discipline);
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error($"UpdateDiscipline {discipline.Id} failed", ex);
+                    _logger.Error($"UpdateDisciplineAsync {discipline.Id} failed", ex);
                     _notificationService.Show("Ошибка при обновлении дисциплины.");
                 }
             }
         }
 
-        public void UpdateGroups(IEnumerable<Group> updatedGroups)
+        public async Task UpdateGroupsAsync(IEnumerable<Group> updatedGroups)
         {
             foreach (var group in updatedGroups)
             {
                 try
                 {
-                    _groupRepo.UpdateAsync(group).Wait();
+                    await _groupRepo.UpdateAsync(group);
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error($"UpdateGroup {group.Id} failed", ex);
+                    _logger.Error($"UpdateGroupAsync {group.Id} failed", ex);
                     _notificationService.Show("Ошибка при обновлении группы.");
                 }
             }
         }
 
-        public void GenerateExams(int count)
+        public async Task GenerateExamsAsync(int count)
         {
             try
             {
-                var teachers = GetTeachers();
-                var disciplines = GetDisciplines();
-                var groups = GetGroups();
+                var teachers = await GetTeachersAsync();
+                var disciplines = await GetDisciplinesAsync();
+                var groups = await GetGroupsAsync();
                 if (teachers.Count == 0 || disciplines.Count == 0 || groups.Count == 0)
                 {
                     _notificationService.Show("Невозможно сгенерировать экзамены: отсутствуют справочные данные (проверьте подключение к серверу).");
@@ -297,36 +291,37 @@ namespace ExamSheduleDesign.Services
                         Classroom = rooms[random.Next(rooms.Length)],
                         IsSelected = false
                     };
-                    AddExam(exam);
+                    await AddExamAsync(exam);
                 }
                 _notificationService.Show($"Сгенерировано {count} экзаменов.");
             }
             catch (Exception ex)
             {
-                _logger.Error("GenerateExams failed", ex);
+                _logger.Error("GenerateExamsAsync failed", ex);
                 _notificationService.Show("Ошибка при генерации экзаменов.");
             }
         }
 
-        public void ClearGeneratedExams()
+        public async Task ClearGeneratedExamsAsync()
         {
             try
             {
-                _examRepo.DeleteAllAsync().Wait();
+                await _examRepo.DeleteAllAsync();
                 _notificationService.Show("Все экзамены удалены.");
             }
             catch (Exception ex)
             {
-                _logger.Error("ClearGeneratedExams failed", ex);
+                _logger.Error("ClearGeneratedExamsAsync failed", ex);
                 _notificationService.Show("Ошибка при очистке экзаменов.");
             }
         }
 
-        public int GetGeneratedExamsCount()
+        public async Task<int> GetGeneratedExamsCountAsync()
         {
             try
             {
-                return _examRepo.GetAllRawAsync().Result.Count;
+                var list = await _examRepo.GetAllRawAsync();
+                return list.Count;
             }
             catch
             {

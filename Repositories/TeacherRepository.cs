@@ -83,13 +83,17 @@ namespace ExamSheduleDesign.Repositories
             {
                 using var conn = _connectionFactory.CreateServerConnection();
                 await conn.OpenAsync();
-                const string sql = "INSERT INTO Teachers (Name, Classroom, AcademicBuilding) VALUES (@name, @classroom, @building)";
+                const string sql = @"
+            INSERT INTO Teachers (Name, Classroom, AcademicBuilding) 
+            VALUES (@name, @classroom, @building);
+            SELECT SCOPE_IDENTITY();";
                 using var cmd = new SqlCommand(sql, conn);
                 cmd.Parameters.AddWithValue("@name", teacher.Name);
                 cmd.Parameters.AddWithValue("@classroom", teacher.Classroom ?? "");
                 cmd.Parameters.AddWithValue("@building", teacher.AcademicBuilding);
-                await cmd.ExecuteNonQueryAsync();
-                _logger.Info($"Добавлен преподаватель: {teacher.Name}");
+                var newId = Convert.ToInt32(await cmd.ExecuteScalarAsync());
+                teacher.Id = newId;
+                _logger.Info($"Добавлен преподаватель: {teacher.Name} с ID {newId}");
             }
             catch (Exception ex)
             {

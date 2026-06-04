@@ -11,7 +11,6 @@ namespace ExamSheduleDesign.ViewModels
     public partial class EditDataViewModel : ObservableObject
     {
         private readonly IDataService _dataService;
-        private readonly SqlDataService _sqlDataService;
         private readonly INotificationService _notificationService;
 
         [ObservableProperty]
@@ -21,10 +20,9 @@ namespace ExamSheduleDesign.ViewModels
         public ObservableCollection<Discipline> Disciplines { get; set; } = new();
         public ObservableCollection<Group> Groups { get; set; } = new();
 
-        public EditDataViewModel(IDataService dataService, SqlDataService sqlDataService, INotificationService notificationService)
+        public EditDataViewModel(IDataService dataService, INotificationService notificationService)
         {
             _dataService = dataService;
-            _sqlDataService = sqlDataService;
             _notificationService = notificationService;
         }
 
@@ -32,9 +30,9 @@ namespace ExamSheduleDesign.ViewModels
         {
             try
             {
-                var teachers = await _sqlDataService.GetTeachersAsync();
-                var disciplines = await _sqlDataService.GetDisciplinesAsync();
-                var groups = await _sqlDataService.GetGroupsAsync();
+                var teachers = await _dataService.GetTeachersAsync();
+                var disciplines = await _dataService.GetDisciplinesAsync();
+                var groups = await _dataService.GetGroupsAsync();
 
                 Teachers.Clear();
                 Disciplines.Clear();
@@ -54,34 +52,34 @@ namespace ExamSheduleDesign.ViewModels
         private void SwitchTab(string tab) => CurrentTab = tab;
 
         [RelayCommand]
-        private void SaveTeachers()
+        private async Task SaveTeachersAsync()
         {
-            _dataService.UpdateTeachers(Teachers);
+            await _dataService.UpdateTeachersAsync(Teachers);
             _notificationService.Show("Изменения преподавателей сохранены.");
         }
 
         [RelayCommand]
-        private void SaveDisciplines()
+        private async Task SaveDisciplinesAsync()
         {
-            _dataService.UpdateDisciplines(Disciplines);
+            await _dataService.UpdateDisciplinesAsync(Disciplines);
             _notificationService.Show("Изменения дисциплин сохранены.");
         }
 
         [RelayCommand]
-        private void SaveGroups()
+        private async Task SaveGroupsAsync()
         {
-            _dataService.UpdateGroups(Groups);
+            await _dataService.UpdateGroupsAsync(Groups);
             _notificationService.Show("Изменения групп сохранены.");
         }
 
         [RelayCommand]
-        private void SaveCurrent()
+        private async Task SaveCurrentAsync()
         {
             switch (CurrentTab)
             {
-                case "Teacher": SaveTeachers(); break;
-                case "Discipline": SaveDisciplines(); break;
-                case "Group": SaveGroups(); break;
+                case "Teacher": await SaveTeachersAsync(); break;
+                case "Discipline": await SaveDisciplinesAsync(); break;
+                case "Group": await SaveGroupsAsync(); break;
             }
         }
     }

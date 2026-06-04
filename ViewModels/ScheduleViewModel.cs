@@ -5,6 +5,7 @@ using ExamSheduleDesign.Services;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -14,7 +15,6 @@ namespace ExamSheduleDesign.ViewModels
     public partial class ScheduleViewModel : ObservableObject
     {
         private readonly IDataService _dataService;
-        private readonly SqlDataService _sqlDataService;
         private readonly INotificationService _notificationService;
 
         [ObservableProperty]
@@ -37,10 +37,9 @@ namespace ExamSheduleDesign.ViewModels
         public ICommand SortAscendingCommand { get; }
         public ICommand SortDescendingCommand { get; }
 
-        public ScheduleViewModel(IDataService dataService, SqlDataService sqlDataService, INotificationService notificationService)
+        public ScheduleViewModel(IDataService dataService, INotificationService notificationService)
         {
             _dataService = dataService;
-            _sqlDataService = sqlDataService;
             _notificationService = notificationService;
 
             SortAscendingCommand = new RelayCommand(() => { IsSortAscending = true; ApplySort(); });
@@ -51,14 +50,42 @@ namespace ExamSheduleDesign.ViewModels
         {
             try
             {
-                var exams = await _sqlDataService.GetExamsAsync();
+                var exams = await _dataService.GetExamsAsync();
+                // Отписываемся от старых экзаменов
+                UnsubscribeExams();
                 Exams = new ObservableCollection<Exam>(exams);
+                // Подписываемся на новые
+                SubscribeExams();
                 UpdateSelectedCount();
                 ApplySort();
             }
             catch (Exception ex)
             {
                 _notificationService.Show($"Ошибка загрузки экзаменов: {ex.Message}");
+            }
+        }
+
+        private void SubscribeExams()
+        {
+            foreach (var exam in Exams)
+            {
+                exam.PropertyChanged += OnExamPropertyChanged;
+            }
+        }
+
+        private void UnsubscribeExams()
+        {
+            foreach (var exam in Exams)
+            {
+                exam.PropertyChanged -= OnExamPropertyChanged;
+            }
+        }
+
+        private void OnExamPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(Exam.IsSelected))
+            {
+                UpdateSelectedCount();
             }
         }
 
@@ -88,9 +115,13 @@ namespace ExamSheduleDesign.ViewModels
             };
 
             var newCollection = new ObservableCollection<Exam>(sorted);
+            UnsubscribeExams(); // отписываемся от старых перед заменой
             Exams.Clear();
             foreach (var exam in newCollection)
+            {
                 Exams.Add(exam);
+            }
+            SubscribeExams(); // подписываемся на новые
         }
 
         [RelayCommand]
@@ -99,18 +130,18 @@ namespace ExamSheduleDesign.ViewModels
             if (exam != null)
             {
                 exam.IsSelected = !exam.IsSelected;
-                UpdateSelectedCount();
+                // UpdateSelectedCount вызывается автоматически через OnExamPropertyChanged
             }
         }
 
         [RelayCommand]
-        private void DeleteSelected()
+        private async Task DeleteSelectedAsync()
         {
             var toDelete = Exams.Where(e => e.IsSelected).ToList();
             if (toDelete.Any())
             {
-                _dataService.RemoveExams(toDelete);
-                _ = LoadExamsAsync();
+                await _dataService.RemoveExamsAsync(toDelete);
+                await LoadExamsAsync(); // перезагружаем, подписки обновятся
             }
         }
 

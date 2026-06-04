@@ -151,7 +151,7 @@ namespace ExamSheduleDesign.Repositories
             {
                 using var conn = _connectionFactory.CreateLocalConnection();
                 await conn.OpenAsync();
-                const string sql = "DELETE FROM Exams";
+                const string sql = "DELETE FROM Exams; DELETE FROM sqlite_sequence WHERE name='Exams';";
                 using var cmd = new SQLiteCommand(sql, conn);
                 await cmd.ExecuteNonQueryAsync();
                 _logger.Warning("Все экзамены удалены из SQLite");

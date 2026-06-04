@@ -85,14 +85,18 @@ namespace ExamSheduleDesign.Repositories
             {
                 using var conn = _connectionFactory.CreateServerConnection();
                 await conn.OpenAsync();
-                const string sql = "INSERT INTO Disciplines (FullName, ShortName12, ShortName9, ShortName5) VALUES (@full, @s12, @s9, @s5)";
+                const string sql = @"
+            INSERT INTO Disciplines (FullName, ShortName12, ShortName9, ShortName5) 
+            VALUES (@full, @s12, @s9, @s5);
+            SELECT SCOPE_IDENTITY();";
                 using var cmd = new SqlCommand(sql, conn);
                 cmd.Parameters.AddWithValue("@full", discipline.FullName ?? "");
                 cmd.Parameters.AddWithValue("@s12", discipline.ShortName12 ?? "");
                 cmd.Parameters.AddWithValue("@s9", discipline.ShortName9);
                 cmd.Parameters.AddWithValue("@s5", discipline.ShortName5 ?? "");
-                await cmd.ExecuteNonQueryAsync();
-                _logger.Info($"Добавлена дисциплина: {discipline.ShortName9}");
+                var newId = Convert.ToInt32(await cmd.ExecuteScalarAsync());
+                discipline.Id = newId;
+                _logger.Info($"Добавлена дисциплина: {discipline.ShortName9} с ID {newId}");
             }
             catch (Exception ex)
             {

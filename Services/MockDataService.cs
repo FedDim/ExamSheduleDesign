@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace ExamSheduleDesign.Services
 {
@@ -138,5 +139,80 @@ namespace ExamSheduleDesign.Services
         public int GetGeneratedExamsCount() => _generatedExams.Count;
 
         public List<Exam> GetExams() => _exams;
+
+        public Task<List<Teacher>> GetTeachersAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<Discipline>> GetDisciplinesAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<Group>> GetGroupsAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<Exam>> GetExamsAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task AddExamAsync(Exam exam)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task RemoveExamsAsync(IEnumerable<Exam> exams)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task AddTeacherAsync(Teacher teacher)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task AddDisciplineAsync(Discipline discipline)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task AddGroupAsync(Group group)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task UpdateTeachersAsync(IEnumerable<Teacher> updatedTeachers)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task UpdateDisciplinesAsync(IEnumerable<Discipline> updatedDisciplines)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task UpdateGroupsAsync(IEnumerable<Group> updatedGroups)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task GenerateExamsAsync(int count)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task ClearGeneratedExamsAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<int> GetGeneratedExamsCountAsync()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

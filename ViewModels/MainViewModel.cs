@@ -12,7 +12,6 @@ namespace ExamSheduleDesign.ViewModels
     public partial class MainViewModel : ObservableObject
     {
         private readonly IDataService _dataService;
-        private readonly SqlDataService _sqlDataService;
         private readonly INotificationService _notificationService;
 
         [ObservableProperty]
@@ -46,10 +45,9 @@ namespace ExamSheduleDesign.ViewModels
         public List<string> TypeOptions { get; } = new() { "Экзамен", "Консультация" };
         public List<Teacher> TeacherListForCombo { get; private set; } = new() { null };
 
-        public MainViewModel(IDataService dataService, SqlDataService sqlDataService, INotificationService notificationService)
+        public MainViewModel(IDataService dataService, INotificationService notificationService)
         {
             _dataService = dataService;
-            _sqlDataService = sqlDataService;
             _notificationService = notificationService;
         }
 
@@ -57,9 +55,9 @@ namespace ExamSheduleDesign.ViewModels
         {
             try
             {
-                var teachers = await _sqlDataService.GetTeachersAsync();
-                var disciplines = await _sqlDataService.GetDisciplinesAsync();
-                var groups = await _sqlDataService.GetGroupsAsync();
+                var teachers = await _dataService.GetTeachersAsync();
+                var disciplines = await _dataService.GetDisciplinesAsync();
+                var groups = await _dataService.GetGroupsAsync();
 
                 Teachers.Clear();
                 Disciplines.Clear();
@@ -80,7 +78,7 @@ namespace ExamSheduleDesign.ViewModels
         }
 
         [RelayCommand]
-        private void AddExam()
+        private async Task AddExamAsync()
         {
             if (SelectedTeacher1 == null || SelectedDiscipline == null || SelectedGroup == null)
             {
@@ -100,7 +98,7 @@ namespace ExamSheduleDesign.ViewModels
                 Classroom = Classroom
             };
 
-            _dataService.AddExam(exam);
+            await _dataService.AddExamAsync(exam);
             _notificationService.Show($"Экзамен добавлен!\n{SelectedDiscipline.FullName}, {SelectedGroup.Name}, {SelectedDate:dd.MM.yyyy}");
 
             SelectedTeacher1 = null;
