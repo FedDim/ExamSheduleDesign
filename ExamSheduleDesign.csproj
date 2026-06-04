@@ -36,5 +36,9 @@
     <Folder Include="Data\Logs\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+
   <!-- Пустые папки, чтобы они отображались в решении -->
 </Project>

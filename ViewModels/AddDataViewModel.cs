@@ -111,5 +111,29 @@ namespace ExamSheduleDesign.ViewModels
             NewGroupDepartment = "Информатика";
             _notificationService.Show("Группа добавлена.");
         }
+
+        [RelayCommand]
+        private async Task ImportFromExcelAsync()
+        {
+            var dialog = new Microsoft.Win32.OpenFileDialog
+            {
+                Filter = "Excel files (*.xlsx)|*.xlsx",
+                Title = "Выберите Excel файл для импорта"
+            };
+            if (dialog.ShowDialog() != true) return;
+
+            DataType dataType = CurrentTab switch
+            {
+                "Teacher" => DataType.TEACHER,
+                "Discipline" => DataType.DISCIPLINE,
+                "Group" => DataType.GROUP,
+                _ => DataType.NULL
+            };
+            if (dataType == DataType.NULL) return;
+
+            var result = await _dataService.ImportFromExcelAsync(dataType, dialog.FileName);
+            _notificationService.Show(result.GetSummary());
+            await LoadDataAsync(); // перезагрузить таблицы
+        }
     }
 }

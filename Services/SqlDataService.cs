@@ -19,11 +19,10 @@ namespace ExamSheduleDesign.Services
         private readonly INotificationService _notificationService;
         private static bool? _serverAvailable = null;
         private readonly DataImporter _dataImporter;
-        private readonly IDocumentGenerator _documentGenerator;
 
         public SqlDataService(ITeacherRepository teacherRepo, IDisciplineRepository disciplineRepo,
                               IGroupRepository groupRepo, IExamRepository examRepo, IAppLogger logger,
-                              INotificationService notificationService, DataImporter dataImporter, IDocumentGenerator documentGenerator)
+                              INotificationService notificationService, DataImporter dataImporter)
         {
             _teacherRepo = teacherRepo;
             _disciplineRepo = disciplineRepo;
@@ -32,7 +31,6 @@ namespace ExamSheduleDesign.Services
             _logger = logger;
             _notificationService = notificationService;
             _dataImporter = dataImporter;
-            _documentGenerator = documentGenerator;
         }
 
         // Асинхронные методы
@@ -336,11 +334,6 @@ namespace ExamSheduleDesign.Services
         public async Task<ImportResult> ImportFromExcelAsync(DataType dataType, string filePath)
         {
             return await _dataImporter.ImportAsync(dataType, filePath);
-        }
-
-        public async Task GenerateDocumentsAsync(string folderPath)
-        {
-            await _documentGenerator.GenerateAllDocumentsAsync(folderPath);
         }
     }
 }

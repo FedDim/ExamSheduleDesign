@@ -214,5 +214,15 @@ namespace ExamSheduleDesign.Services
         {
             throw new NotImplementedException();
         }
+
+        public Task<ImportResult> ImportFromExcelAsync(DataType dataType, string filePath)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task GenerateDocumentsAsync(string folderPath)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -8,6 +8,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using System.Windows.Input;
 
 namespace ExamSheduleDesign.ViewModels
@@ -16,6 +17,7 @@ namespace ExamSheduleDesign.ViewModels
     {
         private readonly IDataService _dataService;
         private readonly INotificationService _notificationService;
+        private readonly IDocumentGenerator _documentGenerator;
 
         [ObservableProperty]
         private ObservableCollection<Exam> _exams = new();
@@ -37,10 +39,11 @@ namespace ExamSheduleDesign.ViewModels
         public ICommand SortAscendingCommand { get; }
         public ICommand SortDescendingCommand { get; }
 
-        public ScheduleViewModel(IDataService dataService, INotificationService notificationService)
+        public ScheduleViewModel(IDataService dataService, INotificationService notificationService, IDocumentGenerator documentGenerator)
         {
             _dataService = dataService;
             _notificationService = notificationService;
+            _documentGenerator = documentGenerator;
 
             SortAscendingCommand = new RelayCommand(() => { IsSortAscending = true; ApplySort(); });
             SortDescendingCommand = new RelayCommand(() => { IsSortAscending = false; ApplySort(); });
@@ -51,10 +54,8 @@ namespace ExamSheduleDesign.ViewModels
             try
             {
                 var exams = await _dataService.GetExamsAsync();
-                // Отписываемся от старых экзаменов
                 UnsubscribeExams();
                 Exams = new ObservableCollection<Exam>(exams);
-                // Подписываемся на новые
                 SubscribeExams();
                 UpdateSelectedCount();
                 ApplySort();
@@ -68,25 +69,19 @@ namespace ExamSheduleDesign.ViewModels
         private void SubscribeExams()
         {
             foreach (var exam in Exams)
-            {
                 exam.PropertyChanged += OnExamPropertyChanged;
-            }
         }
 
         private void UnsubscribeExams()
         {
             foreach (var exam in Exams)
-            {
                 exam.PropertyChanged -= OnExamPropertyChanged;
-            }
         }
 
         private void OnExamPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(Exam.IsSelected))
-            {
                 UpdateSelectedCount();
-            }
         }
 
         private void UpdateSelectedCount()
@@ -115,23 +110,18 @@ namespace ExamSheduleDesign.ViewModels
             };
 
             var newCollection = new ObservableCollection<Exam>(sorted);
-            UnsubscribeExams(); // отписываемся от старых перед заменой
+            UnsubscribeExams();
             Exams.Clear();
             foreach (var exam in newCollection)
-            {
                 Exams.Add(exam);
-            }
-            SubscribeExams(); // подписываемся на новые
+            SubscribeExams();
         }
 
         [RelayCommand]
         private void ToggleSelection(Exam exam)
         {
             if (exam != null)
-            {
                 exam.IsSelected = !exam.IsSelected;
-                // UpdateSelectedCount вызывается автоматически через OnExamPropertyChanged
-            }
         }
 
         [RelayCommand]
@@ -141,14 +131,27 @@ namespace ExamSheduleDesign.ViewModels
             if (toDelete.Any())
             {
                 await _dataService.RemoveExamsAsync(toDelete);
-                await LoadExamsAsync(); // перезагружаем, подписки обновятся
+                await LoadExamsAsync();
             }
         }
 
         [RelayCommand]
-        private void CreateScheduleFile()
+        private async Task CreateScheduleFileAsync()
         {
-            _notificationService.Show("Создание файла расписания (будет реализовано позже)");
+            using var dialog = new FolderBrowserDialog();
+            dialog.Description = "Выберите папку для сохранения документов";
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    await _documentGenerator.GenerateAllDocumentsAsync(dialog.SelectedPath);
+                    _notificationService.Show("Документы успешно созданы.");
+                }
+                catch (Exception ex)
+                {
+                    _notificationService.Show($"Ошибка при создании документов: {ex.Message}");
+                }
+            }
         }
     }
 }
