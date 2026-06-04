@@ -29,6 +29,8 @@ namespace ExamSheduleDesign
             services.AddSingleton<INotificationService, NotificationService>();
             services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>();
             services.AddSingleton<IAppLogger, FileLogger>();
+            services.AddSingleton<DataImporter>();
+            services.AddSingleton<IDocumentGenerator, WordDocumentGenerator>();
 
             // Репозитории
             services.AddSingleton<ITeacherRepository, TeacherRepository>();
