@@ -13,9 +13,9 @@ namespace ExamSheduleDesign.Services
 
         public async Task GenerateAllDocumentsAsync(string folderPath)
         {
-            var exams = await _dataService.GetExamsAsync();
-            var wordHelper = new WordHelper(exams);
-            wordHelper.CreateAllDocuments(folderPath);
+            //var exams = await _dataService.GetExamsAsync();
+            //var wordHelper = new WordHelper(exams);
+            //wordHelper.CreateAllDocuments(folderPath);
         }
     }
 }
