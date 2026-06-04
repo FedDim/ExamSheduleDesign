@@ -124,6 +124,11 @@
                         </StackPanel>
                         <Button Content="Добавить" Command="{Binding AddGroupCommand}" Style="{StaticResource PrimaryButtonStyle}" HorizontalAlignment="Left"/>
                     </StackPanel>
+
+                    <!-- Кнопка импорта Excel (общая для всех вкладок) -->
+                    <Separator Margin="0,16,0,12"/>
+                    <Button Content="Импорт из Excel" Command="{Binding ImportFromExcelCommand}" 
+                            Style="{StaticResource SecondaryButtonStyle}" HorizontalAlignment="Left" Margin="0,8,0,0"/>
                 </StackPanel>
             </Border>
 
