@@ -15,10 +15,5 @@ namespace ExamSheduleDesign.Views
 
             Loaded += async (s, e) => await _viewModel.LoadDataAsync();
         }
-
-        // Обработчики кнопок буфера теперь вызывают методы ViewModel
-        private void SaveBufferBtn_Click(object sender, System.Windows.RoutedEventArgs e) => _viewModel.SaveBuffer();
-        private void LoadBufferBtn_Click(object sender, System.Windows.RoutedEventArgs e) => _viewModel.LoadBuffer();
-        private void ClearBufferBtn_Click(object sender, System.Windows.RoutedEventArgs e) => _viewModel.ClearBuffer();
     }
 }

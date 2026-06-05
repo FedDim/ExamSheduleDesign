@@ -66,9 +66,9 @@
                 <Border Style="{StaticResource CardStyle}">
                     <StackPanel>
                         <TextBlock Style="{StaticResource CardHeaderStyle}">Управление буфером</TextBlock>
-                        <Button Content="Сохранить буфер в файл" Margin="0,0,0,8" Style="{StaticResource SecondaryButtonStyle}" Click="SaveBufferBtn_Click"/>
-                        <Button Content="Загрузить буфер из файла" Margin="0,0,0,8" Style="{StaticResource SecondaryButtonStyle}" Click="LoadBufferBtn_Click"/>
-                        <Button Content="Очистить буфер" Style="{StaticResource DangerButtonStyle}" Click="ClearBufferBtn_Click"/>
+                        <Button Content="Сохранить буфер в файл" Margin="0,0,0,8" Style="{StaticResource SecondaryButtonStyle}" Command="{Binding SaveBufferCommand}"/>
+                        <Button Content="Загрузить буфер из файла" Margin="0,0,0,8" Style="{StaticResource SecondaryButtonStyle}" Command="{Binding LoadBufferCommand}"/>
+                        <Button Content="Очистить буфер" Style="{StaticResource DangerButtonStyle}" Command="{Binding ClearBufferCommand}"/>
                     </StackPanel>
                 </Border>
             </StackPanel>

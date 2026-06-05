@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using ExamSheduleDesign.Models;
 using ExamSheduleDesign.Services;
+using ExamSheduleDesign.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -15,6 +16,7 @@ namespace ExamSheduleDesign.ViewModels
         private readonly IDataService _dataService;
         private readonly INotificationService _notificationService;
         private readonly INavigationService _navigationService;
+        private readonly IBufferService _bufferService;
 
         // Сохранение Id выбранных элементов для восстановления после перезагрузки
         private int? _savedTeacher1Id;
@@ -53,11 +55,13 @@ namespace ExamSheduleDesign.ViewModels
         public List<string> TypeOptions { get; } = new() { "Экзамен", "Консультация" };
         public List<Teacher> TeacherListForCombo { get; private set; } = new() { null };
 
-        public MainViewModel(IDataService dataService, INotificationService notificationService, INavigationService navigationService)
+        public MainViewModel(IDataService dataService, INotificationService notificationService,
+                             INavigationService navigationService, IBufferService bufferService)
         {
             _dataService = dataService;
             _notificationService = notificationService;
             _navigationService = navigationService;
+            _bufferService = bufferService;
         }
 
         public async Task LoadDataAsync()
@@ -160,8 +164,13 @@ namespace ExamSheduleDesign.ViewModels
         [RelayCommand]
         private void EditGroups() => _navigationService.NavigateToEdit("Group");
 
-        public void SaveBuffer() => _notificationService.Show("Сохранение буфера (будет реализовано)");
-        public void LoadBuffer() => _notificationService.Show("Загрузка буфера (будет реализовано)");
-        public void ClearBuffer() => _notificationService.Show("Очистка буфера (будет реализовано)");
+        [RelayCommand]
+        private async Task SaveBufferAsync() => await _bufferService.SaveBufferAsync();
+
+        [RelayCommand]
+        private async Task LoadBufferAsync() => await _bufferService.LoadBufferAsync();
+
+        [RelayCommand]
+        private async Task ClearBufferAsync() => await _bufferService.ClearBufferAsync();
     }
 }

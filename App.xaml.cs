@@ -33,6 +33,7 @@ namespace ExamSheduleDesign
             services.AddSingleton<IConnectionSettingsService, ConnectionSettingsService>();
             services.AddSingleton<IConnectionStringProvider, ConnectionStringProvider>();
             services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>();
+            services.AddSingleton<IBufferService, BufferService>();
 
             // Репозитории
             services.AddSingleton<ITeacherRepository, TeacherRepository>();
