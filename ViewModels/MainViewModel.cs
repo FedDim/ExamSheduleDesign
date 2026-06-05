@@ -5,6 +5,7 @@ using ExamSheduleDesign.Services;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ExamSheduleDesign.ViewModels
@@ -14,6 +15,12 @@ namespace ExamSheduleDesign.ViewModels
         private readonly IDataService _dataService;
         private readonly INotificationService _notificationService;
         private readonly INavigationService _navigationService;
+
+        // Сохранение Id выбранных элементов для восстановления после перезагрузки
+        private int? _savedTeacher1Id;
+        private int? _savedTeacher2Id;
+        private int? _savedDisciplineId;
+        private int? _savedGroupId;
 
         [ObservableProperty]
         private DateTime _selectedDate = DateTime.Parse("2026-06-15");
@@ -57,6 +64,12 @@ namespace ExamSheduleDesign.ViewModels
         {
             try
             {
+                // Сохраняем Id текущих выбранных элементов
+                _savedTeacher1Id = SelectedTeacher1?.Id;
+                _savedTeacher2Id = SelectedTeacher2?.Id;
+                _savedDisciplineId = SelectedDiscipline?.Id;
+                _savedGroupId = SelectedGroup?.Id;
+
                 var teachers = await _dataService.GetTeachersAsync();
                 var disciplines = await _dataService.GetDisciplinesAsync();
                 var groups = await _dataService.GetGroupsAsync();
@@ -72,6 +85,12 @@ namespace ExamSheduleDesign.ViewModels
                 TeacherListForCombo = new List<Teacher> { null };
                 TeacherListForCombo.AddRange(teachers);
                 OnPropertyChanged(nameof(TeacherListForCombo));
+
+                // Восстанавливаем выбранные элементы
+                SelectedTeacher1 = _savedTeacher1Id.HasValue ? Teachers.FirstOrDefault(t => t.Id == _savedTeacher1Id.Value) : null;
+                SelectedTeacher2 = _savedTeacher2Id.HasValue ? Teachers.FirstOrDefault(t => t.Id == _savedTeacher2Id.Value) : null;
+                SelectedDiscipline = _savedDisciplineId.HasValue ? Disciplines.FirstOrDefault(d => d.Id == _savedDisciplineId.Value) : null;
+                SelectedGroup = _savedGroupId.HasValue ? Groups.FirstOrDefault(g => g.Id == _savedGroupId.Value) : null;
             }
             catch (Exception ex)
             {

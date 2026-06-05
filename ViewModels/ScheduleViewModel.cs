@@ -18,6 +18,7 @@ namespace ExamSheduleDesign.ViewModels
         private readonly IDataService _dataService;
         private readonly INotificationService _notificationService;
         private readonly IDocumentGenerator _documentGenerator;
+        private int? _savedExamId;
 
         [ObservableProperty]
         private ObservableCollection<Exam> _exams = new();
@@ -59,12 +60,16 @@ namespace ExamSheduleDesign.ViewModels
         {
             try
             {
+                _savedExamId = SelectedExam?.Id;
+
                 var exams = await _dataService.GetExamsAsync();
                 UnsubscribeExams();
                 Exams = new ObservableCollection<Exam>(exams);
                 SubscribeExams();
                 UpdateSelectedCount();
                 ApplySort();
+
+                SelectedExam = _savedExamId.HasValue ? Exams.FirstOrDefault(e => e.Id == _savedExamId.Value) : null;
             }
             catch (Exception ex)
             {
@@ -93,7 +98,7 @@ namespace ExamSheduleDesign.ViewModels
         private void UpdateSelectedCount()
         {
             SelectedCount = Exams?.Count(e => e.IsSelected) ?? 0;
-            CanEdit = SelectedCount == 1;   // редактирование возможно только при одном выбранном
+            CanEdit = SelectedCount == 1;
         }
 
         partial void OnSortColumnChanged(string value) => ApplySort();
@@ -170,7 +175,6 @@ namespace ExamSheduleDesign.ViewModels
                 return;
             }
 
-            // Создаём копию для редактирования
             var editExam = new Exam
             {
                 Id = SelectedExam.Id,
