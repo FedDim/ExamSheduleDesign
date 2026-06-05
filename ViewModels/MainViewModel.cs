@@ -13,6 +13,7 @@ namespace ExamSheduleDesign.ViewModels
     {
         private readonly IDataService _dataService;
         private readonly INotificationService _notificationService;
+        private readonly INavigationService _navigationService;
 
         [ObservableProperty]
         private DateTime _selectedDate = DateTime.Parse("2026-06-15");
@@ -45,10 +46,11 @@ namespace ExamSheduleDesign.ViewModels
         public List<string> TypeOptions { get; } = new() { "Экзамен", "Консультация" };
         public List<Teacher> TeacherListForCombo { get; private set; } = new() { null };
 
-        public MainViewModel(IDataService dataService, INotificationService notificationService)
+        public MainViewModel(IDataService dataService, INotificationService notificationService, INavigationService navigationService)
         {
             _dataService = dataService;
             _notificationService = notificationService;
+            _navigationService = navigationService;
         }
 
         public async Task LoadDataAsync()
@@ -111,53 +113,25 @@ namespace ExamSheduleDesign.ViewModels
         }
 
         [RelayCommand]
-        private void ShowSchedule()
-        {
-            if (App.Current.MainWindow.DataContext is MainWindowViewModel mainVm)
-                mainVm.NavigateToScheduleCommand.Execute(null);
-        }
+        private void ShowSchedule() => _navigationService.NavigateToSchedule();
 
         [RelayCommand]
-        private void AddTeacher()
-        {
-            if (App.Current.MainWindow.DataContext is MainWindowViewModel mainVm)
-                mainVm.NavigateToAddWithParamCommand.Execute("Teacher");
-        }
+        private void AddTeacher() => _navigationService.NavigateToAdd("Teacher");
 
         [RelayCommand]
-        private void AddDiscipline()
-        {
-            if (App.Current.MainWindow.DataContext is MainWindowViewModel mainVm)
-                mainVm.NavigateToAddWithParamCommand.Execute("Discipline");
-        }
+        private void AddDiscipline() => _navigationService.NavigateToAdd("Discipline");
 
         [RelayCommand]
-        private void AddGroup()
-        {
-            if (App.Current.MainWindow.DataContext is MainWindowViewModel mainVm)
-                mainVm.NavigateToAddWithParamCommand.Execute("Group");
-        }
+        private void AddGroup() => _navigationService.NavigateToAdd("Group");
 
         [RelayCommand]
-        private void EditTeachers()
-        {
-            if (App.Current.MainWindow.DataContext is MainWindowViewModel mainVm)
-                mainVm.NavigateToEditWithParamCommand.Execute("Teacher");
-        }
+        private void EditTeachers() => _navigationService.NavigateToEdit("Teacher");
 
         [RelayCommand]
-        private void EditDisciplines()
-        {
-            if (App.Current.MainWindow.DataContext is MainWindowViewModel mainVm)
-                mainVm.NavigateToEditWithParamCommand.Execute("Discipline");
-        }
+        private void EditDisciplines() => _navigationService.NavigateToEdit("Discipline");
 
         [RelayCommand]
-        private void EditGroups()
-        {
-            if (App.Current.MainWindow.DataContext is MainWindowViewModel mainVm)
-                mainVm.NavigateToEditWithParamCommand.Execute("Group");
-        }
+        private void EditGroups() => _navigationService.NavigateToEdit("Group");
 
         public void SaveBuffer() => _notificationService.Show("Сохранение буфера (будет реализовано)");
         public void LoadBuffer() => _notificationService.Show("Загрузка буфера (будет реализовано)");

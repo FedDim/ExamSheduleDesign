@@ -23,6 +23,7 @@ namespace ExamSheduleDesign
             var services = new ServiceCollection();
 
             // Сервисы
+            services.AddSingleton<INavigationService, NavigationService>();
             services.AddSingleton<IDataService, SqlDataService>();
             services.AddSingleton<INotificationService, NotificationService>();
             services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>();
@@ -36,16 +37,16 @@ namespace ExamSheduleDesign
             services.AddSingleton<IGroupRepository, GroupRepository>();
             services.AddSingleton<IExamRepository, ExamRepository>();
 
-            // ViewModels
-            services.AddTransient<MainWindowViewModel>();
-            services.AddTransient<MainViewModel>();
-            services.AddTransient<ScheduleViewModel>();
-            services.AddTransient<AddDataViewModel>();
-            services.AddTransient<EditDataViewModel>();
-            services.AddTransient<DevViewModel>();
-            services.AddTransient<SettingsViewModel>();
+            // ViewModels – теперь Singleton для сохранения состояния
+            services.AddSingleton<MainWindowViewModel>();
+            services.AddSingleton<MainViewModel>();
+            services.AddSingleton<ScheduleViewModel>();
+            services.AddSingleton<AddDataViewModel>();
+            services.AddSingleton<EditDataViewModel>();
+            services.AddSingleton<DevViewModel>();
+            services.AddSingleton<SettingsViewModel>();
 
-            // Views
+            // Views – оставляем Transient (они создаются каждый раз)
             services.AddTransient<MainWindow>();
             services.AddTransient<MainView>();
             services.AddTransient<ScheduleView>();

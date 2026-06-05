@@ -1,5 +1,5 @@
-﻿using ExamSheduleDesign.ViewModels;
-using System.Windows;
+﻿using ExamSheduleDesign.Services;
+using Microsoft.Extensions.DependencyInjection;
 using System.Windows.Controls;
 
 namespace ExamSheduleDesign.Views
@@ -7,30 +7,43 @@ namespace ExamSheduleDesign.Views
     public partial class NavigationBar : UserControl
     {
         private bool _isUpdating;
+        private readonly INavigationService _navigationService;
 
         public NavigationBar()
         {
             InitializeComponent();
+            _navigationService = App.Services.GetRequiredService<INavigationService>();
 
             NavListBoxMain.SelectionChanged += OnSelectionChanged;
             NavListBoxData.SelectionChanged += OnSelectionChanged;
             NavListBoxService.SelectionChanged += OnSelectionChanged;
             NavListBoxSystem.SelectionChanged += OnSelectionChanged;
 
+            // Подписываемся на изменения навигации, чтобы обновлять выделение при программной навигации
+            _navigationService.PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName == nameof(INavigationService.CurrentPage))
+                {
+                    Dispatcher.Invoke(() => SetSelectedItemByTag(GetCurrentTag()));
+                }
+            };
+
             Loaded += async (s, e) =>
             {
                 await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.Background);
-                if (Application.Current.MainWindow.DataContext is MainWindowViewModel vm)
-                {
-                    // Подписываемся на изменение CurrentPageTag
-                    vm.PropertyChanged += (_, args) =>
-                    {
-                        if (args.PropertyName == nameof(MainWindowViewModel.CurrentPageTag))
-                            SetSelectedItemByTag(vm.CurrentPageTag);
-                    };
-                    SetSelectedItemByTag(vm.CurrentPageTag);
-                }
+                SetSelectedItemByTag(GetCurrentTag());
             };
+        }
+
+        private string GetCurrentTag()
+        {
+            if (_navigationService.CurrentPage is MainView) return "Main";
+            if (_navigationService.CurrentPage is ScheduleView) return "Schedule";
+            if (_navigationService.CurrentPage is AddDataView) return "Add";
+            if (_navigationService.CurrentPage is EditDataView) return "Edit";
+            if (_navigationService.CurrentPage is DevView) return "Dev";
+            if (_navigationService.CurrentPage is SettingsView) return "Settings";
+            return "Main";
         }
 
         private void SetSelectedItemByTag(string tag)
@@ -39,7 +52,6 @@ namespace ExamSheduleDesign.Views
             _isUpdating = true;
             try
             {
-                // Сброс выделения во всех списках
                 NavListBoxMain.SelectedItem = null;
                 NavListBoxData.SelectedItem = null;
                 NavListBoxService.SelectedItem = null;
@@ -77,23 +89,19 @@ namespace ExamSheduleDesign.Views
                 var sourceListBox = sender as ListBox;
                 if (sourceListBox?.SelectedItem is ListBoxItem selectedItem && selectedItem.Tag is string tag)
                 {
-                    // Синхронизация: снимаем выделение в других списках
                     if (sourceListBox != NavListBoxMain) NavListBoxMain.SelectedItem = null;
                     if (sourceListBox != NavListBoxData) NavListBoxData.SelectedItem = null;
                     if (sourceListBox != NavListBoxService) NavListBoxService.SelectedItem = null;
                     if (sourceListBox != NavListBoxSystem) NavListBoxSystem.SelectedItem = null;
 
-                    if (Application.Current.MainWindow.DataContext is MainWindowViewModel vm)
+                    switch (tag)
                     {
-                        switch (tag)
-                        {
-                            case "Main": vm.NavigateToMainCommand.Execute(null); break;
-                            case "Schedule": vm.NavigateToScheduleCommand.Execute(null); break;
-                            case "Add": vm.NavigateToAddCommand.Execute(null); break;
-                            case "Edit": vm.NavigateToEditCommand.Execute(null); break;
-                            case "Dev": vm.NavigateToDevCommand.Execute(null); break;
-                            case "Settings": vm.NavigateToSettingsCommand.Execute(null); break;
-                        }
+                        case "Main": _navigationService.NavigateToMain(); break;
+                        case "Schedule": _navigationService.NavigateToSchedule(); break;
+                        case "Add": _navigationService.NavigateToAdd(); break;
+                        case "Edit": _navigationService.NavigateToEdit(); break;
+                        case "Dev": _navigationService.NavigateToDev(); break;
+                        case "Settings": _navigationService.NavigateToSettings(); break;
                     }
                 }
             }

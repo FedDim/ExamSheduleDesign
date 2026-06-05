@@ -13,6 +13,7 @@ namespace ExamSheduleDesign.Repositories
         private readonly IDbConnectionFactory _connectionFactory;
         private readonly IAppLogger _logger;
         private bool _tableChecked = false;
+        private readonly object _tableLock = new object();
 
         public ExamRepository(IDbConnectionFactory connectionFactory, IAppLogger logger)
         {
@@ -23,32 +24,36 @@ namespace ExamSheduleDesign.Repositories
         private async Task EnsureTableExistsAsync()
         {
             if (_tableChecked) return;
-            try
+            lock (_tableLock)
             {
-                using var conn = _connectionFactory.CreateLocalConnection();
-                await conn.OpenAsync();
-                const string createTableSql = @"
-                    CREATE TABLE IF NOT EXISTS Exams (
-                        Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        Teacher1Id INTEGER,
-                        Teacher2Id INTEGER,
-                        SubjectId INTEGER,
-                        GroupId INTEGER,
-                        Classroom TEXT,
-                        Department TEXT,
-                        ExamDate TEXT,
-                        ExamTime TEXT,
-                        ExamType TEXT
-                    )";
-                using var cmd = new SQLiteCommand(createTableSql, conn);
-                await cmd.ExecuteNonQueryAsync();
-                _tableChecked = true;
-                _logger.Info("Таблица Exams проверена/создана в SQLite");
-            }
-            catch (Exception ex)
-            {
-                _logger.Error("Ошибка при создании таблицы Exams", ex);
-                throw;
+                if (_tableChecked) return;
+                try
+                {
+                    using var conn = _connectionFactory.CreateLocalConnection();
+                    conn.Open();
+                    const string createTableSql = @"
+                CREATE TABLE IF NOT EXISTS Exams (
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    Teacher1Id INTEGER,
+                    Teacher2Id INTEGER,
+                    SubjectId INTEGER,
+                    GroupId INTEGER,
+                    Classroom TEXT,
+                    Department TEXT,
+                    ExamDate TEXT,
+                    ExamTime TEXT,
+                    ExamType TEXT
+                )";
+                    using var cmd = new SQLiteCommand(createTableSql, conn);
+                    cmd.ExecuteNonQuery();
+                    _tableChecked = true;
+                    _logger.Info("Таблица Exams проверена/создана в SQLite");
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error("Ошибка при создании таблицы Exams", ex);
+                    throw;
+                }
             }
         }
 
