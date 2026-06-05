@@ -28,17 +28,19 @@ namespace ExamSheduleDesign.ViewModels
         public ObservableCollection<Discipline> Disciplines { get; } = new();
         public ObservableCollection<Group> Groups { get; } = new();
 
+        [ObservableProperty]
+        private Teacher? _selectedTeacher1;
+
         public EditExamDialogViewModel(Exam exam, IDataService dataService, Window dialog)
         {
             Exam = exam;
             _dataService = dataService;
             _dialog = dialog;
-            _ = LoadDataAsync(); // загружаем списки и обновляем ссылки
+            _ = LoadDataAsync();
         }
 
         private async Task LoadDataAsync()
         {
-            // Загружаем свежие справочники
             var teachers = await _dataService.GetTeachersAsync();
             var disciplines = await _dataService.GetDisciplinesAsync();
             var groups = await _dataService.GetGroupsAsync();
@@ -48,7 +50,6 @@ namespace ExamSheduleDesign.ViewModels
             foreach (var g in groups) Groups.Add(g);
 
             // Подменяем объекты в Exam на те, что содержатся в загруженных коллекциях
-            // (чтобы SelectedItem привязка работала по ссылке)
             if (Exam.Teacher1 != null)
             {
                 var newTeacher1 = Teachers.FirstOrDefault(t => t.Id == Exam.Teacher1.Id);
@@ -70,8 +71,18 @@ namespace ExamSheduleDesign.ViewModels
                 if (newGroup != null) Exam.Group = newGroup;
             }
 
-            // Уведомляем UI, что свойства Exam изменились (для обновления привязок)
+            SelectedTeacher1 = Exam.Teacher1;
             OnPropertyChanged(nameof(Exam));
+        }
+
+        partial void OnSelectedTeacher1Changed(Teacher? value)
+        {
+            if (value != null)
+            {
+                Exam.Classroom = value.Classroom ?? "";
+                OnPropertyChanged(nameof(Exam));
+            }
+            Exam.Teacher1 = value;
         }
 
         [RelayCommand]

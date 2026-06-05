@@ -41,7 +41,7 @@ namespace ExamSheduleDesign.ViewModels
         private string _selectedTime = "9:00";
 
         [ObservableProperty]
-        private string _classroom = "301";
+        private string _classroom = "";
 
         [ObservableProperty]
         private string _selectedType = "Экзамен";
@@ -95,6 +95,14 @@ namespace ExamSheduleDesign.ViewModels
             catch (Exception ex)
             {
                 _notificationService.Show($"Ошибка загрузки справочников: {ex.Message}");
+            }
+        }
+
+        partial void OnSelectedTeacher1Changed(Teacher? value)
+        {
+            if (value != null)
+            {
+                Classroom = value.Classroom ?? "";
             }
         }
 

@@ -73,7 +73,7 @@
                 </Border>
             </StackPanel>
 
-            <!-- ПРАВАЯ КОЛОНКА: Создание расписания (привязка к MainViewModel) -->
+            <!-- ПРАВАЯ КОЛОНКА: Создание расписания -->
             <Border Grid.Column="1" Style="{StaticResource CardStyle}">
                 <StackPanel>
                     <TextBlock Style="{StaticResource CardHeaderStyle}">Создание расписания</TextBlock>
@@ -85,22 +85,46 @@
 
                     <StackPanel Style="{StaticResource FormGroupStyle}">
                         <TextBlock Style="{StaticResource FormLabelStyle}">Преподаватель</TextBlock>
-                        <ComboBox ItemsSource="{Binding TeacherListForCombo}" SelectedItem="{Binding SelectedTeacher1}" DisplayMemberPath="Name" Width="250" HorizontalAlignment="Left"/>
+                        <ComboBox ItemsSource="{Binding TeacherListForCombo}" 
+                                  SelectedItem="{Binding SelectedTeacher1}" 
+                                  DisplayMemberPath="Name" 
+                                  IsEditable="True" 
+                                  IsTextSearchEnabled="True" 
+                                  TextSearch.TextPath="Name"
+                                  Width="250" HorizontalAlignment="Left"/>
                     </StackPanel>
 
                     <StackPanel Style="{StaticResource FormGroupStyle}">
                         <TextBlock Style="{StaticResource FormLabelStyle}">Преподаватель 2</TextBlock>
-                        <ComboBox ItemsSource="{Binding TeacherListForCombo}" SelectedItem="{Binding SelectedTeacher2}" DisplayMemberPath="Name" Width="250" HorizontalAlignment="Left"/>
+                        <ComboBox ItemsSource="{Binding TeacherListForCombo}" 
+                                  SelectedItem="{Binding SelectedTeacher2}" 
+                                  DisplayMemberPath="Name" 
+                                  IsEditable="True" 
+                                  IsTextSearchEnabled="True" 
+                                  TextSearch.TextPath="Name"
+                                  Width="250" HorizontalAlignment="Left"/>
                     </StackPanel>
 
                     <StackPanel Style="{StaticResource FormGroupStyle}">
                         <TextBlock Style="{StaticResource FormLabelStyle}">Дисциплина</TextBlock>
-                        <ComboBox ItemsSource="{Binding Disciplines}" SelectedItem="{Binding SelectedDiscipline}" DisplayMemberPath="FullName" Width="250" HorizontalAlignment="Left"/>
+                        <ComboBox ItemsSource="{Binding Disciplines}" 
+                                  SelectedItem="{Binding SelectedDiscipline}" 
+                                  DisplayMemberPath="FullName" 
+                                  IsEditable="True" 
+                                  IsTextSearchEnabled="True" 
+                                  TextSearch.TextPath="FullName"
+                                  Width="250" HorizontalAlignment="Left"/>
                     </StackPanel>
 
                     <StackPanel Style="{StaticResource FormGroupStyle}">
                         <TextBlock Style="{StaticResource FormLabelStyle}">Группа</TextBlock>
-                        <ComboBox ItemsSource="{Binding Groups}" SelectedItem="{Binding SelectedGroup}" DisplayMemberPath="Name" Width="250" HorizontalAlignment="Left"/>
+                        <ComboBox ItemsSource="{Binding Groups}" 
+                                  SelectedItem="{Binding SelectedGroup}" 
+                                  DisplayMemberPath="Name" 
+                                  IsEditable="True" 
+                                  IsTextSearchEnabled="True" 
+                                  TextSearch.TextPath="Name"
+                                  Width="250" HorizontalAlignment="Left"/>
                     </StackPanel>
 
                     <Grid Margin="0,0,0,12">
@@ -110,7 +134,9 @@
                         </Grid.ColumnDefinitions>
                         <StackPanel Grid.Column="0" Margin="0,0,8,0">
                             <TextBlock Style="{StaticResource FormLabelStyle}">Время</TextBlock>
-                            <ComboBox ItemsSource="{Binding TimeOptions}" SelectedItem="{Binding SelectedTime}" Width="120" HorizontalAlignment="Left"/>
+                            <ComboBox ItemsSource="{Binding TimeOptions}" 
+                                      SelectedItem="{Binding SelectedTime}" 
+                                      IsEditable="True" Width="120" HorizontalAlignment="Left"/>
                         </StackPanel>
                         <StackPanel Grid.Column="1">
                             <TextBlock Style="{StaticResource FormLabelStyle}">Аудитория</TextBlock>
@@ -120,7 +146,9 @@
 
                     <StackPanel Style="{StaticResource FormGroupStyle}">
                         <TextBlock Style="{StaticResource FormLabelStyle}">Тип</TextBlock>
-                        <ComboBox ItemsSource="{Binding TypeOptions}" SelectedItem="{Binding SelectedType}" Width="150" HorizontalAlignment="Left"/>
+                        <ComboBox ItemsSource="{Binding TypeOptions}" 
+                                  SelectedItem="{Binding SelectedType}" 
+                                  IsEditable="False" Width="150" HorizontalAlignment="Left"/>
                     </StackPanel>
 
                     <Separator Margin="0,12,0,12"/>
