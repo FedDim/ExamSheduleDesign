@@ -12,7 +12,6 @@
         <converters:RadioButtonConverter x:Key="RadioButtonConverter"/>
         <converters:TabVisibilityConverter x:Key="TabVisibilityConverter"/>
 
-        <!-- Стиль для кнопок-вкладок -->
         <Style x:Key="TabButtonStyle" TargetType="ToggleButton">
             <Setter Property="FontSize" Value="14"/>
             <Setter Property="Padding" Value="16,8"/>
@@ -46,6 +45,43 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <!-- Исправленный стиль ячейки DataGrid -->
+        <Style x:Key="DataGridCellStyle" TargetType="DataGridCell">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="DataGridCell">
+                        <Border Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter HorizontalAlignment="Left" 
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="DataGridStyle" TargetType="DataGrid">
+            <Setter Property="AutoGenerateColumns" Value="False"/>
+            <Setter Property="HeadersVisibility" Value="Column"/>
+            <Setter Property="GridLinesVisibility" Value="None"/>
+            <Setter Property="RowBackground" Value="Transparent"/>
+            <Setter Property="AlternatingRowBackground" Value="#F9F9F9"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="RowHeight" Value="35"/>
+            <Setter Property="CanUserAddRows" Value="False"/>
+            <Setter Property="CanUserDeleteRows" Value="False"/>
+            <Setter Property="SelectionMode" Value="Single"/>
+            <Setter Property="SelectionUnit" Value="FullRow"/>
+            <Setter Property="CellStyle" Value="{StaticResource DataGridCellStyle}"/>
+        </Style>
     </UserControl.Resources>
 
     <Grid Margin="20">
@@ -55,7 +91,6 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Вкладки -->
         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,16">
             <ToggleButton Style="{StaticResource TabButtonStyle}" 
                           IsChecked="{Binding CurrentTab, Converter={StaticResource RadioButtonConverter}, ConverterParameter=Teacher}"
@@ -74,7 +109,6 @@
             </ToggleButton>
         </StackPanel>
 
-        <!-- Контентная область (таблица) -->
         <Border Grid.Row="1" Style="{StaticResource CardStyle}">
             <Grid>
                 <!-- Таблица преподавателей -->
@@ -83,13 +117,9 @@
                           Style="{StaticResource DataGridStyle}" CanUserAddRows="False" CanUserDeleteRows="False">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="ID" Width="50" Binding="{Binding Id}" IsReadOnly="True"/>
-                        <DataGridTextColumn Header="ФИО" Width="*" Binding="{Binding Name}" IsReadOnly="False">
-                            <DataGridTextColumn.EditingElementStyle>
-                                <Style TargetType="TextBox">
-                                    <Setter Property="Margin" Value="4,0"/>
-                                </Style>
-                            </DataGridTextColumn.EditingElementStyle>
-                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="ФИО" Width="Auto" Binding="{Binding Name}" IsReadOnly="False"/>
+                        <DataGridTextColumn Header="Аудитория" Width="100" Binding="{Binding Classroom}" IsReadOnly="False"/>
+                        <DataGridTextColumn Header="Корпус" Width="80" Binding="{Binding AcademicBuilding}" IsReadOnly="False"/>
                     </DataGrid.Columns>
                 </DataGrid>
 
@@ -99,13 +129,10 @@
                           Style="{StaticResource DataGridStyle}" CanUserAddRows="False" CanUserDeleteRows="False">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="ID" Width="50" Binding="{Binding Id}" IsReadOnly="True"/>
-                        <DataGridTextColumn Header="Название" Width="*" Binding="{Binding FullName}" IsReadOnly="False">
-                            <DataGridTextColumn.EditingElementStyle>
-                                <Style TargetType="TextBox">
-                                    <Setter Property="Margin" Value="4,0"/>
-                                </Style>
-                            </DataGridTextColumn.EditingElementStyle>
-                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="Полное название" Width="Auto" Binding="{Binding FullName}" IsReadOnly="False"/>
+                        <DataGridTextColumn Header="Сокр. 12" Width="80" Binding="{Binding ShortName12}" IsReadOnly="False"/>
+                        <DataGridTextColumn Header="Сокр. 9" Width="80" Binding="{Binding ShortName9}" IsReadOnly="False"/>
+                        <DataGridTextColumn Header="Сокр. 5" Width="80" Binding="{Binding ShortName5}" IsReadOnly="False"/>
                     </DataGrid.Columns>
                 </DataGrid>
 
@@ -115,23 +142,17 @@
                           Style="{StaticResource DataGridStyle}" CanUserAddRows="False" CanUserDeleteRows="False">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="ID" Width="50" Binding="{Binding Id}" IsReadOnly="True"/>
-                        <DataGridTextColumn Header="Название" Width="120" Binding="{Binding Name}" IsReadOnly="False"/>
-                        <DataGridTextColumn Header="Отделение" Width="*" Binding="{Binding Department}" IsReadOnly="False">
-                            <DataGridTextColumn.EditingElementStyle>
-                                <Style TargetType="TextBox">
-                                    <Setter Property="Margin" Value="4,0"/>
-                                </Style>
-                            </DataGridTextColumn.EditingElementStyle>
-                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="Название" Width="Auto" Binding="{Binding Name}" IsReadOnly="False"/>
+                        <DataGridTextColumn Header="Отделение" Width="120" Binding="{Binding Department}" IsReadOnly="False"/>
                     </DataGrid.Columns>
                 </DataGrid>
             </Grid>
         </Border>
 
-        <!-- Нижняя панель с кнопкой сохранения -->
         <Border Grid.Row="2" Style="{StaticResource CardStyle}" Padding="12,12" Margin="0,16,0,0">
             <StackPanel HorizontalAlignment="Right">
-                <Button Content="Сохранить изменения" Command="{Binding SaveCurrentCommand}" Style="{StaticResource PrimaryButtonStyle}" Width="200" Height="36"/>
+                <Button Content="Сохранить изменения" Command="{Binding SaveCurrentCommand}" 
+                        Style="{StaticResource PrimaryButtonStyle}" Width="200" Height="36"/>
             </StackPanel>
         </Border>
     </Grid>

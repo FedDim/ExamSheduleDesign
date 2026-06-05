@@ -5,6 +5,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:converters="clr-namespace:ExamSheduleDesign.Converters"
              xmlns:viewmodels="clr-namespace:ExamSheduleDesign.ViewModels"
+             xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance Type=viewmodels:AddDataViewModel}">
 
@@ -81,38 +82,58 @@
             <!-- ЛЕВАЯ КОЛОНКА: форма добавления -->
             <Border Grid.Column="0" Style="{StaticResource CardStyle}" Margin="0,0,12,0">
                 <StackPanel>
-                    <!-- Заголовок для преподавателя -->
+                    <!-- Заголовки -->
                     <TextBlock Style="{StaticResource CardHeaderStyle}" Margin="0,0,0,16"
                                Visibility="{Binding CurrentTab, Converter={StaticResource TabVisibilityConverter}, ConverterParameter=Teacher}"
                                Text="Добавить преподавателя"/>
-                    <!-- Заголовок для дисциплины -->
                     <TextBlock Style="{StaticResource CardHeaderStyle}" Margin="0,0,0,16"
                                Visibility="{Binding CurrentTab, Converter={StaticResource TabVisibilityConverter}, ConverterParameter=Discipline}"
                                Text="Добавить дисциплину"/>
-                    <!-- Заголовок для группы -->
                     <TextBlock Style="{StaticResource CardHeaderStyle}" Margin="0,0,0,16"
                                Visibility="{Binding CurrentTab, Converter={StaticResource TabVisibilityConverter}, ConverterParameter=Group}"
                                Text="Добавить группу"/>
 
-                    <!-- Форма для преподавателя -->
+                    <!-- Форма для преподавателя (расширена) -->
                     <StackPanel Visibility="{Binding CurrentTab, Converter={StaticResource TabVisibilityConverter}, ConverterParameter=Teacher}">
                         <StackPanel Style="{StaticResource FormGroupStyle}">
                             <TextBlock Style="{StaticResource FormLabelStyle}">ФИО преподавателя</TextBlock>
                             <TextBox Text="{Binding NewTeacherFullName, UpdateSourceTrigger=PropertyChanged}"/>
                         </StackPanel>
+                        <StackPanel Style="{StaticResource FormGroupStyle}">
+                            <TextBlock Style="{StaticResource FormLabelStyle}">Аудитория</TextBlock>
+                            <TextBox Text="{Binding NewTeacherClassroom, UpdateSourceTrigger=PropertyChanged}"/>
+                        </StackPanel>
+                        <StackPanel Style="{StaticResource FormGroupStyle}">
+                            <TextBlock Style="{StaticResource FormLabelStyle}">Корпус</TextBlock>
+                            <controls:NumericUpDown Value="{Binding NewTeacherAcademicBuilding}" 
+                                Minimum="0" Maximum="99" 
+                                Interval="1" Width="100" HorizontalAlignment="Left"/>
+                        </StackPanel>
                         <Button Content="Добавить" Command="{Binding AddTeacherCommand}" Style="{StaticResource PrimaryButtonStyle}" HorizontalAlignment="Left"/>
                     </StackPanel>
 
-                    <!-- Форма для дисциплины -->
+                    <!-- Форма для дисциплины (расширена) -->
                     <StackPanel Visibility="{Binding CurrentTab, Converter={StaticResource TabVisibilityConverter}, ConverterParameter=Discipline}">
                         <StackPanel Style="{StaticResource FormGroupStyle}">
-                            <TextBlock Style="{StaticResource FormLabelStyle}">Название дисциплины</TextBlock>
-                            <TextBox Text="{Binding NewDisciplineName, UpdateSourceTrigger=PropertyChanged}"/>
+                            <TextBlock Style="{StaticResource FormLabelStyle}">Полное название</TextBlock>
+                            <TextBox Text="{Binding NewDisciplineFullName, UpdateSourceTrigger=PropertyChanged}"/>
+                        </StackPanel>
+                        <StackPanel Style="{StaticResource FormGroupStyle}">
+                            <TextBlock Style="{StaticResource FormLabelStyle}">Сокращение (12 символов)</TextBlock>
+                            <TextBox Text="{Binding NewDisciplineShortName12, UpdateSourceTrigger=PropertyChanged}"/>
+                        </StackPanel>
+                        <StackPanel Style="{StaticResource FormGroupStyle}">
+                            <TextBlock Style="{StaticResource FormLabelStyle}">Сокращение (9 символов)</TextBlock>
+                            <TextBox Text="{Binding NewDisciplineShortName9, UpdateSourceTrigger=PropertyChanged}"/>
+                        </StackPanel>
+                        <StackPanel Style="{StaticResource FormGroupStyle}">
+                            <TextBlock Style="{StaticResource FormLabelStyle}">Сокращение (5 символов)</TextBlock>
+                            <TextBox Text="{Binding NewDisciplineShortName5, UpdateSourceTrigger=PropertyChanged}"/>
                         </StackPanel>
                         <Button Content="Добавить" Command="{Binding AddDisciplineCommand}" Style="{StaticResource PrimaryButtonStyle}" HorizontalAlignment="Left"/>
                     </StackPanel>
 
-                    <!-- Форма для группы -->
+                    <!-- Форма для группы (динамическое отделение) -->
                     <StackPanel Visibility="{Binding CurrentTab, Converter={StaticResource TabVisibilityConverter}, ConverterParameter=Group}">
                         <StackPanel Style="{StaticResource FormGroupStyle}">
                             <TextBlock Style="{StaticResource FormLabelStyle}">Название группы</TextBlock>
@@ -120,19 +141,20 @@
                         </StackPanel>
                         <StackPanel Style="{StaticResource FormGroupStyle}">
                             <TextBlock Style="{StaticResource FormLabelStyle}">Отделение</TextBlock>
-                            <ComboBox ItemsSource="{Binding DepartmentOptions}" SelectedItem="{Binding NewGroupDepartment}" Width="200" HorizontalAlignment="Left"/>
+                            <ComboBox ItemsSource="{Binding Departments}" SelectedItem="{Binding NewGroupDepartment}"
+                                      IsEditable="True" TextSearch.TextPath="." Width="200" HorizontalAlignment="Left"/>
                         </StackPanel>
                         <Button Content="Добавить" Command="{Binding AddGroupCommand}" Style="{StaticResource PrimaryButtonStyle}" HorizontalAlignment="Left"/>
                     </StackPanel>
 
-                    <!-- Кнопка импорта Excel (общая для всех вкладок) -->
+                    <!-- Кнопка импорта Excel -->
                     <Separator Margin="0,16,0,12"/>
                     <Button Content="Импорт из Excel" Command="{Binding ImportFromExcelCommand}" 
                             Style="{StaticResource SecondaryButtonStyle}" HorizontalAlignment="Left" Margin="0,8,0,0"/>
                 </StackPanel>
             </Border>
 
-            <!-- ПРАВАЯ КОЛОНКА: таблица существующих записей -->
+            <!-- ПРАВАЯ КОЛОНКА: таблицы (без изменений) -->
             <Border Grid.Column="1" Style="{StaticResource CardStyle}">
                 <StackPanel>
                     <!-- Заголовки таблиц -->
@@ -146,7 +168,7 @@
                                Visibility="{Binding CurrentTab, Converter={StaticResource TabVisibilityConverter}, ConverterParameter=Group}"
                                Text="Существующие группы"/>
 
-                    <!-- Таблица преподавателей -->
+                    <!-- Таблица преподавателей (будет расширена позже, пока оставим) -->
                     <DataGrid ItemsSource="{Binding Teachers}" AutoGenerateColumns="False" HeadersVisibility="Column" RowHeight="35"
                               Visibility="{Binding CurrentTab, Converter={StaticResource TabVisibilityConverter}, ConverterParameter=Teacher}"
                               Style="{StaticResource DataGridStyle}" Margin="0,0,0,12">

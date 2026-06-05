@@ -50,8 +50,12 @@
             </StackPanel>
         </Border>
 
-        <!-- DataGrid -->
-        <DataGrid Grid.Row="1" Style="{StaticResource DataGridStyle}" ItemsSource="{Binding Exams}" AutoGenerateColumns="False" CanUserSortColumns="False">
+        <!-- DataGrid с поддержкой выделения строки -->
+        <DataGrid Grid.Row="1" Style="{StaticResource DataGridStyle}" 
+                  ItemsSource="{Binding Exams}" 
+                  SelectedItem="{Binding SelectedExam}" 
+                  AutoGenerateColumns="False" 
+                  CanUserSortColumns="False">
             <DataGrid.Columns>
                 <DataGridCheckBoxColumn Header=" " Width="40" Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}">
                     <DataGridCheckBoxColumn.ElementStyle>
@@ -82,17 +86,21 @@
             </DataGrid.Columns>
         </DataGrid>
 
-        <!-- Нижняя панель -->
+        <!-- Нижняя панель с кнопками -->
         <Border Grid.Row="2" Style="{StaticResource CardStyle}" Padding="12,12" Margin="0,16,0,0">
             <Grid>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                     <TextBlock Text="Выбрано:" VerticalAlignment="Center" Margin="0,0,8,0"/>
                     <TextBlock Text="{Binding SelectedCount}" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,16,0"/>
                     <Button Content="Удалить экзамен" Command="{Binding DeleteSelectedCommand}" 
-                        Style="{StaticResource DangerButtonStyle}" 
-                        IsEnabled="{Binding SelectedCount, Converter={StaticResource BooleanConverter}}"/>
+                    Style="{StaticResource DangerButtonStyle}" 
+                    IsEnabled="{Binding SelectedCount, Converter={StaticResource BooleanConverter}}"/>
+                    <Button Content="Редактировать" Command="{Binding EditExamCommand}" 
+                    Style="{StaticResource SecondaryButtonStyle}" Margin="8,0,0,0"
+                    IsEnabled="{Binding CanEdit}"/>
                 </StackPanel>
-                <Button Content="Создать файл расписания" Command="{Binding CreateScheduleFileCommand}" Style="{StaticResource PrimaryButtonStyle}" HorizontalAlignment="Right"/>
+                <Button Content="Создать файл расписания" Command="{Binding CreateScheduleFileCommand}" 
+                Style="{StaticResource PrimaryButtonStyle}" HorizontalAlignment="Right"/>
             </Grid>
         </Border>
     </Grid>

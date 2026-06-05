@@ -26,10 +26,16 @@ namespace ExamSheduleDesign.ViewModels
         private int _selectedCount;
 
         [ObservableProperty]
+        private bool _canEdit;   // true только если выбран ровно один экзамен
+
+        [ObservableProperty]
         private string _sortColumn = "Date";
 
         [ObservableProperty]
         private bool _isSortAscending = true;
+
+        [ObservableProperty]
+        private Exam? _selectedExam;
 
         public List<string> SortColumns { get; } = new()
         {
@@ -87,6 +93,7 @@ namespace ExamSheduleDesign.ViewModels
         private void UpdateSelectedCount()
         {
             SelectedCount = Exams?.Count(e => e.IsSelected) ?? 0;
+            CanEdit = SelectedCount == 1;   // редактирование возможно только при одном выбранном
         }
 
         partial void OnSortColumnChanged(string value) => ApplySort();
@@ -151,6 +158,45 @@ namespace ExamSheduleDesign.ViewModels
                 {
                     _notificationService.Show($"Ошибка при создании документов: {ex.Message}");
                 }
+            }
+        }
+
+        [RelayCommand]
+        private async Task EditExamAsync()
+        {
+            if (SelectedExam == null)
+            {
+                _notificationService.Show("Выберите экзамен для редактирования.");
+                return;
+            }
+
+            // Создаём копию для редактирования
+            var editExam = new Exam
+            {
+                Id = SelectedExam.Id,
+                Date = SelectedExam.Date,
+                Time = SelectedExam.Time,
+                Type = SelectedExam.Type,
+                Teacher1 = SelectedExam.Teacher1,
+                Teacher2 = SelectedExam.Teacher2,
+                Discipline = SelectedExam.Discipline,
+                Group = SelectedExam.Group,
+                Classroom = SelectedExam.Classroom,
+                IsSelected = SelectedExam.IsSelected
+            };
+
+            var dialog = new Views.EditExamDialog(editExam, _dataService);
+            if (dialog.ShowDialog() == true)
+            {
+                await _dataService.UpdateExamAsync(editExam);
+                var index = Exams.IndexOf(SelectedExam);
+                if (index >= 0)
+                {
+                    Exams[index] = editExam;
+                    SelectedExam = editExam;
+                }
+                await LoadExamsAsync();
+                _notificationService.Show("Экзамен успешно обновлён.");
             }
         }
     }

@@ -1,0 +1,120 @@
+﻿<metro:MetroWindow x:Class="ExamSheduleDesign.Views.EditExamDialog"
+                   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                   xmlns:metro="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+                   Title="Редактирование экзамена"
+                   MinWidth="500" MinHeight="410"
+                   Width="500" Height="410"
+                   WindowStartupLocation="CenterOwner"
+                   ResizeMode="CanResize">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Поля редактирования -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="120"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Дата -->
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Дата:" 
+                           Style="{StaticResource FormLabelStyle}" VerticalAlignment="Center" Margin="0,0,0,12"/>
+                <DatePicker Grid.Row="0" Grid.Column="1" 
+                            SelectedDate="{Binding Exam.Date}" 
+                            Width="200" HorizontalAlignment="Left" Margin="0,0,0,12"/>
+
+                <!-- Время (с возможностью ввода) -->
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Время:" 
+                           Style="{StaticResource FormLabelStyle}" VerticalAlignment="Center" Margin="0,0,0,12"/>
+                <ComboBox Grid.Row="1" Grid.Column="1" 
+                          ItemsSource="{Binding TimeOptions}" 
+                          SelectedItem="{Binding Exam.Time}" 
+                          IsEditable="True" Width="120" HorizontalAlignment="Left" Margin="0,0,0,12"/>
+
+                <!-- Тип (только выбор, без ввода) -->
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Тип:" 
+                           Style="{StaticResource FormLabelStyle}" VerticalAlignment="Center" Margin="0,0,0,12"/>
+                <ComboBox Grid.Row="2" Grid.Column="1" 
+                          ItemsSource="{Binding TypeOptions}" 
+                          SelectedItem="{Binding Exam.Type}" 
+                          IsEditable="False" Width="150" HorizontalAlignment="Left" Margin="0,0,0,12"/>
+
+                <!-- Преподаватель 1 -->
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="Преподаватель 1:" 
+                           Style="{StaticResource FormLabelStyle}" VerticalAlignment="Center" Margin="0,0,0,12"/>
+                <ComboBox Grid.Row="3" Grid.Column="1" 
+                          ItemsSource="{Binding Teachers}" 
+                          SelectedItem="{Binding Exam.Teacher1}" 
+                          DisplayMemberPath="Name" 
+                          IsEditable="True" 
+                          IsTextSearchEnabled="True" 
+                          TextSearch.TextPath="Name" Margin="0,0,0,12"/>
+
+                <!-- Преподаватель 2 -->
+                <TextBlock Grid.Row="4" Grid.Column="0" Text="Преподаватель 2:" 
+                           Style="{StaticResource FormLabelStyle}" VerticalAlignment="Center" Margin="0,0,0,12"/>
+                <ComboBox Grid.Row="4" Grid.Column="1" 
+                          ItemsSource="{Binding Teachers}" 
+                          SelectedItem="{Binding Exam.Teacher2}" 
+                          DisplayMemberPath="Name" 
+                          IsEditable="True" 
+                          IsTextSearchEnabled="True" 
+                          TextSearch.TextPath="Name" Margin="0,0,0,12"/>
+
+                <!-- Дисциплина -->
+                <TextBlock Grid.Row="5" Grid.Column="0" Text="Дисциплина:" 
+                           Style="{StaticResource FormLabelStyle}" VerticalAlignment="Center" Margin="0,0,0,12"/>
+                <ComboBox Grid.Row="5" Grid.Column="1" 
+                          ItemsSource="{Binding Disciplines}" 
+                          SelectedItem="{Binding Exam.Discipline}" 
+                          DisplayMemberPath="FullName" 
+                          IsEditable="True" 
+                          IsTextSearchEnabled="True" 
+                          TextSearch.TextPath="FullName" Margin="0,0,0,12"/>
+
+                <!-- Группа -->
+                <TextBlock Grid.Row="6" Grid.Column="0" Text="Группа:" 
+                           Style="{StaticResource FormLabelStyle}" VerticalAlignment="Center" Margin="0,0,0,12"/>
+                <ComboBox Grid.Row="6" Grid.Column="1" 
+                          ItemsSource="{Binding Groups}" 
+                          SelectedItem="{Binding Exam.Group}" 
+                          DisplayMemberPath="Name" 
+                          IsEditable="True" 
+                          IsTextSearchEnabled="True" 
+                          TextSearch.TextPath="Name" Margin="0,0,0,12"/>
+
+                <!-- Аудитория -->
+                <TextBlock Grid.Row="7" Grid.Column="0" Text="Аудитория:" 
+                           Style="{StaticResource FormLabelStyle}" VerticalAlignment="Center"/>
+                <TextBox Grid.Row="7" Grid.Column="1" 
+                         Text="{Binding Exam.Classroom}" 
+                         Width="150" HorizontalAlignment="Left"/>
+            </Grid>
+        </ScrollViewer>
+
+        <!-- Кнопки -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+            <Button Content="Сохранить" Command="{Binding SaveCommand}" 
+                    Style="{StaticResource PrimaryButtonStyle}" Width="100" Margin="0,0,8,0"/>
+            <Button Content="Отмена" Command="{Binding CancelCommand}" 
+                    Style="{StaticResource SecondaryButtonStyle}" Width="100"/>
+        </StackPanel>
+    </Grid>
+</metro:MetroWindow>

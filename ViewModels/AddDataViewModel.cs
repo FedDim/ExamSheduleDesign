@@ -3,8 +3,8 @@ using CommunityToolkit.Mvvm.Input;
 using ExamSheduleDesign.Models;
 using ExamSheduleDesign.Services;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ExamSheduleDesign.ViewModels
@@ -17,19 +17,33 @@ namespace ExamSheduleDesign.ViewModels
         [ObservableProperty]
         private string _currentTab = "Teacher";
 
+        // Поля для преподавателя
         [ObservableProperty]
         private string _newTeacherFullName = "";
-
         [ObservableProperty]
-        private string _newDisciplineName = "";
+        private string _newTeacherClassroom = "";
+        [ObservableProperty]
+        private int _newTeacherAcademicBuilding;
 
+        // Поля для дисциплины
+        [ObservableProperty]
+        private string _newDisciplineFullName = "";
+        [ObservableProperty]
+        private string _newDisciplineShortName12 = "";
+        [ObservableProperty]
+        private string _newDisciplineShortName9 = "";
+        [ObservableProperty]
+        private string _newDisciplineShortName5 = "";
+
+        // Поля для группы
         [ObservableProperty]
         private string _newGroupName = "";
-
         [ObservableProperty]
-        private string _newGroupDepartment = "Информатика";
+        private string _newGroupDepartment = "";
 
-        public List<string> DepartmentOptions { get; } = new() { "Информатика", "Экономика", "Гуманитарное" };
+        // Коллекция для списка кафедр
+        [ObservableProperty]
+        private ObservableCollection<string> _departments = new();
 
         public ObservableCollection<Teacher> Teachers { get; set; } = new();
         public ObservableCollection<Discipline> Disciplines { get; set; } = new();
@@ -56,6 +70,12 @@ namespace ExamSheduleDesign.ViewModels
                 foreach (var t in teachers) Teachers.Add(t);
                 foreach (var d in disciplines) Disciplines.Add(d);
                 foreach (var g in groups) Groups.Add(g);
+
+                // Обновляем список кафедр для группы
+                var deptList = groups.Select(g => g.Department).Where(d => !string.IsNullOrEmpty(d)).Distinct().OrderBy(d => d).ToList();
+                Departments.Clear();
+                foreach (var dept in deptList)
+                    Departments.Add(dept);
             }
             catch (Exception ex)
             {
@@ -74,25 +94,41 @@ namespace ExamSheduleDesign.ViewModels
                 _notificationService.Show("Введите ФИО преподавателя.");
                 return;
             }
-            var teacher = new Teacher { Name = NewTeacherFullName.Trim() };
+            var teacher = new Teacher
+            {
+                Name = NewTeacherFullName.Trim(),
+                Classroom = NewTeacherClassroom?.Trim() ?? "",
+                AcademicBuilding = NewTeacherAcademicBuilding
+            };
             await _dataService.AddTeacherAsync(teacher);
             Teachers.Add(teacher);
             NewTeacherFullName = "";
+            NewTeacherClassroom = "";
+            NewTeacherAcademicBuilding = 0;
             _notificationService.Show("Преподаватель добавлен.");
         }
 
         [RelayCommand]
         private async Task AddDisciplineAsync()
         {
-            if (string.IsNullOrWhiteSpace(NewDisciplineName))
+            if (string.IsNullOrWhiteSpace(NewDisciplineFullName))
             {
-                _notificationService.Show("Введите название дисциплины.");
+                _notificationService.Show("Введите полное название дисциплины.");
                 return;
             }
-            var discipline = new Discipline { FullName = NewDisciplineName.Trim() };
+            var discipline = new Discipline
+            {
+                FullName = NewDisciplineFullName.Trim(),
+                ShortName12 = NewDisciplineShortName12?.Trim() ?? "",
+                ShortName9 = NewDisciplineShortName9?.Trim() ?? "",
+                ShortName5 = NewDisciplineShortName5?.Trim() ?? ""
+            };
             await _dataService.AddDisciplineAsync(discipline);
             Disciplines.Add(discipline);
-            NewDisciplineName = "";
+            NewDisciplineFullName = "";
+            NewDisciplineShortName12 = "";
+            NewDisciplineShortName9 = "";
+            NewDisciplineShortName5 = "";
             _notificationService.Show("Дисциплина добавлена.");
         }
 
@@ -104,11 +140,17 @@ namespace ExamSheduleDesign.ViewModels
                 _notificationService.Show("Введите название группы.");
                 return;
             }
-            var group = new Group { Name = NewGroupName.Trim(), Department = NewGroupDepartment };
+            var group = new Group
+            {
+                Name = NewGroupName.Trim(),
+                Department = NewGroupDepartment?.Trim() ?? ""
+            };
             await _dataService.AddGroupAsync(group);
             Groups.Add(group);
+            if (!Departments.Contains(group.Department) && !string.IsNullOrEmpty(group.Department))
+                Departments.Add(group.Department);
             NewGroupName = "";
-            NewGroupDepartment = "Информатика";
+            NewGroupDepartment = "";
             _notificationService.Show("Группа добавлена.");
         }
 
@@ -133,7 +175,7 @@ namespace ExamSheduleDesign.ViewModels
 
             var result = await _dataService.ImportFromExcelAsync(dataType, dialog.FileName);
             _notificationService.Show(result.GetSummary());
-            await LoadDataAsync(); // перезагрузить таблицы
+            await LoadDataAsync();
         }
     }
 }
