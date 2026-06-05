@@ -12,7 +12,18 @@ namespace ExamSheduleDesign.Views
             InitializeComponent();
             _viewModel = viewModel;
             DataContext = _viewModel;
-            Loaded += async (s, e) => await _viewModel.LoadDataAsync();
+
+            Loaded += (s, e) =>
+            {
+                if (DataContext is DevViewModel vm)
+                    PasswordBox.Password = vm.Password;
+            };
+        }
+
+        private void PasswordBox_PasswordChanged(object sender, System.Windows.RoutedEventArgs e)
+        {
+            if (DataContext is DevViewModel vm)
+                vm.Password = PasswordBox.Password;
         }
     }
 }

@@ -20,10 +20,12 @@ namespace ExamSheduleDesign.Services
         private readonly INotificationService _notificationService;
         private readonly DataImporter _dataImporter;
         private static volatile int _serverAvailable = 0; // 0 = unknown, 1 = available, 2 = unavailable
+        private readonly IConnectionStringProvider _connectionStringProvider;
 
         public SqlDataService(ITeacherRepository teacherRepo, IDisciplineRepository disciplineRepo,
                               IGroupRepository groupRepo, IExamRepository examRepo, IAppLogger logger,
-                              INotificationService notificationService, DataImporter dataImporter)
+                              INotificationService notificationService, DataImporter dataImporter,
+                              IConnectionStringProvider connectionStringProvider) // новый параметр
         {
             _teacherRepo = teacherRepo;
             _disciplineRepo = disciplineRepo;
@@ -32,6 +34,7 @@ namespace ExamSheduleDesign.Services
             _logger = logger;
             _notificationService = notificationService;
             _dataImporter = dataImporter;
+            _connectionStringProvider = connectionStringProvider;
         }
 
         // Асинхронные методы
@@ -362,6 +365,22 @@ namespace ExamSheduleDesign.Services
         public async Task<ImportResult> ImportFromExcelAsync(DataType dataType, string filePath)
         {
             return await _dataImporter.ImportAsync(dataType, filePath);
+        }
+
+        public async Task ReconnectAsync()
+        {
+            _serverAvailable = 0; // unknown
+            _connectionStringProvider.Refresh();
+            try
+            {
+                await _teacherRepo.GetAllAsync();
+                _notificationService.Show("Переподключение успешно выполнено.");
+            }
+            catch (Exception ex)
+            {
+                _logger.Error("ReconnectAsync failed", ex);
+                _notificationService.Show("Ошибка переподключения. Проверьте настройки соединения.");
+            }
         }
     }
 }

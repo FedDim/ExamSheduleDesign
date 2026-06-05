@@ -5,10 +5,13 @@ namespace ExamSheduleDesign.Views
 {
     public partial class SettingsView : UserControl
     {
+        private readonly SettingsViewModel _viewModel;
+
         public SettingsView(SettingsViewModel viewModel)
         {
             InitializeComponent();
-            DataContext = viewModel;
+            _viewModel = viewModel;
+            DataContext = _viewModel;
         }
     }
 }

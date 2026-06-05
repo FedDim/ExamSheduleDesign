@@ -14,6 +14,7 @@ namespace ExamSheduleDesign.ViewModels
     {
         private readonly IDataService _dataService;
         private readonly INotificationService _notificationService;
+        private readonly IConnectionSettingsService _connectionSettings;
 
         [ObservableProperty]
         private int _generationCount = 10;
@@ -36,10 +37,35 @@ namespace ExamSheduleDesign.ViewModels
         [ObservableProperty]
         private int _groupsCount;
 
-        public DevViewModel(IDataService dataService, INotificationService notificationService)
+        // Поля настроек подключения
+        [ObservableProperty]
+        private string _server;
+
+        [ObservableProperty]
+        private string _username;
+
+        [ObservableProperty]
+        private string _password;
+
+        [ObservableProperty]
+        private string _databaseName;
+
+        public DevViewModel(IDataService dataService, INotificationService notificationService,
+                            IConnectionSettingsService connectionSettings)
         {
             _dataService = dataService;
             _notificationService = notificationService;
+            _connectionSettings = connectionSettings;
+            _ = LoadConnectionSettingsAsync();
+        }
+
+        private async Task LoadConnectionSettingsAsync()
+        {
+            await _connectionSettings.LoadAsync();
+            Server = _connectionSettings.Server;
+            Username = _connectionSettings.Username;
+            Password = _connectionSettings.Password;
+            DatabaseName = _connectionSettings.DatabaseName;
         }
 
         public async Task LoadDataAsync()
@@ -82,7 +108,6 @@ namespace ExamSheduleDesign.ViewModels
             if (IsGenerating) return;
             IsGenerating = true;
             StatusText = "Генерация...";
-
             await _dataService.GenerateExamsAsync(GenerationCount);
             await RefreshGeneratedListAsync();
             await LoadCountsAsync();
@@ -101,6 +126,17 @@ namespace ExamSheduleDesign.ViewModels
                 await LoadCountsAsync();
                 StatusText = "Сгенерированные экзамены удалены";
             }
+        }
+
+        [RelayCommand]
+        private async Task SaveConnectionSettingsAsync()
+        {
+            _connectionSettings.Server = Server;
+            _connectionSettings.Username = Username;
+            _connectionSettings.Password = Password;
+            _connectionSettings.DatabaseName = DatabaseName;
+            await _connectionSettings.SaveAsync();
+            await _dataService.ReconnectAsync();
         }
     }
 }

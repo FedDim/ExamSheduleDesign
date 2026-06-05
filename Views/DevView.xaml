@@ -4,8 +4,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:viewmodels="clr-namespace:ExamSheduleDesign.ViewModels"
-             mc:Ignorable="d"
              xmlns:converters="clr-namespace:ExamSheduleDesign.Converters"
+             xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+             mc:Ignorable="d"
              d:DataContext="{d:DesignInstance Type=viewmodels:DevViewModel}">
 
     <UserControl.Resources>
@@ -18,59 +19,104 @@
             <ColumnDefinition Width="2*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- Левая панель: управление -->
+        <!-- ЛЕВАЯ ПАНЕЛЬ (с прокруткой) -->
         <Border Grid.Column="0" Style="{StaticResource CardStyle}" Margin="0,0,16,0">
-            <StackPanel>
-                <TextBlock Style="{StaticResource CardHeaderStyle}">Генерация экзаменов</TextBlock>
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <StackPanel>
 
-                <StackPanel Style="{StaticResource FormGroupStyle}">
-                    <TextBlock Style="{StaticResource FormLabelStyle}">Количество для генерации</TextBlock>
-                    <TextBox Text="{Binding GenerationCount, UpdateSourceTrigger=PropertyChanged}" Width="100" HorizontalAlignment="Left"/>
+                    <!-- Блок: Генерация экзаменов -->
+                    <TextBlock Style="{StaticResource CardHeaderStyle}">Генерация экзаменов</TextBlock>
+
+                    <StackPanel Style="{StaticResource FormGroupStyle}">
+                        <TextBlock Style="{StaticResource FormLabelStyle}">Количество для генерации</TextBlock>
+                        <controls:NumericUpDown Value="{Binding GenerationCount}" 
+                                                Minimum="1" Maximum="1000" 
+                                                Interval="1" Width="100" HorizontalAlignment="Left"/>
+                    </StackPanel>
+
+                    <Button Content="Сгенерировать" Command="{Binding GenerateCommand}" 
+                            Style="{StaticResource PrimaryButtonStyle}" 
+                            IsEnabled="{Binding IsGenerating, Converter={StaticResource InverseBooleanConverter}}" 
+                            Width="150" Margin="0,0,0,12"/>
+
+                    <Button Content="Удалить сгенерированные" Command="{Binding ClearGeneratedCommand}" 
+                            Style="{StaticResource DangerButtonStyle}" Width="200" Margin="0,0,0,12"/>
+
+                    <Separator Margin="0,12,0,12"/>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                        <Ellipse Width="12" Height="12" Fill="{StaticResource AccentBrush}" Margin="0,0,8,0"/>
+                        <TextBlock Text="{Binding StatusText}" FontStyle="Italic" Foreground="{StaticResource SecondaryTextBrush}"/>
+                    </StackPanel>
+
+                    <!-- Блок: Статистика -->
+                    <TextBlock Style="{StaticResource CardHeaderStyle}" FontSize="14" Margin="0,8,0,8">Статистика</TextBlock>
+                    <TextBlock>Преподавателей: <Run Text="{Binding TeachersCount, Mode=OneWay}"/></TextBlock>
+                    <TextBlock>Дисциплин: <Run Text="{Binding DisciplinesCount, Mode=OneWay}"/></TextBlock>
+                    <TextBlock>Групп: <Run Text="{Binding GroupsCount, Mode=OneWay}"/></TextBlock>
+
+                    <Separator Margin="0,12,0,12"/>
+
+                    <!-- Блок: Настройки подключения к SQL Server -->
+                    <TextBlock Style="{StaticResource CardHeaderStyle}" FontSize="14" Margin="0,8,0,8">Подключение к SQL Server</TextBlock>
+
+                    <StackPanel Style="{StaticResource FormGroupStyle}">
+                        <TextBlock Style="{StaticResource FormLabelStyle}">Сервер</TextBlock>
+                        <TextBox Text="{Binding Server, UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+
+                    <StackPanel Style="{StaticResource FormGroupStyle}">
+                        <TextBlock Style="{StaticResource FormLabelStyle}">Пользователь</TextBlock>
+                        <TextBox Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+
+                    <StackPanel Style="{StaticResource FormGroupStyle}">
+                        <TextBlock Style="{StaticResource FormLabelStyle}">Пароль</TextBlock>
+                        <PasswordBox x:Name="PasswordBox" PasswordChanged="PasswordBox_PasswordChanged"/>
+                    </StackPanel>
+
+                    <StackPanel Style="{StaticResource FormGroupStyle}">
+                        <TextBlock Style="{StaticResource FormLabelStyle}">Имя базы данных</TextBlock>
+                        <TextBox Text="{Binding DatabaseName, UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+
+                    <Button Content="Сохранить подключение" Command="{Binding SaveConnectionSettingsCommand}" 
+                            Style="{StaticResource PrimaryButtonStyle}" Margin="0,0,0,12"/>
+
+                    <Separator Margin="0,12,0,12"/>
+
+                    <Button Content="Тест загрузки экзаменов" Command="{Binding TestLoadExamsCommand}" 
+                            Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,0,12"/>
                 </StackPanel>
-
-                <Button Content="Сгенерировать" Command="{Binding GenerateCommand}" Style="{StaticResource PrimaryButtonStyle}" 
-                        IsEnabled="{Binding IsGenerating, Converter={StaticResource InverseBooleanConverter}}" Width="150" Margin="0,0,0,12"/>
-
-                <Button Content="Удалить сгенерированные" Command="{Binding ClearGeneratedCommand}" Style="{StaticResource DangerButtonStyle}" Width="200" Margin="0,0,0,12"/>
-
-                <Separator Margin="0,12,0,12"/>
-
-                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-                    <Ellipse Width="12" Height="12" Fill="{StaticResource AccentBrush}" Margin="0,0,8,0"/>
-                    <TextBlock Text="{Binding StatusText}" FontStyle="Italic" Foreground="{StaticResource SecondaryTextBrush}"/>
-                </StackPanel>
-
-                <!-- Простая статистика -->
-                <TextBlock Style="{StaticResource CardHeaderStyle}" FontSize="14" Margin="0,8,0,8">Информация</TextBlock>
-                <TextBlock>Преподавателей: <Run Text="{Binding TeachersCount, Mode=OneWay}"/></TextBlock>
-                <TextBlock>Дисциплин: <Run Text="{Binding DisciplinesCount, Mode=OneWay}"/></TextBlock>
-                <TextBlock>Групп: <Run Text="{Binding GroupsCount, Mode=OneWay}"/></TextBlock>
-
-                <Button Content="Тест загрузки экзаменов" Command="{Binding TestLoadExamsCommand}" 
-        Style="{StaticResource SecondaryButtonStyle}" Margin="0,12,0,0"/>
-                
-            </StackPanel>
+            </ScrollViewer>
         </Border>
 
-        <!-- Правая панель: список сгенерированных экзаменов -->
+        <!-- ПРАВАЯ ПАНЕЛЬ: список сгенерированных экзаменов (с прокруткой) -->
         <Border Grid.Column="1" Style="{StaticResource CardStyle}">
-            <StackPanel>
-                <TextBlock Style="{StaticResource CardHeaderStyle}">Сгенерированные экзамены</TextBlock>
-                <ListView ItemsSource="{Binding GeneratedExams}" Height="400" ScrollViewer.HorizontalScrollBarVisibility="Auto">
-                    <ListView.View>
-                        <GridView>
-                            <GridViewColumn Header="Дата" Width="80" DisplayMemberBinding="{Binding Date, StringFormat=dd.MM.yyyy}"/>
-                            <GridViewColumn Header="Время" Width="60" DisplayMemberBinding="{Binding Time}"/>
-                            <GridViewColumn Header="Тип" Width="80" DisplayMemberBinding="{Binding Type}"/>
-                            <GridViewColumn Header="Преподаватель 1" Width="120" DisplayMemberBinding="{Binding Teacher1.Name}"/>
-                            <GridViewColumn Header="Преподаватель 2" Width="120" DisplayMemberBinding="{Binding Teacher2.Name}"/>
-                            <GridViewColumn Header="Дисциплина" Width="120" DisplayMemberBinding="{Binding Discipline.FullName}"/>
-                            <GridViewColumn Header="Группа" Width="80" DisplayMemberBinding="{Binding Group.Name}"/>
-                            <GridViewColumn Header="Аудитория" Width="70" DisplayMemberBinding="{Binding Classroom}"/>
-                        </GridView>
-                    </ListView.View>
-                </ListView>
-            </StackPanel>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" Style="{StaticResource CardHeaderStyle}">Сгенерированные экзамены</TextBlock>
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                    <ListView ItemsSource="{Binding GeneratedExams}" 
+                              ScrollViewer.HorizontalScrollBarVisibility="Auto">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Header="Дата" Width="80" DisplayMemberBinding="{Binding Date, StringFormat=dd.MM.yyyy}"/>
+                                <GridViewColumn Header="Время" Width="60" DisplayMemberBinding="{Binding Time}"/>
+                                <GridViewColumn Header="Тип" Width="80" DisplayMemberBinding="{Binding Type}"/>
+                                <GridViewColumn Header="Преподаватель 1" Width="120" DisplayMemberBinding="{Binding Teacher1.Name}"/>
+                                <GridViewColumn Header="Преподаватель 2" Width="120" DisplayMemberBinding="{Binding Teacher2.Name}"/>
+                                <GridViewColumn Header="Дисциплина" Width="120" DisplayMemberBinding="{Binding Discipline.FullName}"/>
+                                <GridViewColumn Header="Группа" Width="80" DisplayMemberBinding="{Binding Group.Name}"/>
+                                <GridViewColumn Header="Аудитория" Width="70" DisplayMemberBinding="{Binding Classroom}"/>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </ScrollViewer>
+            </Grid>
         </Border>
     </Grid>
 </UserControl>
