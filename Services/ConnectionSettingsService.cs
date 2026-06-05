@@ -17,28 +17,31 @@ namespace ExamSheduleDesign.Services
 
         public ConnectionSettingsService()
         {
-            string appData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            string appFolder = Path.Combine(appData, "ExamScheduleDesign");
-            Directory.CreateDirectory(appFolder);
-            _filePath = Path.Combine(appFolder, "connection.json");
+            string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            string dataFolder = Path.Combine(baseDir, "Data");
+            Directory.CreateDirectory(dataFolder);
+            _filePath = Path.Combine(dataFolder, "connection.json");
             _data = new ConnectionData();
+            LoadSync(); // синхронная загрузка при создании сервиса
+        }
+
+        private void LoadSync()
+        {
+            if (File.Exists(_filePath))
+            {
+                string json = File.ReadAllText(_filePath);
+                _data = JsonSerializer.Deserialize<ConnectionData>(json) ?? new ConnectionData();
+            }
+            else
+            {
+                ResetToDefaults();
+                Save();
+            }
         }
 
         public async Task LoadAsync()
         {
-            await Task.Run(() =>
-            {
-                if (File.Exists(_filePath))
-                {
-                    string json = File.ReadAllText(_filePath);
-                    _data = JsonSerializer.Deserialize<ConnectionData>(json) ?? new ConnectionData();
-                }
-                else
-                {
-                    ResetToDefaults();
-                    Save();
-                }
-            });
+            await Task.Run(() => LoadSync());
         }
 
         public async Task SaveAsync()
