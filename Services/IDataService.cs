@@ -18,6 +18,7 @@ namespace ExamSheduleDesign.Services
         Task UpdateTeachersAsync(IEnumerable<Teacher> updatedTeachers);
         Task UpdateDisciplinesAsync(IEnumerable<Discipline> updatedDisciplines);
         Task UpdateGroupsAsync(IEnumerable<Group> updatedGroups);
+        Task UpdateExamAsync(Exam exam);
         Task GenerateExamsAsync(int count);
         Task ClearGeneratedExamsAsync();
         Task<int> GetGeneratedExamsCountAsync();

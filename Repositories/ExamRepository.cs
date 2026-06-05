@@ -124,6 +124,46 @@ namespace ExamSheduleDesign.Repositories
             }
         }
 
+        public async Task UpdateAsync(ExamScheduleDto exam)
+        {
+            await EnsureTableExistsAsync();
+            try
+            {
+                using var conn = _connectionFactory.CreateLocalConnection();
+                await conn.OpenAsync();
+                const string sql = @"
+                    UPDATE Exams SET
+                        Teacher1Id = @Teacher1Id,
+                        Teacher2Id = @Teacher2Id,
+                        SubjectId = @SubjectId,
+                        GroupId = @GroupId,
+                        Classroom = @Classroom,
+                        Department = @Department,
+                        ExamDate = @ExamDate,
+                        ExamTime = @ExamTime,
+                        ExamType = @ExamType
+                    WHERE Id = @Id";
+                using var cmd = new SQLiteCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@Teacher1Id", exam.Teacher1Id);
+                cmd.Parameters.AddWithValue("@Teacher2Id", exam.Teacher2Id ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@SubjectId", exam.SubjectId);
+                cmd.Parameters.AddWithValue("@GroupId", exam.GroupId);
+                cmd.Parameters.AddWithValue("@Classroom", exam.Classroom ?? "");
+                cmd.Parameters.AddWithValue("@Department", exam.DepartmentName ?? "");
+                cmd.Parameters.AddWithValue("@ExamDate", exam.ExamDate ?? "");
+                cmd.Parameters.AddWithValue("@ExamTime", exam.ExamTime ?? "");
+                cmd.Parameters.AddWithValue("@ExamType", exam.ExamType ?? "");
+                cmd.Parameters.AddWithValue("@Id", exam.Id);
+                await cmd.ExecuteNonQueryAsync();
+                _logger.Info($"Обновлён экзамен ID {exam.Id}");
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"ExamRepository.UpdateAsync ({exam.Id})", ex);
+                throw;
+            }
+        }
+
         public async Task DeleteAsync(int examId)
         {
             await EnsureTableExistsAsync();
@@ -154,7 +194,7 @@ namespace ExamSheduleDesign.Repositories
                 const string sql = "DELETE FROM Exams; DELETE FROM sqlite_sequence WHERE name='Exams';";
                 using var cmd = new SQLiteCommand(sql, conn);
                 await cmd.ExecuteNonQueryAsync();
-                _logger.Warning("Все экзамены удалены из SQLite");
+                _logger.Warning("Все экзамены удалены из SQLite, счётчик сброшен");
             }
             catch (Exception ex)
             {

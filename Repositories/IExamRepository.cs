@@ -8,6 +8,7 @@ namespace ExamSheduleDesign.Repositories
     {
         Task<List<ExamScheduleDto>> GetAllRawAsync();
         Task AddAsync(ExamScheduleDto exam);
+        Task UpdateAsync(ExamScheduleDto exam);
         Task DeleteAsync(int examId);
         Task DeleteAllAsync();
     }

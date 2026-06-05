@@ -6,8 +6,6 @@ using ExamSheduleDesign.ViewModels;
 using ExamSheduleDesign.Views;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Configuration;
-using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows;
@@ -59,18 +57,20 @@ namespace ExamSheduleDesign
 
             Services = services.BuildServiceProvider();
 
-            // Асинхронная проверка SQL Server (не блокирует UI)
+            // Получаем фабрику подключений из DI
+            var connectionFactory = Services.GetRequiredService<IDbConnectionFactory>();
+
             Task.Run(() =>
             {
                 try
                 {
-                    using (var conn = new SqlConnection(ConfigurationManager.ConnectionStrings["ExamScheduleServer"].ConnectionString))
+                    using (var conn = connectionFactory.CreateServerConnection())
                     {
                         conn.Open();
                         Debug.WriteLine("Сервер SQL Server доступен.");
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     Dispatcher.Invoke(() =>
                     {

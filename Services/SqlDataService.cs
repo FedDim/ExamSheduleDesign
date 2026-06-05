@@ -5,6 +5,7 @@ using ExamSheduleDesign.Services.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ExamSheduleDesign.Services
@@ -17,8 +18,8 @@ namespace ExamSheduleDesign.Services
         private readonly IExamRepository _examRepo;
         private readonly IAppLogger _logger;
         private readonly INotificationService _notificationService;
-        private static bool? _serverAvailable = null;
         private readonly DataImporter _dataImporter;
+        private static volatile int _serverAvailable = 0; // 0 = unknown, 1 = available, 2 = unavailable
 
         public SqlDataService(ITeacherRepository teacherRepo, IDisciplineRepository disciplineRepo,
                               IGroupRepository groupRepo, IExamRepository examRepo, IAppLogger logger,
@@ -36,16 +37,16 @@ namespace ExamSheduleDesign.Services
         // Асинхронные методы
         public async Task<List<Teacher>> GetTeachersAsync()
         {
-            if (_serverAvailable == false) return new List<Teacher>();
+            if (_serverAvailable == 2) return new List<Teacher>();
             try
             {
                 var result = await _teacherRepo.GetAllAsync();
-                _serverAvailable = true;
+                Interlocked.CompareExchange(ref _serverAvailable, 1, 0);
                 return result;
             }
             catch (Exception ex)
             {
-                _serverAvailable = false;
+                Interlocked.CompareExchange(ref _serverAvailable, 2, 0);
                 _logger.Error("GetTeachersAsync - сервер недоступен", ex);
                 return new List<Teacher>();
             }
@@ -53,16 +54,16 @@ namespace ExamSheduleDesign.Services
 
         public async Task<List<Discipline>> GetDisciplinesAsync()
         {
-            if (_serverAvailable == false) return new List<Discipline>();
+            if (_serverAvailable == 2) return new List<Discipline>();
             try
             {
                 var result = await _disciplineRepo.GetAllAsync();
-                _serverAvailable = true;
+                Interlocked.CompareExchange(ref _serverAvailable, 1, 0);
                 return result;
             }
             catch (Exception ex)
             {
-                _serverAvailable = false;
+                Interlocked.CompareExchange(ref _serverAvailable, 2, 0);
                 _logger.Error("GetDisciplinesAsync - сервер недоступен", ex);
                 return new List<Discipline>();
             }
@@ -70,16 +71,16 @@ namespace ExamSheduleDesign.Services
 
         public async Task<List<Group>> GetGroupsAsync()
         {
-            if (_serverAvailable == false) return new List<Group>();
+            if (_serverAvailable == 2) return new List<Group>();
             try
             {
                 var result = await _groupRepo.GetAllAsync();
-                _serverAvailable = true;
+                Interlocked.CompareExchange(ref _serverAvailable, 1, 0);
                 return result;
             }
             catch (Exception ex)
             {
-                _serverAvailable = false;
+                Interlocked.CompareExchange(ref _serverAvailable, 2, 0);
                 _logger.Error("GetGroupsAsync - сервер недоступен", ex);
                 return new List<Group>();
             }
@@ -257,6 +258,33 @@ namespace ExamSheduleDesign.Services
                     _logger.Error($"UpdateGroupAsync {group.Id} failed", ex);
                     _notificationService.Show("Ошибка при обновлении группы.");
                 }
+            }
+        }
+
+        public async Task UpdateExamAsync(Exam exam)
+        {
+            try
+            {
+                var dto = new ExamScheduleDto
+                {
+                    Id = exam.Id,
+                    Teacher1Id = exam.Teacher1?.Id ?? 0,
+                    Teacher2Id = exam.Teacher2?.Id,
+                    SubjectId = exam.Discipline?.Id ?? 0,
+                    GroupId = exam.Group?.Id ?? 0,
+                    Classroom = exam.Classroom ?? "",
+                    DepartmentName = exam.Group?.Department ?? "",
+                    ExamDate = exam.Date.ToString("yyyy-MM-dd"),
+                    ExamTime = exam.Time,
+                    ExamType = exam.Type
+                };
+                await _examRepo.UpdateAsync(dto);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"UpdateExamAsync failed: {ex.Message}", ex);
+                _notificationService.Show("Ошибка при обновлении экзамена.");
+                throw;
             }
         }
 
