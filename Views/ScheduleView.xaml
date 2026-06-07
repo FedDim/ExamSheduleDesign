@@ -5,12 +5,16 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:converters="clr-namespace:ExamSheduleDesign.Converters"
              xmlns:viewmodels="clr-namespace:ExamSheduleDesign.ViewModels"
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance Type=viewmodels:ScheduleViewModel}">
 
     <UserControl.Resources>
         <converters:BooleanConverter x:Key="BooleanConverter"/>
+        <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+        <converters:ExamTypeToColorConverter x:Key="ExamTypeToColorConverter"/>
 
+        <!-- Стиль для DataGrid -->
         <Style x:Key="DataGridStyle" TargetType="DataGrid">
             <Setter Property="AutoGenerateColumns" Value="False"/>
             <Setter Property="HeadersVisibility" Value="Column"/>
@@ -26,10 +30,87 @@
             <Setter Property="SelectionUnit" Value="FullRow"/>
         </Style>
 
-        <Style x:Key="DataGridCellStyle" TargetType="DataGridCell">
-            <Setter Property="VerticalAlignment" Value="Center"/>
+        <!-- Стиль ячейки (убираем фон при выделении) -->
+        <Style TargetType="DataGridCell">
+            <Setter Property="Background" Value="Transparent"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="Transparent"/>
+                    <Setter Property="BorderBrush" Value="Transparent"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Стиль строки DataGrid: выделение выбранных (IsSelected) и убираем стандартное выделение -->
+        <Style TargetType="DataGridRow">
+            <Setter Property="Background" Value="Transparent"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                    <Setter Property="Background" Value="#E6F0FA"/>
+                </DataTrigger>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="Transparent"/>
+                    <Setter Property="BorderBrush" Value="Transparent"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Стиль заголовка столбца с русским индикатором сортировки -->
+        <Style x:Key="DataGridColumnHeaderStyle" TargetType="DataGridColumnHeader">
+            <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.ThemeForeground}"/>
+            <Setter Property="Background" Value="{StaticResource CardBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="0,0,1,1"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="DataGridColumnHeader">
+                        <Grid>
+                            <Border Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}">
+                                <Grid Margin="{TemplateBinding Padding}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <ContentPresenter Grid.Column="0" VerticalAlignment="Center"
+                                                      Content="{TemplateBinding Content}"
+                                                      ContentTemplate="{TemplateBinding ContentTemplate}"/>
+                                    <Path x:Name="SortArrow" Grid.Column="1"
+                                          Width="8" Height="6" Margin="4,0,0,0"
+                                          Visibility="Collapsed"
+                                          Fill="{TemplateBinding Foreground}"
+                                          Data="M0,4 L4,0 L8,4 Z"/>
+                                    <TextBlock x:Name="SortText" Grid.Column="1" 
+                                               Margin="4,0,0,0" VerticalAlignment="Center"
+                                               Visibility="Collapsed"
+                                               Text="По возрастанию" FontSize="10"/>
+                                </Grid>
+                            </Border>
+                            <Thumb x:Name="PART_LeftHeaderGripper" HorizontalAlignment="Left"/>
+                            <Thumb x:Name="PART_RightHeaderGripper" HorizontalAlignment="Right"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="SortDirection" Value="Ascending">
+                                <Setter TargetName="SortArrow" Property="Visibility" Value="Visible"/>
+                                <Setter TargetName="SortArrow" Property="Data" Value="M0,4 L4,0 L8,4 Z"/>
+                                <Setter TargetName="SortText" Property="Visibility" Value="Visible"/>
+                                <Setter TargetName="SortText" Property="Text" Value="По возрастанию"/>
+                            </Trigger>
+                            <Trigger Property="SortDirection" Value="Descending">
+                                <Setter TargetName="SortArrow" Property="Visibility" Value="Visible"/>
+                                <Setter TargetName="SortArrow" Property="Data" Value="M0,0 L4,4 L8,0 Z"/>
+                                <Setter TargetName="SortText" Property="Visibility" Value="Visible"/>
+                                <Setter TargetName="SortText" Property="Text" Value="По убыванию"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
     </UserControl.Resources>
 
@@ -44,41 +125,78 @@
         <Border Grid.Row="0" Style="{StaticResource CardStyle}" Padding="12,8" Margin="0,0,0,16">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                 <TextBlock Text="Сортировать по:" VerticalAlignment="Center" Margin="0,0,12,0" FontWeight="SemiBold"/>
-                <ComboBox ItemsSource="{Binding SortColumns}" SelectedItem="{Binding SortColumn}" Width="180" Margin="0,0,12,0"/>
-                <Button Content="По возрастанию" Command="{Binding SortAscendingCommand}" Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,8,0"/>
-                <Button Content="По убыванию" Command="{Binding SortDescendingCommand}" Style="{StaticResource SecondaryButtonStyle}"/>
+                <ComboBox ItemsSource="{Binding SortColumns}" SelectedItem="{Binding SortColumn}" 
+                          Width="180" Margin="0,0,12,0"/>
+                <Button Command="{Binding SortAscendingCommand}" Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,8,0">
+                    <StackPanel Orientation="Horizontal">
+                        <iconPacks:PackIconModern Kind="ArrowUp" Width="16" Height="16" Margin="0,0,5,0"/>
+                        <TextBlock Text="По возрастанию (А-Я)"/>
+                    </StackPanel>
+                </Button>
+                <Button Command="{Binding SortDescendingCommand}" Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,8,0">
+                    <StackPanel Orientation="Horizontal">
+                        <iconPacks:PackIconModern Kind="ArrowDown" Width="16" Height="16" Margin="0,0,5,0"/>
+                        <TextBlock Text="По убыванию (Я-А)"/>
+                    </StackPanel>
+                </Button>
             </StackPanel>
         </Border>
 
-        <!-- DataGrid с поддержкой выделения строки -->
+        <!-- DataGrid -->
         <DataGrid Grid.Row="1" Style="{StaticResource DataGridStyle}" 
                   ItemsSource="{Binding Exams}" 
                   SelectedItem="{Binding SelectedExam}" 
                   AutoGenerateColumns="False" 
-                  CanUserSortColumns="False">
+                  CanUserSortColumns="False"
+                  ColumnHeaderStyle="{StaticResource DataGridColumnHeaderStyle}">
             <DataGrid.Columns>
-                <DataGridCheckBoxColumn Header=" " Width="40" Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}">
-                    <DataGridCheckBoxColumn.ElementStyle>
-                        <Style TargetType="CheckBox">
-                            <Setter Property="HorizontalAlignment" Value="Center"/>
-                            <Setter Property="VerticalAlignment" Value="Center"/>
-                        </Style>
-                    </DataGridCheckBoxColumn.ElementStyle>
-                </DataGridCheckBoxColumn>
-
-                <DataGridTextColumn Header="Преподаватель 1" Width="150" Binding="{Binding Teacher1.Name}" CellStyle="{StaticResource DataGridCellStyle}"/>
-                <DataGridTextColumn Header="Преподаватель 2" Width="150" Binding="{Binding Teacher2.Name}" CellStyle="{StaticResource DataGridCellStyle}"/>
-                <DataGridTextColumn Header="Дата" Width="100" Binding="{Binding Date, StringFormat=dd.MM.yyyy}" CellStyle="{StaticResource DataGridCellStyle}"/>
-                <DataGridTextColumn Header="Дисциплина" Width="150" Binding="{Binding Discipline.FullName}" CellStyle="{StaticResource DataGridCellStyle}"/>
-                <DataGridTextColumn Header="Группа" Width="100" Binding="{Binding Group.Name}" CellStyle="{StaticResource DataGridCellStyle}"/>
-                <DataGridTextColumn Header="Отделение" Width="100" Binding="{Binding Group.Department}" CellStyle="{StaticResource DataGridCellStyle}"/>
-                <DataGridTextColumn Header="Время" Width="80" Binding="{Binding Time}" CellStyle="{StaticResource DataGridCellStyle}"/>
-                <DataGridTextColumn Header="Аудитория" Width="80" Binding="{Binding Classroom}" CellStyle="{StaticResource DataGridCellStyle}"/>
-                <DataGridTemplateColumn Header="Тип" Width="100">
+                <!-- Чекбокс "Выбрать все" в заголовке -->
+                <DataGridTemplateColumn Header=" " Width="40">
+                    <DataGridTemplateColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <CheckBox IsChecked="{Binding DataContext.SelectAllState, RelativeSource={RelativeSource AncestorType=DataGrid}, Mode=TwoWay}"
+                                      Command="{Binding DataContext.SelectAllCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                      HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.HeaderTemplate>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border CornerRadius="12" Padding="8,2" Background="{StaticResource AccentBrush}" HorizontalAlignment="Center">
-                                <TextBlock Text="{Binding Type}" Foreground="White" FontSize="11" FontWeight="SemiBold"/>
+                            <CheckBox IsChecked="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}"
+                                      HorizontalAlignment="Center" VerticalAlignment="Center"
+                                      Command="{Binding DataContext.ToggleSelectionCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                      CommandParameter="{Binding}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <!-- Столбцы данных (имена для обращения из code-behind) -->
+                <DataGridTextColumn x:Name="Teacher1Column" Header="Преподаватель 1" Width="150" 
+                                    Binding="{Binding Teacher1.Name}" CellStyle="{StaticResource DataGridCellStyle}"/>
+                <DataGridTextColumn x:Name="Teacher2Column" Header="Преподаватель 2" Width="150" 
+                                    Binding="{Binding Teacher2.Name}" CellStyle="{StaticResource DataGridCellStyle}"/>
+                <DataGridTextColumn x:Name="DateColumn" Header="Дата" Width="100" 
+                                    Binding="{Binding Date, StringFormat=dd.MM.yyyy}" CellStyle="{StaticResource DataGridCellStyle}"/>
+                <DataGridTextColumn x:Name="DisciplineColumn" Header="Дисциплина" Width="150" 
+                                    Binding="{Binding Discipline.FullName}" CellStyle="{StaticResource DataGridCellStyle}"/>
+                <DataGridTextColumn x:Name="GroupColumn" Header="Группа" Width="100" 
+                                    Binding="{Binding Group.Name}" CellStyle="{StaticResource DataGridCellStyle}"/>
+                <DataGridTextColumn x:Name="DepartmentColumn" Header="Отделение" Width="100" 
+                                    Binding="{Binding Group.Department}" CellStyle="{StaticResource DataGridCellStyle}"/>
+                <DataGridTextColumn x:Name="TimeColumn" Header="Время" Width="80" 
+                                    Binding="{Binding Time}" CellStyle="{StaticResource DataGridCellStyle}"/>
+                <DataGridTextColumn x:Name="ClassroomColumn" Header="Аудитория" Width="80" 
+                                    Binding="{Binding Classroom}" CellStyle="{StaticResource DataGridCellStyle}"/>
+                <DataGridTemplateColumn x:Name="TypeColumn" Header="Тип" Width="100">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border CornerRadius="12" Padding="8,2" HorizontalAlignment="Center"
+                                    Background="{Binding Type, Converter={StaticResource ExamTypeToColorConverter}}">
+                                <TextBlock Text="{Binding Type}" 
+                                           Foreground="White" 
+                                           FontSize="11" 
+                                           FontWeight="SemiBold"
+                                           TextAlignment="Center"
+                                           VerticalAlignment="Center"/>
                             </Border>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -86,21 +204,25 @@
             </DataGrid.Columns>
         </DataGrid>
 
-        <!-- Нижняя панель с кнопками -->
+        <!-- Нижняя панель -->
         <Border Grid.Row="2" Style="{StaticResource CardStyle}" Padding="12,12" Margin="0,16,0,0">
             <Grid>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                     <TextBlock Text="Выбрано:" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                    <TextBlock Text="{Binding SelectedCount}" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,16,0"/>
+                    <TextBlock FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,16,0">
+                        <Run Text="{Binding SelectedCount}"/>
+                        <Run Text=" из "/>
+                        <Run Text="{Binding TotalCount}"/>
+                    </TextBlock>
                     <Button Content="Удалить экзамен" Command="{Binding DeleteSelectedCommand}" 
-                    Style="{StaticResource DangerButtonStyle}" 
-                    IsEnabled="{Binding SelectedCount, Converter={StaticResource BooleanConverter}}"/>
+                            Style="{StaticResource DangerButtonStyle}" 
+                            IsEnabled="{Binding SelectedCount, Converter={StaticResource BooleanConverter}}"/>
                     <Button Content="Редактировать" Command="{Binding EditExamCommand}" 
-                    Style="{StaticResource SecondaryButtonStyle}" Margin="8,0,0,0"
-                    IsEnabled="{Binding CanEdit}"/>
+                            Style="{StaticResource SecondaryButtonStyle}" Margin="8,0,0,0"
+                            IsEnabled="{Binding CanEdit}"/>
                 </StackPanel>
                 <Button Content="Создать файл расписания" Command="{Binding CreateScheduleFileCommand}" 
-                Style="{StaticResource PrimaryButtonStyle}" HorizontalAlignment="Right"/>
+                        Style="{StaticResource PrimaryButtonStyle}" HorizontalAlignment="Right"/>
             </Grid>
         </Border>
     </Grid>

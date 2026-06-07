@@ -24,13 +24,16 @@ namespace ExamSheduleDesign.ViewModels
         private ObservableCollection<Exam> _exams = new();
 
         [ObservableProperty]
-        private int _selectedCount;
+        private int _selectedCount;      // количество выбранных экзаменов
 
         [ObservableProperty]
-        private bool _canEdit;   // true только если выбран ровно один экзамен
+        private int _totalCount;          // общее количество экзаменов
 
         [ObservableProperty]
-        private string _sortColumn = "Date";
+        private bool _canEdit;            // true только если выбран ровно один экзамен
+
+        [ObservableProperty]
+        private string _sortColumn = "Преподаватель 1";
 
         [ObservableProperty]
         private bool _isSortAscending = true;
@@ -38,9 +41,12 @@ namespace ExamSheduleDesign.ViewModels
         [ObservableProperty]
         private Exam? _selectedExam;
 
+        [ObservableProperty]
+        private bool? _selectAllState;    // null = indeterminate, true = все выбраны, false = не выбраны
+
         public List<string> SortColumns { get; } = new()
         {
-            "Date", "Teacher1", "Teacher2", "Discipline", "Group", "Time", "Classroom", "Type"
+            "Преподаватель 1", "Преподаватель 2", "Дата", "Дисциплина", "Группа", "Время", "Аудитория", "Тип"
         };
 
         public ICommand SortAscendingCommand { get; }
@@ -66,10 +72,11 @@ namespace ExamSheduleDesign.ViewModels
                 UnsubscribeExams();
                 Exams = new ObservableCollection<Exam>(exams);
                 SubscribeExams();
-                UpdateSelectedCount();
+                UpdateCounts();
                 ApplySort();
 
                 SelectedExam = _savedExamId.HasValue ? Exams.FirstOrDefault(e => e.Id == _savedExamId.Value) : null;
+                UpdateSelectAllState(); // обновить состояние чекбокса "Выбрать все"
             }
             catch (Exception ex)
             {
@@ -92,13 +99,46 @@ namespace ExamSheduleDesign.ViewModels
         private void OnExamPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(Exam.IsSelected))
-                UpdateSelectedCount();
+            {
+                UpdateCounts();
+                UpdateSelectAllState();
+            }
         }
 
-        private void UpdateSelectedCount()
+        private void UpdateCounts()
         {
             SelectedCount = Exams?.Count(e => e.IsSelected) ?? 0;
+            TotalCount = Exams?.Count ?? 0;
             CanEdit = SelectedCount == 1;
+        }
+
+        private void UpdateSelectAllState()
+        {
+            if (Exams == null || Exams.Count == 0)
+                SelectAllState = false;
+            else if (Exams.All(e => e.IsSelected))
+                SelectAllState = true;
+            else if (Exams.Any(e => e.IsSelected))
+                SelectAllState = null;
+            else
+                SelectAllState = false;
+        }
+
+        [RelayCommand]
+        private void SelectAll()
+        {
+            if (SelectAllState == true)
+            {
+                // Если все выбраны – снимаем все
+                foreach (var exam in Exams)
+                    exam.IsSelected = false;
+            }
+            else
+            {
+                // Иначе выбираем все
+                foreach (var exam in Exams)
+                    exam.IsSelected = true;
+            }
         }
 
         partial void OnSortColumnChanged(string value) => ApplySort();
@@ -110,14 +150,14 @@ namespace ExamSheduleDesign.ViewModels
 
             var sorted = SortColumn switch
             {
-                "Teacher1" => IsSortAscending ? Exams.OrderBy(e => e.Teacher1?.Name) : Exams.OrderByDescending(e => e.Teacher1?.Name),
-                "Teacher2" => IsSortAscending ? Exams.OrderBy(e => e.Teacher2?.Name) : Exams.OrderByDescending(e => e.Teacher2?.Name),
-                "Date" => IsSortAscending ? Exams.OrderBy(e => e.Date) : Exams.OrderByDescending(e => e.Date),
-                "Discipline" => IsSortAscending ? Exams.OrderBy(e => e.Discipline?.FullName) : Exams.OrderByDescending(e => e.Discipline?.FullName),
-                "Group" => IsSortAscending ? Exams.OrderBy(e => e.Group?.Name) : Exams.OrderByDescending(e => e.Group?.Name),
-                "Time" => IsSortAscending ? Exams.OrderBy(e => e.Time) : Exams.OrderByDescending(e => e.Time),
-                "Classroom" => IsSortAscending ? Exams.OrderBy(e => e.Classroom) : Exams.OrderByDescending(e => e.Classroom),
-                "Type" => IsSortAscending ? Exams.OrderBy(e => e.Type) : Exams.OrderByDescending(e => e.Type),
+                "Преподаватель 1" => IsSortAscending ? Exams.OrderBy(e => e.Teacher1?.Name) : Exams.OrderByDescending(e => e.Teacher1?.Name),
+                "Преподаватель 2" => IsSortAscending ? Exams.OrderBy(e => e.Teacher2?.Name) : Exams.OrderByDescending(e => e.Teacher2?.Name),
+                "Дата" => IsSortAscending ? Exams.OrderBy(e => e.Date) : Exams.OrderByDescending(e => e.Date),
+                "Дисциплина" => IsSortAscending ? Exams.OrderBy(e => e.Discipline?.FullName) : Exams.OrderByDescending(e => e.Discipline?.FullName),
+                "Группа" => IsSortAscending ? Exams.OrderBy(e => e.Group?.Name) : Exams.OrderByDescending(e => e.Group?.Name),
+                "Время" => IsSortAscending ? Exams.OrderBy(e => e.Time) : Exams.OrderByDescending(e => e.Time),
+                "Аудитория" => IsSortAscending ? Exams.OrderBy(e => e.Classroom) : Exams.OrderByDescending(e => e.Classroom),
+                "Тип" => IsSortAscending ? Exams.OrderBy(e => e.Type) : Exams.OrderByDescending(e => e.Type),
                 _ => IsSortAscending ? Exams.OrderBy(e => e.Date) : Exams.OrderByDescending(e => e.Date),
             };
 

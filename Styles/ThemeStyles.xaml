@@ -1,6 +1,8 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
+    <SolidColorBrush x:Key="SuccessBrush" Color="#2E7D32"/>
+
     <!-- === Фоны (три разных оттенка) === -->
     <SolidColorBrush x:Key="WindowBackgroundBrush" Color="#EAECF0"/><!-- фон окна -->
     <SolidColorBrush x:Key="NavBackgroundBrush" Color="#FFFFFF"/><!-- боковая панель -->
