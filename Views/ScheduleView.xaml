@@ -126,14 +126,38 @@
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                 <TextBlock Text="Сортировать по:" VerticalAlignment="Center" Margin="0,0,12,0" FontWeight="SemiBold"/>
                 <ComboBox ItemsSource="{Binding SortColumns}" SelectedItem="{Binding SortColumn}" 
-                          Width="180" Margin="0,0,12,0"/>
-                <Button Command="{Binding SortAscendingCommand}" Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,8,0">
+                  Width="180" Margin="0,0,12,0"/>
+
+                <!-- Кнопка сортировки по возрастанию -->
+                <Button Command="{Binding SortAscendingCommand}" Margin="0,0,8,0">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource SecondaryButtonStyle}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsSortAscending}" Value="True">
+                                    <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+                                    <Setter Property="Foreground" Value="White"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
                     <StackPanel Orientation="Horizontal">
                         <iconPacks:PackIconModern Kind="ArrowUp" Width="16" Height="16" Margin="0,0,5,0"/>
                         <TextBlock Text="По возрастанию (А-Я)"/>
                     </StackPanel>
                 </Button>
-                <Button Command="{Binding SortDescendingCommand}" Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,8,0">
+
+                <!-- Кнопка сортировки по убыванию -->
+                <Button Command="{Binding SortDescendingCommand}" Margin="0,0,8,0">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource SecondaryButtonStyle}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsSortAscending}" Value="False">
+                                    <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+                                    <Setter Property="Foreground" Value="White"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
                     <StackPanel Orientation="Horizontal">
                         <iconPacks:PackIconModern Kind="ArrowDown" Width="16" Height="16" Margin="0,0,5,0"/>
                         <TextBlock Text="По убыванию (Я-А)"/>
