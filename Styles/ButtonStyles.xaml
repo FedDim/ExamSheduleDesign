@@ -6,6 +6,7 @@
         <Setter Property="FontFamily" Value="Segoe UI, sans-serif"/>
         <Setter Property="FontSize" Value="14"/>
         <Setter Property="Padding" Value="12,8"/>
+        <Setter Property="MinWidth" Value="75"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderBrush" Value="#E0E0E0"/>
@@ -18,7 +19,8 @@
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
                             CornerRadius="4">
-                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                          Margin="{TemplateBinding Padding}"/>
                     </Border>
                 </ControlTemplate>
             </Setter.Value>
