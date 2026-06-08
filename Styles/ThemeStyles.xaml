@@ -91,4 +91,10 @@
         <Setter Property="Margin" Value="0,0,0,4"/>
     </Style>
 
+    <!-- Кисти для уведомлений -->
+    <SolidColorBrush x:Key="NotificationInfoBrush" Color="#0078D4"/>
+    <SolidColorBrush x:Key="NotificationErrorBrush" Color="#C42B1C"/>
+    <SolidColorBrush x:Key="NotificationWarningBrush" Color="#FF8C00"/>
+    <SolidColorBrush x:Key="NotificationSuccessBrush" Color="#2E7D32"/>
+
 </ResourceDictionary>
