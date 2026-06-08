@@ -127,18 +127,10 @@ namespace ExamSheduleDesign.ViewModels
         [RelayCommand]
         private void SelectAll()
         {
-            if (SelectAllState == true)
-            {
-                // Если все выбраны – снимаем все
-                foreach (var exam in Exams)
-                    exam.IsSelected = false;
-            }
-            else
-            {
-                // Иначе выбираем все
-                foreach (var exam in Exams)
-                    exam.IsSelected = true;
-            }
+            // Если не все выбраны – выбираем все, иначе снимаем все
+            bool newState = SelectAllState != true;
+            foreach (var exam in Exams)
+                exam.IsSelected = newState;
         }
 
         partial void OnSortColumnChanged(string value) => ApplySort();
@@ -167,13 +159,6 @@ namespace ExamSheduleDesign.ViewModels
             foreach (var exam in newCollection)
                 Exams.Add(exam);
             SubscribeExams();
-        }
-
-        [RelayCommand]
-        private void ToggleSelection(Exam exam)
-        {
-            if (exam != null)
-                exam.IsSelected = !exam.IsSelected;
         }
 
         [RelayCommand]
