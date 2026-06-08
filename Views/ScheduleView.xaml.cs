@@ -1,4 +1,5 @@
-﻿using ExamSheduleDesign.ViewModels;
+﻿using ExamSheduleDesign.Models;
+using ExamSheduleDesign.ViewModels;
 using System.Collections.Generic;
 using System.Windows.Controls;
 
@@ -59,6 +60,19 @@ namespace ExamSheduleDesign.Views
                         column.DisplayIndex = index++;
                     }
                 }
+            }
+        }
+
+        private void DataGrid_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            // Находим строку, на которую кликнули (через визуальное дерево)
+            var hit = e.OriginalSource as System.Windows.DependencyObject;
+            while (hit != null && !(hit is DataGridRow))
+                hit = System.Windows.Media.VisualTreeHelper.GetParent(hit);
+
+            if (hit is DataGridRow row && row.DataContext is Exam exam)
+            {
+                exam.IsSelected = !exam.IsSelected;
             }
         }
     }

@@ -172,55 +172,64 @@
                   SelectedItem="{Binding SelectedExam}" 
                   AutoGenerateColumns="False" 
                   CanUserSortColumns="False"
-                  ColumnHeaderStyle="{StaticResource DataGridColumnHeaderStyle}">
+                  ColumnHeaderStyle="{StaticResource DataGridColumnHeaderStyle}"
+                  MouseDoubleClick="DataGrid_MouseDoubleClick">
             <DataGrid.Columns>
                 <!-- Чекбокс "Выбрать все" в заголовке -->
                 <DataGridTemplateColumn Header=" " Width="40">
                     <DataGridTemplateColumn.HeaderTemplate>
                         <DataTemplate>
                             <CheckBox IsChecked="{Binding DataContext.SelectAllState, RelativeSource={RelativeSource AncestorType=DataGrid}, Mode=TwoWay}"
-                                      Command="{Binding DataContext.SelectAllCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                      HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                          Command="{Binding DataContext.SelectAllCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.HeaderTemplate>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <CheckBox IsChecked="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}"
-                                      HorizontalAlignment="Center" VerticalAlignment="Center"
-                                      Command="{Binding DataContext.ToggleSelectionCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                      CommandParameter="{Binding}"/>
+                          HorizontalAlignment="Center" VerticalAlignment="Center"
+                          Command="{Binding DataContext.ToggleSelectionCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                          CommandParameter="{Binding}"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <!-- Столбцы данных (имена для обращения из code-behind) -->
+                <!-- Столбцы данных (только для чтения) -->
                 <DataGridTextColumn x:Name="Teacher1Column" Header="Преподаватель 1" Width="150" 
-                                    Binding="{Binding Teacher1.Name}" CellStyle="{StaticResource DataGridCellStyle}"/>
+                        Binding="{Binding Teacher1.Name}" CellStyle="{StaticResource DataGridCellStyle}"
+                        IsReadOnly="True"/>
                 <DataGridTextColumn x:Name="Teacher2Column" Header="Преподаватель 2" Width="150" 
-                                    Binding="{Binding Teacher2.Name}" CellStyle="{StaticResource DataGridCellStyle}"/>
+                        Binding="{Binding Teacher2.Name}" CellStyle="{StaticResource DataGridCellStyle}"
+                        IsReadOnly="True"/>
                 <DataGridTextColumn x:Name="DateColumn" Header="Дата" Width="100" 
-                                    Binding="{Binding Date, StringFormat=dd.MM.yyyy}" CellStyle="{StaticResource DataGridCellStyle}"/>
+                        Binding="{Binding Date, StringFormat=dd.MM.yyyy}" CellStyle="{StaticResource DataGridCellStyle}"
+                        IsReadOnly="True"/>
                 <DataGridTextColumn x:Name="DisciplineColumn" Header="Дисциплина" Width="150" 
-                                    Binding="{Binding Discipline.FullName}" CellStyle="{StaticResource DataGridCellStyle}"/>
+                        Binding="{Binding Discipline.FullName}" CellStyle="{StaticResource DataGridCellStyle}"
+                        IsReadOnly="True"/>
                 <DataGridTextColumn x:Name="GroupColumn" Header="Группа" Width="100" 
-                                    Binding="{Binding Group.Name}" CellStyle="{StaticResource DataGridCellStyle}"/>
+                        Binding="{Binding Group.Name}" CellStyle="{StaticResource DataGridCellStyle}"
+                        IsReadOnly="True"/>
                 <DataGridTextColumn x:Name="DepartmentColumn" Header="Отделение" Width="100" 
-                                    Binding="{Binding Group.Department}" CellStyle="{StaticResource DataGridCellStyle}"/>
+                        Binding="{Binding Group.Department}" CellStyle="{StaticResource DataGridCellStyle}"
+                        IsReadOnly="True"/>
                 <DataGridTextColumn x:Name="TimeColumn" Header="Время" Width="80" 
-                                    Binding="{Binding Time}" CellStyle="{StaticResource DataGridCellStyle}"/>
+                        Binding="{Binding Time}" CellStyle="{StaticResource DataGridCellStyle}"
+                        IsReadOnly="True"/>
                 <DataGridTextColumn x:Name="ClassroomColumn" Header="Аудитория" Width="80" 
-                                    Binding="{Binding Classroom}" CellStyle="{StaticResource DataGridCellStyle}"/>
+                        Binding="{Binding Classroom}" CellStyle="{StaticResource DataGridCellStyle}"
+                        IsReadOnly="True"/>
                 <DataGridTemplateColumn x:Name="TypeColumn" Header="Тип" Width="100">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Border CornerRadius="12" Padding="8,2" HorizontalAlignment="Center"
-                                    Background="{Binding Type, Converter={StaticResource ExamTypeToColorConverter}}">
+                        Background="{Binding Type, Converter={StaticResource ExamTypeToColorConverter}}">
                                 <TextBlock Text="{Binding Type}" 
-                                           Foreground="White" 
-                                           FontSize="11" 
-                                           FontWeight="SemiBold"
-                                           TextAlignment="Center"
-                                           VerticalAlignment="Center"/>
+                               Foreground="White" 
+                               FontSize="11" 
+                               FontWeight="SemiBold"
+                               TextAlignment="Center"
+                               VerticalAlignment="Center"/>
                             </Border>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
