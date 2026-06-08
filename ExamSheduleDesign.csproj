@@ -10,6 +10,9 @@
     <AssemblyName>ExamSheduleDesign</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="ExamScheduleIcon_v2.ico" />
+  </ItemGroup>
+  <ItemGroup>
     <COMReference Include="Microsoft.Office.Interop.Word">
       <WrapperTool>tlbimp</WrapperTool>
       <VersionMinor>7</VersionMinor>
@@ -38,6 +41,10 @@
 
   <ItemGroup>
     <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="ExamScheduleIcon_v2.ico" />
   </ItemGroup>
 
   <ItemGroup>

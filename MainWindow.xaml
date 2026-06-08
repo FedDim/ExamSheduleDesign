@@ -11,7 +11,9 @@
                    WindowStartupLocation="CenterScreen"
                    WindowState="Maximized"
                    Background="{StaticResource WindowBackgroundBrush}"
-                   GlowBrush="{DynamicResource MahApps.Brushes.Accent}">
+                   GlowBrush="{DynamicResource MahApps.Brushes.Accent}" 
+                   Icon="/ExamScheduleIcon_v2.ico"
+                   ShowIconOnTitleBar="False">
 
     <metro:MetroWindow.Resources>
         <Storyboard x:Key="PageTransition">
