@@ -168,10 +168,11 @@
                                Visibility="{Binding CurrentTab, Converter={StaticResource TabVisibilityConverter}, ConverterParameter=Group}"
                                Text="Существующие группы"/>
 
-                    <!-- Таблица преподавателей (будет расширена позже, пока оставим) -->
+                    <!-- Таблица преподавателей -->
                     <DataGrid ItemsSource="{Binding Teachers}" AutoGenerateColumns="False" HeadersVisibility="Column" RowHeight="35"
-                              Visibility="{Binding CurrentTab, Converter={StaticResource TabVisibilityConverter}, ConverterParameter=Teacher}"
-                              Style="{StaticResource DataGridStyle}" Margin="0,0,0,12">
+                        Visibility="{Binding CurrentTab, Converter={StaticResource TabVisibilityConverter}, ConverterParameter=Teacher}"
+                        Style="{StaticResource DataGridStyle}" Margin="0,0,0,12"
+                        MaxHeight="450" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="ID" Width="50" Binding="{Binding Id}" IsReadOnly="True"/>
                             <DataGridTextColumn Header="ФИО" Width="*" Binding="{Binding Name}" IsReadOnly="True"/>
@@ -180,8 +181,9 @@
 
                     <!-- Таблица дисциплин -->
                     <DataGrid ItemsSource="{Binding Disciplines}" AutoGenerateColumns="False" HeadersVisibility="Column" RowHeight="35"
-                              Visibility="{Binding CurrentTab, Converter={StaticResource TabVisibilityConverter}, ConverterParameter=Discipline}"
-                              Style="{StaticResource DataGridStyle}" Margin="0,0,0,12">
+                        Visibility="{Binding CurrentTab, Converter={StaticResource TabVisibilityConverter}, ConverterParameter=Discipline}"
+                        Style="{StaticResource DataGridStyle}" Margin="0,0,0,12"
+                        MaxHeight="450" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="ID" Width="50" Binding="{Binding Id}" IsReadOnly="True"/>
                             <DataGridTextColumn Header="Название" Width="*" Binding="{Binding FullName}" IsReadOnly="True"/>
@@ -190,8 +192,9 @@
 
                     <!-- Таблица групп -->
                     <DataGrid ItemsSource="{Binding Groups}" AutoGenerateColumns="False" HeadersVisibility="Column" RowHeight="35"
-                              Visibility="{Binding CurrentTab, Converter={StaticResource TabVisibilityConverter}, ConverterParameter=Group}"
-                              Style="{StaticResource DataGridStyle}" Margin="0,0,0,12">
+                        Visibility="{Binding CurrentTab, Converter={StaticResource TabVisibilityConverter}, ConverterParameter=Group}"
+                        Style="{StaticResource DataGridStyle}" Margin="0,0,0,12"
+                        MaxHeight="450" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="ID" Width="50" Binding="{Binding Id}" IsReadOnly="True"/>
                             <DataGridTextColumn Header="Название" Width="120" Binding="{Binding Name}" IsReadOnly="True"/>
