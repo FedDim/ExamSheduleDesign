@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using ExamSheduleDesign.Controls;
 using ExamSheduleDesign.Models;
 using ExamSheduleDesign.Services;
 using ExamSheduleDesign.Services.Interfaces;
@@ -18,7 +19,6 @@ namespace ExamSheduleDesign.ViewModels
         private readonly INavigationService _navigationService;
         private readonly IBufferService _bufferService;
 
-        // Сохранение Id выбранных элементов для восстановления после перезагрузки
         private int? _savedTeacher1Id;
         private int? _savedTeacher2Id;
         private int? _savedDisciplineId;
@@ -68,7 +68,6 @@ namespace ExamSheduleDesign.ViewModels
         {
             try
             {
-                // Сохраняем Id текущих выбранных элементов
                 _savedTeacher1Id = SelectedTeacher1?.Id;
                 _savedTeacher2Id = SelectedTeacher2?.Id;
                 _savedDisciplineId = SelectedDiscipline?.Id;
@@ -90,7 +89,6 @@ namespace ExamSheduleDesign.ViewModels
                 TeacherListForCombo.AddRange(teachers);
                 OnPropertyChanged(nameof(TeacherListForCombo));
 
-                // Восстанавливаем выбранные элементы
                 SelectedTeacher1 = _savedTeacher1Id.HasValue ? Teachers.FirstOrDefault(t => t.Id == _savedTeacher1Id.Value) : null;
                 SelectedTeacher2 = _savedTeacher2Id.HasValue ? Teachers.FirstOrDefault(t => t.Id == _savedTeacher2Id.Value) : null;
                 SelectedDiscipline = _savedDisciplineId.HasValue ? Disciplines.FirstOrDefault(d => d.Id == _savedDisciplineId.Value) : null;
@@ -98,7 +96,7 @@ namespace ExamSheduleDesign.ViewModels
             }
             catch (Exception ex)
             {
-                _notificationService.Show($"Ошибка загрузки справочников: {ex.Message}");
+                _notificationService.Show($"Ошибка загрузки справочников: {ex.Message}", NotificationType.Error);
             }
         }
 
@@ -115,7 +113,7 @@ namespace ExamSheduleDesign.ViewModels
         {
             if (SelectedTeacher1 == null || SelectedDiscipline == null || SelectedGroup == null)
             {
-                _notificationService.Show("Заполните обязательные поля: преподаватель, дисциплина, группа.");
+                _notificationService.Show("Заполните обязательные поля: преподаватель, дисциплина, группа.", NotificationType.Warning);
                 return;
             }
 
@@ -131,16 +129,23 @@ namespace ExamSheduleDesign.ViewModels
                 Classroom = Classroom
             };
 
-            await _dataService.AddExamAsync(exam);
-            _notificationService.Show($"Экзамен добавлен!\n{SelectedDiscipline.FullName}, {SelectedGroup.Name}, {SelectedDate:dd.MM.yyyy}");
-
-            SelectedTeacher1 = null;
-            SelectedTeacher2 = null;
-            SelectedDiscipline = null;
-            SelectedGroup = null;
-            Classroom = "301";
-            SelectedTime = "9:00";
-            SelectedType = "Экзамен";
+            try
+            {
+                await _dataService.AddExamAsync(exam);
+                _notificationService.Show($"Экзамен добавлен!\n{SelectedDiscipline.FullName}, {SelectedGroup.Name}, {SelectedDate:dd.MM.yyyy}", NotificationType.Success);
+                // Очистка после успешного добавления
+                SelectedTeacher1 = null;
+                SelectedTeacher2 = null;
+                SelectedDiscipline = null;
+                SelectedGroup = null;
+                Classroom = "301";
+                SelectedTime = "9:00";
+                SelectedType = "Экзамен";
+            }
+            catch (Exception ex)
+            {
+                _notificationService.Show($"Ошибка при добавлении экзамена: {ex.Message}", NotificationType.Error);
+            }
         }
 
         [RelayCommand]
@@ -165,12 +170,45 @@ namespace ExamSheduleDesign.ViewModels
         private void EditGroups() => _navigationService.NavigateToEdit("Group");
 
         [RelayCommand]
-        private async Task SaveBufferAsync() => await _bufferService.SaveBufferAsync();
+        private async Task SaveBufferAsync()
+        {
+            try
+            {
+                await _bufferService.SaveBufferAsync();
+                _notificationService.Show("Буфер сохранён.", NotificationType.Success);
+            }
+            catch (Exception ex)
+            {
+                _notificationService.Show($"Ошибка сохранения буфера: {ex.Message}", NotificationType.Error);
+            }
+        }
 
         [RelayCommand]
-        private async Task LoadBufferAsync() => await _bufferService.LoadBufferAsync();
+        private async Task LoadBufferAsync()
+        {
+            try
+            {
+                await _bufferService.LoadBufferAsync();
+                _notificationService.Show("Буфер загружен.", NotificationType.Success);
+            }
+            catch (Exception ex)
+            {
+                _notificationService.Show($"Ошибка загрузки буфера: {ex.Message}", NotificationType.Error);
+            }
+        }
 
         [RelayCommand]
-        private async Task ClearBufferAsync() => await _bufferService.ClearBufferAsync();
+        private async Task ClearBufferAsync()
+        {
+            try
+            {
+                await _bufferService.ClearBufferAsync();
+                _notificationService.Show("Буфер очищен.", NotificationType.Success);
+            }
+            catch (Exception ex)
+            {
+                _notificationService.Show($"Ошибка очистки буфера: {ex.Message}", NotificationType.Error);
+            }
+        }
     }
 }

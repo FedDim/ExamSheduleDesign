@@ -12,14 +12,14 @@ namespace ExamSheduleDesign.Services
             _notificationControl = notificationControl;
         }
 
-        public void Show(string message)
+        public void Show(string message, NotificationType type = NotificationType.Information)
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
                 if (_notificationControl != null)
-                    _notificationControl.Show(message);
+                    _notificationControl.Show(message, type);
                 else
-                    MessageBox.Show(message); // fallback
+                    MessageBox.Show(message);
             });
         }
     }

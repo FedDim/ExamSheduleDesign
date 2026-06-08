@@ -2,7 +2,12 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
-             Width="300" Height="Auto">
+             x:Name="Root"
+             MinWidth="200" MaxWidth="500" Width="Auto"
+             Height="Auto"
+             VerticalAlignment="Top"
+             HorizontalAlignment="Right">
+
     <UserControl.Resources>
         <Storyboard x:Key="ShowAnimation">
             <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
@@ -20,15 +25,24 @@
         </Storyboard>
     </UserControl.Resources>
 
-    <Border Background="{StaticResource CardBackgroundBrush}"
+    <Border x:Name="BorderRoot" Background="{StaticResource CardBackgroundBrush}"
             CornerRadius="8"
             BorderBrush="{StaticResource AccentBrush}"
             BorderThickness="0,0,0,3"
             Effect="{StaticResource CardShadow}"
             Padding="12,8">
         <StackPanel Orientation="Horizontal">
-            <iconPacks:PackIconModern Kind="Information" Width="20" Height="20" Foreground="{StaticResource AccentBrush}" Margin="0,0,12,0"/>
-            <TextBlock x:Name="MessageText" Foreground="{StaticResource PrimaryTextBrush}" FontSize="13" TextWrapping="Wrap"/>
+            <iconPacks:PackIconModern x:Name="Icon" Kind="Information" 
+                                      Width="20" Height="20" 
+                                      Foreground="{StaticResource AccentBrush}" 
+                                      Margin="0,0,12,0" 
+                                      VerticalAlignment="Top"/>
+            <TextBlock x:Name="MessageText" 
+                       Foreground="{StaticResource PrimaryTextBrush}" 
+                       FontSize="13" 
+                       TextWrapping="Wrap" 
+                       MaxWidth="450"
+                       VerticalAlignment="Center"/>
         </StackPanel>
     </Border>
 </UserControl>

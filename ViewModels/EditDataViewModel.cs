@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using ExamSheduleDesign.Controls;
 using ExamSheduleDesign.Models;
 using ExamSheduleDesign.Services;
 using System;
@@ -44,7 +45,7 @@ namespace ExamSheduleDesign.ViewModels
             }
             catch (Exception ex)
             {
-                _notificationService.Show($"Ошибка загрузки справочников: {ex.Message}");
+                _notificationService.Show($"Ошибка загрузки справочников: {ex.Message}", NotificationType.Error);
             }
         }
 
@@ -54,22 +55,43 @@ namespace ExamSheduleDesign.ViewModels
         [RelayCommand]
         private async Task SaveTeachersAsync()
         {
-            await _dataService.UpdateTeachersAsync(Teachers);
-            _notificationService.Show("Изменения преподавателей сохранены.");
+            try
+            {
+                await _dataService.UpdateTeachersAsync(Teachers);
+                _notificationService.Show("Изменения преподавателей сохранены.", NotificationType.Success);
+            }
+            catch (Exception ex)
+            {
+                _notificationService.Show($"Ошибка при сохранении преподавателей: {ex.Message}", NotificationType.Error);
+            }
         }
 
         [RelayCommand]
         private async Task SaveDisciplinesAsync()
         {
-            await _dataService.UpdateDisciplinesAsync(Disciplines);
-            _notificationService.Show("Изменения дисциплин сохранены.");
+            try
+            {
+                await _dataService.UpdateDisciplinesAsync(Disciplines);
+                _notificationService.Show("Изменения дисциплин сохранены.", NotificationType.Success);
+            }
+            catch (Exception ex)
+            {
+                _notificationService.Show($"Ошибка при сохранении дисциплин: {ex.Message}", NotificationType.Error);
+            }
         }
 
         [RelayCommand]
         private async Task SaveGroupsAsync()
         {
-            await _dataService.UpdateGroupsAsync(Groups);
-            _notificationService.Show("Изменения групп сохранены.");
+            try
+            {
+                await _dataService.UpdateGroupsAsync(Groups);
+                _notificationService.Show("Изменения групп сохранены.", NotificationType.Success);
+            }
+            catch (Exception ex)
+            {
+                _notificationService.Show($"Ошибка при сохранении групп: {ex.Message}", NotificationType.Error);
+            }
         }
 
         [RelayCommand]

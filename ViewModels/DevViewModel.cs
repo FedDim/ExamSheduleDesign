@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using ExamSheduleDesign.Controls;
 using ExamSheduleDesign.Models;
 using ExamSheduleDesign.Services;
 using System;
@@ -37,7 +38,6 @@ namespace ExamSheduleDesign.ViewModels
         [ObservableProperty]
         private int _groupsCount;
 
-        // Поля настроек подключения
         [ObservableProperty]
         private string _server;
 
@@ -94,11 +94,11 @@ namespace ExamSheduleDesign.ViewModels
             try
             {
                 var exams = await _dataService.GetExamsAsync();
-                _notificationService.Show($"Загружено экзаменов: {exams.Count}");
+                _notificationService.Show($"Загружено экзаменов: {exams.Count}", NotificationType.Information);
             }
             catch (Exception ex)
             {
-                _notificationService.Show($"Ошибка: {ex.Message}");
+                _notificationService.Show($"Ошибка: {ex.Message}", NotificationType.Error);
             }
         }
 

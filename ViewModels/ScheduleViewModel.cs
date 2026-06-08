@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using ExamSheduleDesign.Controls;
 using ExamSheduleDesign.Models;
 using ExamSheduleDesign.Services;
 using System;
@@ -24,13 +25,13 @@ namespace ExamSheduleDesign.ViewModels
         private ObservableCollection<Exam> _exams = new();
 
         [ObservableProperty]
-        private int _selectedCount;      // количество выбранных экзаменов
+        private int _selectedCount;
 
         [ObservableProperty]
-        private int _totalCount;          // общее количество экзаменов
+        private int _totalCount;
 
         [ObservableProperty]
-        private bool _canEdit;            // true только если выбран ровно один экзамен
+        private bool _canEdit;
 
         [ObservableProperty]
         private string _sortColumn = "Преподаватель 1";
@@ -42,7 +43,7 @@ namespace ExamSheduleDesign.ViewModels
         private Exam? _selectedExam;
 
         [ObservableProperty]
-        private bool? _selectAllState;    // null = indeterminate, true = все выбраны, false = не выбраны
+        private bool? _selectAllState;
 
         public List<string> SortColumns { get; } = new()
         {
@@ -76,11 +77,11 @@ namespace ExamSheduleDesign.ViewModels
                 ApplySort();
 
                 SelectedExam = _savedExamId.HasValue ? Exams.FirstOrDefault(e => e.Id == _savedExamId.Value) : null;
-                UpdateSelectAllState(); // обновить состояние чекбокса "Выбрать все"
+                UpdateSelectAllState();
             }
             catch (Exception ex)
             {
-                _notificationService.Show($"Ошибка загрузки экзаменов: {ex.Message}");
+                _notificationService.Show($"Ошибка загрузки экзаменов: {ex.Message}", NotificationType.Error);
             }
         }
 
@@ -127,7 +128,6 @@ namespace ExamSheduleDesign.ViewModels
         [RelayCommand]
         private void SelectAll()
         {
-            // Если не все выбраны – выбираем все, иначе снимаем все
             bool newState = SelectAllState != true;
             foreach (var exam in Exams)
                 exam.IsSelected = newState;
@@ -182,11 +182,11 @@ namespace ExamSheduleDesign.ViewModels
                 try
                 {
                     await _documentGenerator.GenerateAllDocumentsAsync(dialog.SelectedPath);
-                    _notificationService.Show("Документы успешно созданы.");
+                    _notificationService.Show("Документы успешно созданы.", NotificationType.Success);
                 }
                 catch (Exception ex)
                 {
-                    _notificationService.Show($"Ошибка при создании документов: {ex.Message}");
+                    _notificationService.Show($"Ошибка при создании документов: {ex.Message}", NotificationType.Error);
                 }
             }
         }
@@ -196,7 +196,7 @@ namespace ExamSheduleDesign.ViewModels
         {
             if (SelectedExam == null)
             {
-                _notificationService.Show("Выберите экзамен для редактирования.");
+                _notificationService.Show("Выберите экзамен для редактирования.", NotificationType.Warning);
                 return;
             }
 
@@ -225,7 +225,7 @@ namespace ExamSheduleDesign.ViewModels
                     SelectedExam = editExam;
                 }
                 await LoadExamsAsync();
-                _notificationService.Show("Экзамен успешно обновлён.");
+                _notificationService.Show("Экзамен успешно обновлён.", NotificationType.Success);
             }
         }
     }

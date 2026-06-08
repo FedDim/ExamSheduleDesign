@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using ExamSheduleDesign.Controls;
 using ExamSheduleDesign.Models;
 using ExamSheduleDesign.Services;
 using System;
@@ -71,7 +72,6 @@ namespace ExamSheduleDesign.ViewModels
                 foreach (var d in disciplines) Disciplines.Add(d);
                 foreach (var g in groups) Groups.Add(g);
 
-                // Обновляем список кафедр для группы
                 var deptList = groups.Select(g => g.Department).Where(d => !string.IsNullOrEmpty(d)).Distinct().OrderBy(d => d).ToList();
                 Departments.Clear();
                 foreach (var dept in deptList)
@@ -79,7 +79,7 @@ namespace ExamSheduleDesign.ViewModels
             }
             catch (Exception ex)
             {
-                _notificationService.Show($"Ошибка загрузки справочников: {ex.Message}");
+                _notificationService.Show($"Ошибка загрузки справочников: {ex.Message}", NotificationType.Error);
             }
         }
 
@@ -91,7 +91,7 @@ namespace ExamSheduleDesign.ViewModels
         {
             if (string.IsNullOrWhiteSpace(NewTeacherFullName))
             {
-                _notificationService.Show("Введите ФИО преподавателя.");
+                _notificationService.Show("Введите ФИО преподавателя.", NotificationType.Warning);
                 return;
             }
             var teacher = new Teacher
@@ -100,12 +100,19 @@ namespace ExamSheduleDesign.ViewModels
                 Classroom = NewTeacherClassroom?.Trim() ?? "",
                 AcademicBuilding = NewTeacherAcademicBuilding
             };
-            await _dataService.AddTeacherAsync(teacher);
-            Teachers.Add(teacher);
-            NewTeacherFullName = "";
-            NewTeacherClassroom = "";
-            NewTeacherAcademicBuilding = 0;
-            _notificationService.Show("Преподаватель добавлен.");
+            try
+            {
+                await _dataService.AddTeacherAsync(teacher);
+                Teachers.Add(teacher);
+                NewTeacherFullName = "";
+                NewTeacherClassroom = "";
+                NewTeacherAcademicBuilding = 0;
+                _notificationService.Show("Преподаватель добавлен.", NotificationType.Success);
+            }
+            catch (Exception ex)
+            {
+                _notificationService.Show($"Ошибка при добавлении преподавателя: {ex.Message}", NotificationType.Error);
+            }
         }
 
         [RelayCommand]
@@ -113,7 +120,7 @@ namespace ExamSheduleDesign.ViewModels
         {
             if (string.IsNullOrWhiteSpace(NewDisciplineFullName))
             {
-                _notificationService.Show("Введите полное название дисциплины.");
+                _notificationService.Show("Введите полное название дисциплины.", NotificationType.Warning);
                 return;
             }
             var discipline = new Discipline
@@ -123,13 +130,20 @@ namespace ExamSheduleDesign.ViewModels
                 ShortName9 = NewDisciplineShortName9?.Trim() ?? "",
                 ShortName5 = NewDisciplineShortName5?.Trim() ?? ""
             };
-            await _dataService.AddDisciplineAsync(discipline);
-            Disciplines.Add(discipline);
-            NewDisciplineFullName = "";
-            NewDisciplineShortName12 = "";
-            NewDisciplineShortName9 = "";
-            NewDisciplineShortName5 = "";
-            _notificationService.Show("Дисциплина добавлена.");
+            try
+            {
+                await _dataService.AddDisciplineAsync(discipline);
+                Disciplines.Add(discipline);
+                NewDisciplineFullName = "";
+                NewDisciplineShortName12 = "";
+                NewDisciplineShortName9 = "";
+                NewDisciplineShortName5 = "";
+                _notificationService.Show("Дисциплина добавлена.", NotificationType.Success);
+            }
+            catch (Exception ex)
+            {
+                _notificationService.Show($"Ошибка при добавлении дисциплины: {ex.Message}", NotificationType.Error);
+            }
         }
 
         [RelayCommand]
@@ -137,7 +151,7 @@ namespace ExamSheduleDesign.ViewModels
         {
             if (string.IsNullOrWhiteSpace(NewGroupName))
             {
-                _notificationService.Show("Введите название группы.");
+                _notificationService.Show("Введите название группы.", NotificationType.Warning);
                 return;
             }
             var group = new Group
@@ -145,13 +159,20 @@ namespace ExamSheduleDesign.ViewModels
                 Name = NewGroupName.Trim(),
                 Department = NewGroupDepartment?.Trim() ?? ""
             };
-            await _dataService.AddGroupAsync(group);
-            Groups.Add(group);
-            if (!Departments.Contains(group.Department) && !string.IsNullOrEmpty(group.Department))
-                Departments.Add(group.Department);
-            NewGroupName = "";
-            NewGroupDepartment = "";
-            _notificationService.Show("Группа добавлена.");
+            try
+            {
+                await _dataService.AddGroupAsync(group);
+                Groups.Add(group);
+                if (!Departments.Contains(group.Department) && !string.IsNullOrEmpty(group.Department))
+                    Departments.Add(group.Department);
+                NewGroupName = "";
+                NewGroupDepartment = "";
+                _notificationService.Show("Группа добавлена.", NotificationType.Success);
+            }
+            catch (Exception ex)
+            {
+                _notificationService.Show($"Ошибка при добавлении группы: {ex.Message}", NotificationType.Error);
+            }
         }
 
         [RelayCommand]
@@ -173,9 +194,21 @@ namespace ExamSheduleDesign.ViewModels
             };
             if (dataType == DataType.NULL) return;
 
-            var result = await _dataService.ImportFromExcelAsync(dataType, dialog.FileName);
-            _notificationService.Show(result.GetSummary());
-            await LoadDataAsync();
+            try
+            {
+                var result = await _dataService.ImportFromExcelAsync(dataType, dialog.FileName);
+                if (result.ErrorsCount > 0)
+                    _notificationService.Show(result.GetSummary(), NotificationType.Error);
+                else if (result.Added > 0 && result.Skipped == 0)
+                    _notificationService.Show(result.GetSummary(), NotificationType.Success);
+                else
+                    _notificationService.Show(result.GetSummary(), NotificationType.Warning);
+                await LoadDataAsync();
+            }
+            catch (Exception ex)
+            {
+                _notificationService.Show($"Ошибка импорта: {ex.Message}", NotificationType.Error);
+            }
         }
     }
 }

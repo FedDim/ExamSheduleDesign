@@ -1,6 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using ExamSheduleDesign.Controls;
 using ExamSheduleDesign.Services;
+using System;
 using System.Threading.Tasks;
 
 namespace ExamSheduleDesign.ViewModels
@@ -19,7 +21,14 @@ namespace ExamSheduleDesign.ViewModels
         [RelayCommand]
         private async Task ReconnectAsync()
         {
-            await _dataService.ReconnectAsync();
+            try
+            {
+                await _dataService.ReconnectAsync();
+            }
+            catch (Exception ex)
+            {
+                _notificationService.Show($"Ошибка переподключения: {ex.Message}", NotificationType.Error);
+            }
         }
     }
 }

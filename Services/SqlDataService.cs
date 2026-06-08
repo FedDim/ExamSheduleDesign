@@ -1,4 +1,5 @@
-﻿using ExamSheduleDesign.Models;
+﻿using ExamSheduleDesign.Controls; // для NotificationType
+using ExamSheduleDesign.Models;
 using ExamSheduleDesign.Repositories;
 using ExamSheduleDesign.Services.DTO;
 using ExamSheduleDesign.Services.Logging;
@@ -19,13 +20,13 @@ namespace ExamSheduleDesign.Services
         private readonly IAppLogger _logger;
         private readonly INotificationService _notificationService;
         private readonly DataImporter _dataImporter;
-        private static volatile int _serverAvailable = 0; // 0 = unknown, 1 = available, 2 = unavailable
+        private static volatile int _serverAvailable = 0;
         private readonly IConnectionStringProvider _connectionStringProvider;
 
         public SqlDataService(ITeacherRepository teacherRepo, IDisciplineRepository disciplineRepo,
                               IGroupRepository groupRepo, IExamRepository examRepo, IAppLogger logger,
                               INotificationService notificationService, DataImporter dataImporter,
-                              IConnectionStringProvider connectionStringProvider) // новый параметр
+                              IConnectionStringProvider connectionStringProvider)
         {
             _teacherRepo = teacherRepo;
             _disciplineRepo = disciplineRepo;
@@ -37,7 +38,6 @@ namespace ExamSheduleDesign.Services
             _connectionStringProvider = connectionStringProvider;
         }
 
-        // Асинхронные методы
         public async Task<List<Teacher>> GetTeachersAsync()
         {
             if (_serverAvailable == 2) return new List<Teacher>();
@@ -89,10 +89,7 @@ namespace ExamSheduleDesign.Services
             }
         }
 
-        public async Task<List<Exam>> GetExamsAsync()
-        {
-            return await GetAllExamsWithDetailsAsync();
-        }
+        public async Task<List<Exam>> GetExamsAsync() => await GetAllExamsWithDetailsAsync();
 
         private async Task<List<Exam>> GetAllExamsWithDetailsAsync()
         {
@@ -156,7 +153,7 @@ namespace ExamSheduleDesign.Services
             catch (Exception ex)
             {
                 _logger.Error($"AddExamAsync failed: {ex.Message}", ex);
-                _notificationService.Show("Ошибка при сохранении экзамена.");
+                _notificationService.Show("Ошибка при сохранении экзамена.", NotificationType.Error);
             }
         }
 
@@ -172,7 +169,7 @@ namespace ExamSheduleDesign.Services
                 catch (Exception ex)
                 {
                     _logger.Error($"RemoveExamAsync {exam.Id} failed", ex);
-                    _notificationService.Show("Ошибка при удалении экзамена.");
+                    _notificationService.Show("Ошибка при удалении экзамена.", NotificationType.Error);
                 }
             }
         }
@@ -186,7 +183,7 @@ namespace ExamSheduleDesign.Services
             catch (Exception ex)
             {
                 _logger.Error($"AddTeacherAsync failed: {ex.Message}", ex);
-                _notificationService.Show("Ошибка при добавлении преподавателя.");
+                _notificationService.Show("Ошибка при добавлении преподавателя.", NotificationType.Error);
             }
         }
 
@@ -199,7 +196,7 @@ namespace ExamSheduleDesign.Services
             catch (Exception ex)
             {
                 _logger.Error($"AddDisciplineAsync failed: {ex.Message}", ex);
-                _notificationService.Show("Ошибка при добавлении дисциплины.");
+                _notificationService.Show("Ошибка при добавлении дисциплины.", NotificationType.Error);
             }
         }
 
@@ -212,7 +209,7 @@ namespace ExamSheduleDesign.Services
             catch (Exception ex)
             {
                 _logger.Error($"AddGroupAsync failed: {ex.Message}", ex);
-                _notificationService.Show("Ошибка при добавлении группы.");
+                _notificationService.Show("Ошибка при добавлении группы.", NotificationType.Error);
             }
         }
 
@@ -227,7 +224,7 @@ namespace ExamSheduleDesign.Services
                 catch (Exception ex)
                 {
                     _logger.Error($"UpdateTeacherAsync {teacher.Id} failed", ex);
-                    _notificationService.Show("Ошибка при обновлении преподавателя.");
+                    _notificationService.Show("Ошибка при обновлении преподавателя.", NotificationType.Error);
                 }
             }
         }
@@ -243,7 +240,7 @@ namespace ExamSheduleDesign.Services
                 catch (Exception ex)
                 {
                     _logger.Error($"UpdateDisciplineAsync {discipline.Id} failed", ex);
-                    _notificationService.Show("Ошибка при обновлении дисциплины.");
+                    _notificationService.Show("Ошибка при обновлении дисциплины.", NotificationType.Error);
                 }
             }
         }
@@ -259,7 +256,7 @@ namespace ExamSheduleDesign.Services
                 catch (Exception ex)
                 {
                     _logger.Error($"UpdateGroupAsync {group.Id} failed", ex);
-                    _notificationService.Show("Ошибка при обновлении группы.");
+                    _notificationService.Show("Ошибка при обновлении группы.", NotificationType.Error);
                 }
             }
         }
@@ -286,7 +283,7 @@ namespace ExamSheduleDesign.Services
             catch (Exception ex)
             {
                 _logger.Error($"UpdateExamAsync failed: {ex.Message}", ex);
-                _notificationService.Show("Ошибка при обновлении экзамена.");
+                _notificationService.Show("Ошибка при обновлении экзамена.", NotificationType.Error);
                 throw;
             }
         }
@@ -300,7 +297,7 @@ namespace ExamSheduleDesign.Services
                 var groups = await GetGroupsAsync();
                 if (teachers.Count == 0 || disciplines.Count == 0 || groups.Count == 0)
                 {
-                    _notificationService.Show("Невозможно сгенерировать экзамены: отсутствуют справочные данные (проверьте подключение к серверу).");
+                    _notificationService.Show("Невозможно сгенерировать экзамены: отсутствуют справочные данные (проверьте подключение к серверу).", NotificationType.Warning);
                     return;
                 }
 
@@ -326,12 +323,12 @@ namespace ExamSheduleDesign.Services
                     };
                     await AddExamAsync(exam);
                 }
-                _notificationService.Show($"Сгенерировано {count} экзаменов.");
+                _notificationService.Show($"Сгенерировано {count} экзаменов.", NotificationType.Success);
             }
             catch (Exception ex)
             {
                 _logger.Error("GenerateExamsAsync failed", ex);
-                _notificationService.Show("Ошибка при генерации экзаменов.");
+                _notificationService.Show("Ошибка при генерации экзаменов.", NotificationType.Error);
             }
         }
 
@@ -340,12 +337,12 @@ namespace ExamSheduleDesign.Services
             try
             {
                 await _examRepo.DeleteAllAsync();
-                _notificationService.Show("Все экзамены удалены.");
+                _notificationService.Show("Все экзамены удалены.", NotificationType.Success);
             }
             catch (Exception ex)
             {
                 _logger.Error("ClearGeneratedExamsAsync failed", ex);
-                _notificationService.Show("Ошибка при очистке экзаменов.");
+                _notificationService.Show("Ошибка при очистке экзаменов.", NotificationType.Error);
             }
         }
 
@@ -369,17 +366,17 @@ namespace ExamSheduleDesign.Services
 
         public async Task ReconnectAsync()
         {
-            _serverAvailable = 0; // unknown
+            _serverAvailable = 0;
             _connectionStringProvider.Refresh();
             try
             {
                 await _teacherRepo.GetAllAsync();
-                _notificationService.Show("Переподключение успешно выполнено.");
+                _notificationService.Show("Переподключение успешно выполнено.", NotificationType.Success);
             }
             catch (Exception ex)
             {
                 _logger.Error("ReconnectAsync failed", ex);
-                _notificationService.Show("Ошибка переподключения. Проверьте настройки соединения.");
+                _notificationService.Show("Ошибка переподключения. Проверьте настройки соединения.", NotificationType.Error);
             }
         }
     }
