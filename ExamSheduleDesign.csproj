@@ -10,6 +10,7 @@
     <AssemblyName>ExamSheduleDesign</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Assets\ExamScheduleIcon_v2.png" />
     <None Remove="ExamScheduleIcon_v2.ico" />
   </ItemGroup>
   <ItemGroup>
@@ -44,6 +45,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Assets\ExamScheduleIcon_v2.png" />
     <Resource Include="ExamScheduleIcon_v2.ico" />
   </ItemGroup>
 
