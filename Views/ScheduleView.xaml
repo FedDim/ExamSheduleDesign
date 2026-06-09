@@ -27,6 +27,8 @@
             <Setter Property="CanUserDeleteRows" Value="False"/>
             <Setter Property="SelectionMode" Value="Single"/>
             <Setter Property="SelectionUnit" Value="FullRow"/>
+            <Setter Property="FrozenColumnCount" Value="1"/>
+            <!-- фиксируем столбец с чекбоксами -->
         </Style>
 
         <Style TargetType="DataGridCell">
@@ -159,71 +161,75 @@
             </StackPanel>
         </Border>
 
-        <DataGrid Grid.Row="1" Style="{StaticResource DataGridStyle}" 
-                  ItemsSource="{Binding Exams}" 
-                  SelectedItem="{Binding SelectedExam}" 
-                  AutoGenerateColumns="False" 
-                  CanUserSortColumns="False"
-                  ColumnHeaderStyle="{StaticResource DataGridColumnHeaderStyle}"
-                  MouseDoubleClick="DataGrid_MouseDoubleClick">
-            <DataGrid.Columns>
-                <DataGridTemplateColumn Header=" " Width="40">
-                    <DataGridTemplateColumn.HeaderTemplate>
-                        <DataTemplate>
-                            <CheckBox IsChecked="{Binding DataContext.SelectAllState, RelativeSource={RelativeSource AncestorType=DataGrid}, Mode=OneWay}"
-                  Command="{Binding DataContext.SelectAllCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                  HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.HeaderTemplate>
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <CheckBox IsChecked="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}"
-                                      HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
+        <!-- Оборачиваем DataGrid в ScrollViewer с горизонтальной прокруткой -->
+        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+            <DataGrid Style="{StaticResource DataGridStyle}" 
+                      ItemsSource="{Binding Exams}" 
+                      SelectedItem="{Binding SelectedExam}" 
+                      AutoGenerateColumns="False" 
+                      CanUserSortColumns="False"
+                      ColumnHeaderStyle="{StaticResource DataGridColumnHeaderStyle}"
+                      MouseDoubleClick="DataGrid_MouseDoubleClick"
+                      ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn Header=" " Width="40">
+                        <DataGridTemplateColumn.HeaderTemplate>
+                            <DataTemplate>
+                                <CheckBox IsChecked="{Binding DataContext.SelectAllState, RelativeSource={RelativeSource AncestorType=DataGrid}, Mode=OneWay}"
+                                          Command="{Binding DataContext.SelectAllCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.HeaderTemplate>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox IsChecked="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}"
+                                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
 
-                <DataGridTextColumn x:Name="Teacher1Column" Header="Преподаватель 1" Width="150" 
-                                    Binding="{Binding Teacher1.Name}" CellStyle="{StaticResource DataGridCellStyle}"
-                                    IsReadOnly="True"/>
-                <DataGridTextColumn x:Name="Teacher2Column" Header="Преподаватель 2" Width="150" 
-                                    Binding="{Binding Teacher2.Name}" CellStyle="{StaticResource DataGridCellStyle}"
-                                    IsReadOnly="True"/>
-                <DataGridTextColumn x:Name="DateColumn" Header="Дата" Width="100" 
-                                    Binding="{Binding Date, StringFormat=dd.MM.yyyy}" CellStyle="{StaticResource DataGridCellStyle}"
-                                    IsReadOnly="True"/>
-                <DataGridTextColumn x:Name="DisciplineColumn" Header="Дисциплина" Width="150" 
-                                    Binding="{Binding Discipline.FullName}" CellStyle="{StaticResource DataGridCellStyle}"
-                                    IsReadOnly="True"/>
-                <DataGridTextColumn x:Name="GroupColumn" Header="Группа" Width="100" 
-                                    Binding="{Binding Group.Name}" CellStyle="{StaticResource DataGridCellStyle}"
-                                    IsReadOnly="True"/>
-                <DataGridTextColumn x:Name="DepartmentColumn" Header="Отделение" Width="100" 
-                                    Binding="{Binding Group.Department}" CellStyle="{StaticResource DataGridCellStyle}"
-                                    IsReadOnly="True"/>
-                <DataGridTextColumn x:Name="TimeColumn" Header="Время" Width="80" 
-                                    Binding="{Binding Time}" CellStyle="{StaticResource DataGridCellStyle}"
-                                    IsReadOnly="True"/>
-                <DataGridTextColumn x:Name="ClassroomColumn" Header="Аудитория" Width="80" 
-                                    Binding="{Binding Classroom}" CellStyle="{StaticResource DataGridCellStyle}"
-                                    IsReadOnly="True"/>
-                <DataGridTemplateColumn x:Name="TypeColumn" Header="Тип" Width="100">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Border CornerRadius="12" Padding="8,2" HorizontalAlignment="Center"
-                                    Background="{Binding Type, Converter={StaticResource ExamTypeToColorConverter}}">
-                                <TextBlock Text="{Binding Type}" 
-                                           Foreground="White" 
-                                           FontSize="11" 
-                                           FontWeight="SemiBold"
-                                           TextAlignment="Center"
-                                           VerticalAlignment="Center"/>
-                            </Border>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-            </DataGrid.Columns>
-        </DataGrid>
+                    <DataGridTextColumn x:Name="Teacher1Column" Header="Преподаватель 1" Width="150" 
+                                        Binding="{Binding Teacher1.Name}" CellStyle="{StaticResource DataGridCellStyle}"
+                                        IsReadOnly="True"/>
+                    <DataGridTextColumn x:Name="Teacher2Column" Header="Преподаватель 2" Width="150" 
+                                        Binding="{Binding Teacher2.Name}" CellStyle="{StaticResource DataGridCellStyle}"
+                                        IsReadOnly="True"/>
+                    <DataGridTextColumn x:Name="DateColumn" Header="Дата" Width="100" 
+                                        Binding="{Binding Date, StringFormat=dd.MM.yyyy}" CellStyle="{StaticResource DataGridCellStyle}"
+                                        IsReadOnly="True"/>
+                    <DataGridTextColumn x:Name="DisciplineColumn" Header="Дисциплина" Width="150" 
+                                        Binding="{Binding Discipline.FullName}" CellStyle="{StaticResource DataGridCellStyle}"
+                                        IsReadOnly="True"/>
+                    <DataGridTextColumn x:Name="GroupColumn" Header="Группа" Width="100" 
+                                        Binding="{Binding Group.Name}" CellStyle="{StaticResource DataGridCellStyle}"
+                                        IsReadOnly="True"/>
+                    <DataGridTextColumn x:Name="DepartmentColumn" Header="Отделение" Width="100" 
+                                        Binding="{Binding Group.Department}" CellStyle="{StaticResource DataGridCellStyle}"
+                                        IsReadOnly="True"/>
+                    <DataGridTextColumn x:Name="TimeColumn" Header="Время" Width="80" 
+                                        Binding="{Binding Time}" CellStyle="{StaticResource DataGridCellStyle}"
+                                        IsReadOnly="True"/>
+                    <DataGridTextColumn x:Name="ClassroomColumn" Header="Аудитория" Width="80" 
+                                        Binding="{Binding Classroom}" CellStyle="{StaticResource DataGridCellStyle}"
+                                        IsReadOnly="True"/>
+                    <DataGridTemplateColumn x:Name="TypeColumn" Header="Тип" Width="100">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Border CornerRadius="12" Padding="8,2" HorizontalAlignment="Center"
+                                        Background="{Binding Type, Converter={StaticResource ExamTypeToColorConverter}}">
+                                    <TextBlock Text="{Binding Type}" 
+                                               Foreground="White" 
+                                               FontSize="11" 
+                                               FontWeight="SemiBold"
+                                               TextAlignment="Center"
+                                               VerticalAlignment="Center"/>
+                                </Border>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </ScrollViewer>
 
         <Border Grid.Row="2" Style="{StaticResource CardStyle}" Padding="12,12" Margin="0,16,0,0">
             <Grid>
