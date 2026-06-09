@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Input;
@@ -21,6 +22,7 @@ namespace ExamSheduleDesign.ViewModels
         private readonly IDocumentGenerator _documentGenerator;
         private readonly IExamCountNotifier _examCountNotifier;
         private int? _savedExamId;
+        private CancellationTokenSource _cancellationTokenSource;
 
         [ObservableProperty]
         private ObservableCollection<Exam> _exams = new();
@@ -45,6 +47,15 @@ namespace ExamSheduleDesign.ViewModels
 
         [ObservableProperty]
         private bool? _selectAllState;
+
+        [ObservableProperty]
+        private bool _isGenerating;
+
+        [ObservableProperty]
+        private int _generationProgress;
+
+        [ObservableProperty]
+        private string _generationStatus = "";
 
         public List<string> SortColumns { get; } = new()
         {
@@ -181,18 +192,57 @@ namespace ExamSheduleDesign.ViewModels
         {
             using var dialog = new FolderBrowserDialog();
             dialog.Description = "Выберите папку для сохранения документов";
-            if (dialog.ShowDialog() == DialogResult.OK)
+            if (dialog.ShowDialog() != DialogResult.OK) return;
+
+            // Отменяем предыдущую генерацию, если есть
+            _cancellationTokenSource?.Cancel();
+            _cancellationTokenSource = new CancellationTokenSource();
+            var token = _cancellationTokenSource.Token;
+
+            var progress = new Progress<string>(status =>
             {
-                try
-                {
-                    await _documentGenerator.GenerateAllDocumentsAsync(dialog.SelectedPath);
-                    _notificationService.Show("Документы успешно созданы.", NotificationType.Success);
-                }
-                catch (Exception ex)
-                {
-                    _notificationService.Show($"Ошибка при создании документов: {ex.Message}", NotificationType.Error);
-                }
+                GenerationStatus = status;
+                // Простой подсчёт прогресса по названиям файлов (можно усложнить)
+                if (status.Contains("дате")) GenerationProgress = 25;
+                else if (status.Contains("преподавателям")) GenerationProgress = 50;
+                else if (status.Contains("дисциплинам")) GenerationProgress = 75;
+                else if (status.Contains("отделениям")) GenerationProgress = 100;
+                else GenerationProgress = 0;
+            });
+
+            IsGenerating = true;
+            GenerationProgress = 0;
+            GenerationStatus = "Подготовка...";
+
+            try
+            {
+                await _documentGenerator.GenerateAllDocumentsAsync(dialog.SelectedPath, token, progress);
+                _notificationService.Show("Документы успешно созданы.", NotificationType.Success);
+                GenerationProgress = 100;
+                GenerationStatus = "Готово";
             }
+            catch (OperationCanceledException)
+            {
+                _notificationService.Show("Генерация отменена.", NotificationType.Warning);
+                GenerationStatus = "Отменено";
+            }
+            catch (Exception ex)
+            {
+                _notificationService.Show($"Ошибка: {ex.Message}", NotificationType.Error);
+                GenerationStatus = "Ошибка";
+            }
+            finally
+            {
+                IsGenerating = false;
+                _cancellationTokenSource?.Dispose();
+                _cancellationTokenSource = null;
+            }
+        }
+
+        [RelayCommand]
+        private void CancelGeneration()
+        {
+            _cancellationTokenSource?.Cancel();
         }
 
         [RelayCommand]

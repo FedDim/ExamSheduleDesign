@@ -1,6 +1,7 @@
 ﻿using ExamSheduleDesign.Controls;
 using ExamSheduleDesign.Services.Logging;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ExamSheduleDesign.Services
@@ -18,7 +19,7 @@ namespace ExamSheduleDesign.Services
             _logger = logger;
         }
 
-        public async Task GenerateAllDocumentsAsync(string folderPath)
+        public async Task GenerateAllDocumentsAsync(string folderPath, CancellationToken cancellationToken = default, IProgress<string> progress = null)
         {
             try
             {
@@ -29,12 +30,16 @@ namespace ExamSheduleDesign.Services
                     return;
                 }
 
-                // Запускаем генерацию в отдельном STA-потоке (требуется для COM Interop)
                 await Task.Run(() =>
                 {
                     var wordHelper = new WordHelper(exams);
-                    wordHelper.CreateAllDocuments(folderPath);
-                });
+                    wordHelper.CreateAllDocuments(folderPath, cancellationToken, progress);
+                }, cancellationToken);
+            }
+            catch (OperationCanceledException)
+            {
+                _notificationService.Show("Генерация документов отменена.", NotificationType.Warning);
+                throw;
             }
             catch (Exception ex)
             {

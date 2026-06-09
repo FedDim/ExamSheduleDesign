@@ -1,9 +1,11 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ExamSheduleDesign.Services
 {
     public interface IDocumentGenerator
     {
-        Task GenerateAllDocumentsAsync(string folderPath);
+        Task GenerateAllDocumentsAsync(string folderPath, CancellationToken cancellationToken = default, IProgress<string> progress = null);
     }
 }
