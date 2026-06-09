@@ -19,6 +19,7 @@ namespace ExamSheduleDesign.ViewModels
         private readonly IDataService _dataService;
         private readonly INotificationService _notificationService;
         private readonly IDocumentGenerator _documentGenerator;
+        private readonly IExamCountNotifier _examCountNotifier;
         private int? _savedExamId;
 
         [ObservableProperty]
@@ -53,11 +54,13 @@ namespace ExamSheduleDesign.ViewModels
         public ICommand SortAscendingCommand { get; }
         public ICommand SortDescendingCommand { get; }
 
-        public ScheduleViewModel(IDataService dataService, INotificationService notificationService, IDocumentGenerator documentGenerator)
+        public ScheduleViewModel(IDataService dataService, INotificationService notificationService,
+                                 IDocumentGenerator documentGenerator, IExamCountNotifier examCountNotifier)
         {
             _dataService = dataService;
             _notificationService = notificationService;
             _documentGenerator = documentGenerator;
+            _examCountNotifier = examCountNotifier;
 
             SortAscendingCommand = new RelayCommand(() => { IsSortAscending = true; ApplySort(); });
             SortDescendingCommand = new RelayCommand(() => { IsSortAscending = false; ApplySort(); });
@@ -110,6 +113,7 @@ namespace ExamSheduleDesign.ViewModels
         {
             SelectedCount = Exams?.Count(e => e.IsSelected) ?? 0;
             TotalCount = Exams?.Count ?? 0;
+            _examCountNotifier.UpdateCount(TotalCount);
             CanEdit = SelectedCount == 1;
         }
 

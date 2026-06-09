@@ -24,5 +24,7 @@ namespace ExamSheduleDesign.Services
         Task<int> GetGeneratedExamsCountAsync();
         Task<ImportResult> ImportFromExcelAsync(DataType dataType, string filePath);
         Task ReconnectAsync();
+        Task<bool> CheckServerConnectionAsync();
+        Task<int> GetTotalExamsCountAsync();
     }
 }

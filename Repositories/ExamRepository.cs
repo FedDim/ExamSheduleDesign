@@ -32,18 +32,18 @@ namespace ExamSheduleDesign.Repositories
                     using var conn = _connectionFactory.CreateLocalConnection();
                     conn.Open();
                     const string createTableSql = @"
-                CREATE TABLE IF NOT EXISTS Exams (
-                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    Teacher1Id INTEGER,
-                    Teacher2Id INTEGER,
-                    SubjectId INTEGER,
-                    GroupId INTEGER,
-                    Classroom TEXT,
-                    Department TEXT,
-                    ExamDate TEXT,
-                    ExamTime TEXT,
-                    ExamType TEXT
-                )";
+                        CREATE TABLE IF NOT EXISTS Exams (
+                            Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            Teacher1Id INTEGER,
+                            Teacher2Id INTEGER,
+                            SubjectId INTEGER,
+                            GroupId INTEGER,
+                            Classroom TEXT,
+                            Department TEXT,
+                            ExamDate TEXT,
+                            ExamTime TEXT,
+                            ExamType TEXT
+                        )";
                     using var cmd = new SQLiteCommand(createTableSql, conn);
                     cmd.ExecuteNonQuery();
                     _tableChecked = true;
@@ -206,6 +206,16 @@ namespace ExamSheduleDesign.Repositories
                 _logger.Error("ExamRepository.DeleteAllAsync", ex);
                 throw;
             }
+        }
+
+        public async Task<int> GetCountAsync()
+        {
+            await EnsureTableExistsAsync();
+            using var conn = _connectionFactory.CreateLocalConnection();
+            await conn.OpenAsync();
+            const string sql = "SELECT COUNT(*) FROM Exams";
+            using var cmd = new SQLiteCommand(sql, conn);
+            return Convert.ToInt32(await cmd.ExecuteScalarAsync());
         }
     }
 }

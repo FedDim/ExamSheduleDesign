@@ -4,7 +4,7 @@
                    xmlns:metro="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
                    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
                    xmlns:views="clr-namespace:ExamSheduleDesign.Views"
-                   xmlns:controls="clr-namespace:ExamSheduleDesign.Controls"
+                   xmlns:controls="clr-namespace:ExamSheduleDesign.Controls" xmlns:converters="clr-namespace:ExamSheduleDesign.Converters"
                    Title="Генератор расписания экзаменов"
                    Width="1200" Height="800"
                    MinWidth="800" MinHeight="700"
@@ -22,6 +22,7 @@
             <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
                              From="15" To="0" Duration="0:0:0.15"/>
         </Storyboard>
+        <converters:BoolToColorConverter x:Key="BoolToColorConverter"/>
     </metro:MetroWindow.Resources>
 
     <!-- Единый корневой Grid -->
@@ -42,11 +43,25 @@
 
             <!-- Хлебные крошки -->
             <Border Grid.Column="1" Grid.Row="0" Background="{StaticResource CardBackgroundBrush}" Padding="12,8" CornerRadius="12,12,0,0"
-                    BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="Расписание экзаменов / " Foreground="{StaticResource SecondaryTextBrush}"/>
-                    <TextBlock Text="{Binding Breadcrumb}" Foreground="{StaticResource PrimaryTextBrush}" FontWeight="SemiBold"/>
-                </StackPanel>
+        BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="Расписание экзаменов / " Foreground="{StaticResource SecondaryTextBrush}"
+                                   FontSize="16"/>
+                        <TextBlock Text="{Binding Breadcrumb}" Foreground="{StaticResource PrimaryTextBrush}" FontWeight="SemiBold"
+                                   FontSize="16"/>
+                    </StackPanel>
+                    <Button Grid.Column="1" Width="14" Height="14" Padding="0" Background="Transparent" BorderThickness="0"
+                Command="{Binding RefreshConnectionStatusCommand}" ToolTip="Проверить подключение к серверу" VerticalAlignment="Center">
+                        <Button.Content>
+                            <Ellipse Width="14" Height="14" Fill="{Binding IsServerConnected, Converter={StaticResource BoolToColorConverter}}"/>
+                        </Button.Content>
+                    </Button>
+                </Grid>
             </Border>
 
             <!-- Контентная область -->

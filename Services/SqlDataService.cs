@@ -1,10 +1,11 @@
-﻿using ExamSheduleDesign.Controls; // для NotificationType
+﻿using ExamSheduleDesign.Controls;
 using ExamSheduleDesign.Models;
 using ExamSheduleDesign.Repositories;
 using ExamSheduleDesign.Services.DTO;
 using ExamSheduleDesign.Services.Logging;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,13 +21,15 @@ namespace ExamSheduleDesign.Services
         private readonly IAppLogger _logger;
         private readonly INotificationService _notificationService;
         private readonly DataImporter _dataImporter;
-        private static volatile int _serverAvailable = 0;
         private readonly IConnectionStringProvider _connectionStringProvider;
+        private readonly IExamCountNotifier _examCountNotifier;
+        private static volatile int _serverAvailable = 0;
 
         public SqlDataService(ITeacherRepository teacherRepo, IDisciplineRepository disciplineRepo,
                               IGroupRepository groupRepo, IExamRepository examRepo, IAppLogger logger,
                               INotificationService notificationService, DataImporter dataImporter,
-                              IConnectionStringProvider connectionStringProvider)
+                              IConnectionStringProvider connectionStringProvider,
+                              IExamCountNotifier examCountNotifier)
         {
             _teacherRepo = teacherRepo;
             _disciplineRepo = disciplineRepo;
@@ -36,8 +39,10 @@ namespace ExamSheduleDesign.Services
             _notificationService = notificationService;
             _dataImporter = dataImporter;
             _connectionStringProvider = connectionStringProvider;
+            _examCountNotifier = examCountNotifier;
         }
 
+        // ========== Асинхронные методы ==========
         public async Task<List<Teacher>> GetTeachersAsync()
         {
             if (_serverAvailable == 2) return new List<Teacher>();
@@ -132,6 +137,7 @@ namespace ExamSheduleDesign.Services
             }
         }
 
+        // ========== Операции с экзаменами ==========
         public async Task AddExamAsync(Exam exam)
         {
             try
@@ -149,6 +155,7 @@ namespace ExamSheduleDesign.Services
                     ExamType = exam.Type
                 };
                 await _examRepo.AddAsync(dto);
+                await UpdateExamCountAsync();
             }
             catch (Exception ex)
             {
@@ -172,8 +179,110 @@ namespace ExamSheduleDesign.Services
                     _notificationService.Show("Ошибка при удалении экзамена.", NotificationType.Error);
                 }
             }
+            await UpdateExamCountAsync();
         }
 
+        public async Task UpdateExamAsync(Exam exam)
+        {
+            try
+            {
+                var dto = new ExamScheduleDto
+                {
+                    Id = exam.Id,
+                    Teacher1Id = exam.Teacher1?.Id ?? 0,
+                    Teacher2Id = exam.Teacher2?.Id,
+                    SubjectId = exam.Discipline?.Id ?? 0,
+                    GroupId = exam.Group?.Id ?? 0,
+                    Classroom = exam.Classroom ?? "",
+                    DepartmentName = exam.Group?.Department ?? "",
+                    ExamDate = exam.Date.ToString("yyyy-MM-dd"),
+                    ExamTime = exam.Time,
+                    ExamType = exam.Type
+                };
+                await _examRepo.UpdateAsync(dto);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"UpdateExamAsync failed: {ex.Message}", ex);
+                _notificationService.Show("Ошибка при обновлении экзамена.", NotificationType.Error);
+                throw;
+            }
+        }
+
+        public async Task GenerateExamsAsync(int count)
+        {
+            try
+            {
+                var teachers = await GetTeachersAsync();
+                var disciplines = await GetDisciplinesAsync();
+                var groups = await GetGroupsAsync();
+                if (teachers.Count == 0 || disciplines.Count == 0 || groups.Count == 0)
+                {
+                    _notificationService.Show("Невозможно сгенерировать экзамены: отсутствуют справочные данные (проверьте подключение к серверу).", NotificationType.Warning);
+                    return;
+                }
+
+                var random = new Random();
+                var times = new[] { "9:00", "10:40", "11:00", "13:00", "13:30", "14:35", "15:00", "16:20" };
+                var rooms = new[] { "301", "205", "402", "110", "215", "101", "305" };
+                var types = new[] { "Экзамен", "Консультация" };
+                var startDate = DateTime.Today.AddDays(7);
+
+                for (int i = 0; i < count; i++)
+                {
+                    var exam = new Exam
+                    {
+                        Date = startDate.AddDays(random.Next(0, 14)),
+                        Time = times[random.Next(times.Length)],
+                        Type = types[random.Next(types.Length)],
+                        Teacher1 = teachers[random.Next(teachers.Count)],
+                        Teacher2 = random.Next(2) == 0 ? null : teachers[random.Next(teachers.Count)],
+                        Discipline = disciplines[random.Next(disciplines.Count)],
+                        Group = groups[random.Next(groups.Count)],
+                        Classroom = rooms[random.Next(rooms.Length)],
+                        IsSelected = false
+                    };
+                    await AddExamAsync(exam);
+                }
+                await UpdateExamCountAsync(); // дополнительное уведомление после массовой генерации
+                _notificationService.Show($"Сгенерировано {count} экзаменов.", NotificationType.Success);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error("GenerateExamsAsync failed", ex);
+                _notificationService.Show("Ошибка при генерации экзаменов.", NotificationType.Error);
+            }
+        }
+
+        public async Task ClearGeneratedExamsAsync()
+        {
+            try
+            {
+                await _examRepo.DeleteAllAsync();
+                await UpdateExamCountAsync();
+                _notificationService.Show("Все экзамены удалены.", NotificationType.Success);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error("ClearGeneratedExamsAsync failed", ex);
+                _notificationService.Show("Ошибка при очистке экзаменов.", NotificationType.Error);
+            }
+        }
+
+        public async Task<int> GetGeneratedExamsCountAsync()
+        {
+            try
+            {
+                var list = await _examRepo.GetAllRawAsync();
+                return list.Count;
+            }
+            catch
+            {
+                return 0;
+            }
+        }
+
+        // ========== Операции со справочниками ==========
         public async Task AddTeacherAsync(Teacher teacher)
         {
             try
@@ -261,104 +370,7 @@ namespace ExamSheduleDesign.Services
             }
         }
 
-        public async Task UpdateExamAsync(Exam exam)
-        {
-            try
-            {
-                var dto = new ExamScheduleDto
-                {
-                    Id = exam.Id,
-                    Teacher1Id = exam.Teacher1?.Id ?? 0,
-                    Teacher2Id = exam.Teacher2?.Id,
-                    SubjectId = exam.Discipline?.Id ?? 0,
-                    GroupId = exam.Group?.Id ?? 0,
-                    Classroom = exam.Classroom ?? "",
-                    DepartmentName = exam.Group?.Department ?? "",
-                    ExamDate = exam.Date.ToString("yyyy-MM-dd"),
-                    ExamTime = exam.Time,
-                    ExamType = exam.Type
-                };
-                await _examRepo.UpdateAsync(dto);
-            }
-            catch (Exception ex)
-            {
-                _logger.Error($"UpdateExamAsync failed: {ex.Message}", ex);
-                _notificationService.Show("Ошибка при обновлении экзамена.", NotificationType.Error);
-                throw;
-            }
-        }
-
-        public async Task GenerateExamsAsync(int count)
-        {
-            try
-            {
-                var teachers = await GetTeachersAsync();
-                var disciplines = await GetDisciplinesAsync();
-                var groups = await GetGroupsAsync();
-                if (teachers.Count == 0 || disciplines.Count == 0 || groups.Count == 0)
-                {
-                    _notificationService.Show("Невозможно сгенерировать экзамены: отсутствуют справочные данные (проверьте подключение к серверу).", NotificationType.Warning);
-                    return;
-                }
-
-                var random = new Random();
-                var times = new[] { "9:00", "10:40", "11:00", "13:00", "13:30", "14:35", "15:00", "16:20" };
-                var rooms = new[] { "301", "205", "402", "110", "215", "101", "305" };
-                var types = new[] { "Экзамен", "Консультация" };
-                var startDate = DateTime.Today.AddDays(7);
-
-                for (int i = 0; i < count; i++)
-                {
-                    var exam = new Exam
-                    {
-                        Date = startDate.AddDays(random.Next(0, 14)),
-                        Time = times[random.Next(times.Length)],
-                        Type = types[random.Next(types.Length)],
-                        Teacher1 = teachers[random.Next(teachers.Count)],
-                        Teacher2 = random.Next(2) == 0 ? null : teachers[random.Next(teachers.Count)],
-                        Discipline = disciplines[random.Next(disciplines.Count)],
-                        Group = groups[random.Next(groups.Count)],
-                        Classroom = rooms[random.Next(rooms.Length)],
-                        IsSelected = false
-                    };
-                    await AddExamAsync(exam);
-                }
-                _notificationService.Show($"Сгенерировано {count} экзаменов.", NotificationType.Success);
-            }
-            catch (Exception ex)
-            {
-                _logger.Error("GenerateExamsAsync failed", ex);
-                _notificationService.Show("Ошибка при генерации экзаменов.", NotificationType.Error);
-            }
-        }
-
-        public async Task ClearGeneratedExamsAsync()
-        {
-            try
-            {
-                await _examRepo.DeleteAllAsync();
-                _notificationService.Show("Все экзамены удалены.", NotificationType.Success);
-            }
-            catch (Exception ex)
-            {
-                _logger.Error("ClearGeneratedExamsAsync failed", ex);
-                _notificationService.Show("Ошибка при очистке экзаменов.", NotificationType.Error);
-            }
-        }
-
-        public async Task<int> GetGeneratedExamsCountAsync()
-        {
-            try
-            {
-                var list = await _examRepo.GetAllRawAsync();
-                return list.Count;
-            }
-            catch
-            {
-                return 0;
-            }
-        }
-
+        // ========== Импорт, переподключение и вспомогательные методы ==========
         public async Task<ImportResult> ImportFromExcelAsync(DataType dataType, string filePath)
         {
             return await _dataImporter.ImportAsync(dataType, filePath);
@@ -378,6 +390,31 @@ namespace ExamSheduleDesign.Services
                 _logger.Error("ReconnectAsync failed", ex);
                 _notificationService.Show("Ошибка переподключения. Проверьте настройки соединения.", NotificationType.Error);
             }
+        }
+
+        public async Task<bool> CheckServerConnectionAsync()
+        {
+            try
+            {
+                using (var connection = new SqlConnection(_connectionStringProvider.GetServerConnectionString()))
+                {
+                    await connection.OpenAsync();
+                    return true;
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        // ========== Подсчёт количества экзаменов и уведомления ==========
+        public async Task<int> GetTotalExamsCountAsync() => await _examRepo.GetCountAsync();
+
+        private async Task UpdateExamCountAsync()
+        {
+            var count = await GetTotalExamsCountAsync();
+            _examCountNotifier.UpdateCount(count);
         }
     }
 }

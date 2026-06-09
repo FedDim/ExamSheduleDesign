@@ -11,5 +11,6 @@ namespace ExamSheduleDesign.Repositories
         Task UpdateAsync(ExamScheduleDto exam);
         Task DeleteAsync(int examId);
         Task DeleteAllAsync();
+        Task<int> GetCountAsync();
     }
 }

@@ -32,8 +32,8 @@ namespace ExamSheduleDesign
             services.AddSingleton<DataImporter>();
             services.AddSingleton<IConnectionSettingsService, ConnectionSettingsService>();
             services.AddSingleton<IConnectionStringProvider, ConnectionStringProvider>();
-            services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>();
             services.AddSingleton<IBufferService, BufferService>();
+            services.AddSingleton<IExamCountNotifier, ExamCountNotifier>();
 
             // Репозитории
             services.AddSingleton<ITeacherRepository, TeacherRepository>();
