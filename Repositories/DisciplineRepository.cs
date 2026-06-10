@@ -4,6 +4,7 @@ using ExamSheduleDesign.Services.Logging;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Data.SQLite;
 using System.Threading.Tasks;
 
 namespace ExamSheduleDesign.Repositories
@@ -164,6 +165,17 @@ namespace ExamSheduleDesign.Repositories
                 _logger.Error($"DisciplineRepository.ExistsAsync ({shortName9})", ex);
                 return false;
             }
+        }
+
+        public async Task<bool> HasExamsAsync(int id)
+        {
+            using var conn = _connectionFactory.CreateLocalConnection();
+            await conn.OpenAsync();
+            const string sql = "SELECT COUNT(*) FROM Exams WHERE SubjectId = @id";
+            using var cmd = new SQLiteCommand(sql, conn);
+            cmd.Parameters.AddWithValue("@id", id);
+            long count = (long)await cmd.ExecuteScalarAsync();
+            return count > 0;
         }
     }
 }

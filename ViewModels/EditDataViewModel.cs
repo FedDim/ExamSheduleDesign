@@ -17,6 +17,24 @@ namespace ExamSheduleDesign.ViewModels
         [ObservableProperty]
         private string _currentTab = "Teacher";
 
+        [ObservableProperty]
+        private object? _selectedTeacher;
+
+        [ObservableProperty]
+        private object? _selectedDiscipline;
+
+        [ObservableProperty]
+        private object? _selectedGroup;
+
+        [ObservableProperty]
+        private bool _canDeleteTeacher;   // true если выбран преподаватель
+
+        [ObservableProperty]
+        private bool _canDeleteDiscipline; // true если выбрана дисциплина
+
+        [ObservableProperty]
+        private bool _canDeleteGroup;     // true если выбрана группа
+
         public ObservableCollection<Teacher> Teachers { get; set; } = new();
         public ObservableCollection<Discipline> Disciplines { get; set; } = new();
         public ObservableCollection<Group> Groups { get; set; } = new();
@@ -47,6 +65,21 @@ namespace ExamSheduleDesign.ViewModels
             {
                 _notificationService.Show($"Ошибка загрузки справочников: {ex.Message}", NotificationType.Error);
             }
+        }
+
+        partial void OnSelectedTeacherChanged(object? value)
+        {
+            CanDeleteTeacher = value != null;
+        }
+
+        partial void OnSelectedDisciplineChanged(object? value)
+        {
+            CanDeleteDiscipline = value != null;
+        }
+
+        partial void OnSelectedGroupChanged(object? value)
+        {
+            CanDeleteGroup = value != null;
         }
 
         [RelayCommand]
@@ -102,6 +135,35 @@ namespace ExamSheduleDesign.ViewModels
                 case "Teacher": await SaveTeachersAsync(); break;
                 case "Discipline": await SaveDisciplinesAsync(); break;
                 case "Group": await SaveGroupsAsync(); break;
+            }
+        }
+
+        [RelayCommand]
+        private async Task DeleteCurrentAsync()
+        {
+            switch (CurrentTab)
+            {
+                case "Teacher":
+                    if (SelectedTeacher is Teacher teacher)
+                    {
+                        await _dataService.DeleteTeacherAsync(teacher.Id);
+                        await LoadDataAsync();
+                    }
+                    break;
+                case "Discipline":
+                    if (SelectedDiscipline is Discipline discipline)
+                    {
+                        await _dataService.DeleteDisciplineAsync(discipline.Id);
+                        await LoadDataAsync();
+                    }
+                    break;
+                case "Group":
+                    if (SelectedGroup is Group group)
+                    {
+                        await _dataService.DeleteGroupAsync(group.Id);
+                        await LoadDataAsync();
+                    }
+                    break;
             }
         }
     }

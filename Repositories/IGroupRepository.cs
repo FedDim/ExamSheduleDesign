@@ -12,5 +12,6 @@ namespace ExamSheduleDesign.Repositories
         Task UpdateAsync(Group group);
         Task DeleteAsync(int id);
         Task<bool> ExistsAsync(string name);
+        Task<bool> HasExamsAsync(int id);
     }
 }

@@ -12,5 +12,6 @@ namespace ExamSheduleDesign.Repositories
         Task UpdateAsync(Discipline discipline);
         Task DeleteAsync(int id);
         Task<bool> ExistsAsync(string shortName9);
+        Task<bool> HasExamsAsync(int id);
     }
 }

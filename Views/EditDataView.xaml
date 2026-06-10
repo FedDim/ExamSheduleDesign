@@ -11,6 +11,7 @@
     <UserControl.Resources>
         <converters:RadioButtonConverter x:Key="RadioButtonConverter"/>
         <converters:TabVisibilityConverter x:Key="TabVisibilityConverter"/>
+        <converters:BooleanConverter x:Key="BooleanConverter"/>
 
         <Style x:Key="TabButtonStyle" TargetType="ToggleButton">
             <Setter Property="FontSize" Value="14"/>
@@ -46,25 +47,10 @@
             </Setter>
         </Style>
 
-        <!-- Исправленный стиль ячейки DataGrid -->
         <Style x:Key="DataGridCellStyle" TargetType="DataGridCell">
             <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Padding" Value="8,4"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="DataGridCell">
-                        <Border Background="{TemplateBinding Background}" 
-                                BorderBrush="{TemplateBinding BorderBrush}" 
-                                BorderThickness="{TemplateBinding BorderThickness}">
-                            <ContentPresenter HorizontalAlignment="Left" 
-                                              VerticalAlignment="Center"/>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
         </Style>
 
         <Style x:Key="DataGridStyle" TargetType="DataGrid">
@@ -114,10 +100,11 @@
                 <!-- Таблица преподавателей -->
                 <DataGrid ItemsSource="{Binding Teachers}" AutoGenerateColumns="False" HeadersVisibility="Column" RowHeight="35"
                           Visibility="{Binding CurrentTab, Converter={StaticResource TabVisibilityConverter}, ConverterParameter=Teacher}"
-                          Style="{StaticResource DataGridStyle}" CanUserAddRows="False" CanUserDeleteRows="False">
+                          Style="{StaticResource DataGridStyle}" CanUserAddRows="False" CanUserDeleteRows="False"
+                          SelectedItem="{Binding SelectedTeacher}">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="ID" Width="50" Binding="{Binding Id}" IsReadOnly="True"/>
-                        <DataGridTextColumn Header="ФИО" Width="Auto" Binding="{Binding Name}" IsReadOnly="False"/>
+                        <DataGridTextColumn Header="ФИО" Width="*" Binding="{Binding Name}" IsReadOnly="False"/>
                         <DataGridTextColumn Header="Аудитория" Width="100" Binding="{Binding Classroom}" IsReadOnly="False"/>
                         <DataGridTextColumn Header="Корпус" Width="80" Binding="{Binding AcademicBuilding}" IsReadOnly="False"/>
                     </DataGrid.Columns>
@@ -126,10 +113,11 @@
                 <!-- Таблица дисциплин -->
                 <DataGrid ItemsSource="{Binding Disciplines}" AutoGenerateColumns="False" HeadersVisibility="Column" RowHeight="35"
                           Visibility="{Binding CurrentTab, Converter={StaticResource TabVisibilityConverter}, ConverterParameter=Discipline}"
-                          Style="{StaticResource DataGridStyle}" CanUserAddRows="False" CanUserDeleteRows="False">
+                          Style="{StaticResource DataGridStyle}" CanUserAddRows="False" CanUserDeleteRows="False"
+                          SelectedItem="{Binding SelectedDiscipline}">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="ID" Width="50" Binding="{Binding Id}" IsReadOnly="True"/>
-                        <DataGridTextColumn Header="Полное название" Width="Auto" Binding="{Binding FullName}" IsReadOnly="False"/>
+                        <DataGridTextColumn Header="Полное название" Width="*" Binding="{Binding FullName}" IsReadOnly="False"/>
                         <DataGridTextColumn Header="Сокр. 12" Width="80" Binding="{Binding ShortName12}" IsReadOnly="False"/>
                         <DataGridTextColumn Header="Сокр. 9" Width="80" Binding="{Binding ShortName9}" IsReadOnly="False"/>
                         <DataGridTextColumn Header="Сокр. 5" Width="80" Binding="{Binding ShortName5}" IsReadOnly="False"/>
@@ -139,10 +127,11 @@
                 <!-- Таблица групп -->
                 <DataGrid ItemsSource="{Binding Groups}" AutoGenerateColumns="False" HeadersVisibility="Column" RowHeight="35"
                           Visibility="{Binding CurrentTab, Converter={StaticResource TabVisibilityConverter}, ConverterParameter=Group}"
-                          Style="{StaticResource DataGridStyle}" CanUserAddRows="False" CanUserDeleteRows="False">
+                          Style="{StaticResource DataGridStyle}" CanUserAddRows="False" CanUserDeleteRows="False"
+                          SelectedItem="{Binding SelectedGroup}">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="ID" Width="50" Binding="{Binding Id}" IsReadOnly="True"/>
-                        <DataGridTextColumn Header="Название" Width="Auto" Binding="{Binding Name}" IsReadOnly="False"/>
+                        <DataGridTextColumn Header="Название" Width="*" Binding="{Binding Name}" IsReadOnly="False"/>
                         <DataGridTextColumn Header="Отделение" Width="120" Binding="{Binding Department}" IsReadOnly="False"/>
                     </DataGrid.Columns>
                 </DataGrid>
@@ -150,10 +139,29 @@
         </Border>
 
         <Border Grid.Row="2" Style="{StaticResource CardStyle}" Padding="12,12" Margin="0,16,0,0">
-            <StackPanel HorizontalAlignment="Right">
+            <Grid>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                    <!-- Кнопка удаления для преподавателей -->
+                    <Button Content="Удалить выбранное" Command="{Binding DeleteCurrentCommand}" 
+                            Style="{StaticResource DangerButtonStyle}"
+                            IsEnabled="{Binding CanDeleteTeacher}"
+                            Visibility="{Binding CurrentTab, Converter={StaticResource TabVisibilityConverter}, ConverterParameter=Teacher}"/>
+
+                    <!-- Кнопка удаления для дисциплин -->
+                    <Button Content="Удалить выбранное" Command="{Binding DeleteCurrentCommand}" 
+                            Style="{StaticResource DangerButtonStyle}"
+                            IsEnabled="{Binding CanDeleteDiscipline}"
+                            Visibility="{Binding CurrentTab, Converter={StaticResource TabVisibilityConverter}, ConverterParameter=Discipline}"/>
+
+                    <!-- Кнопка удаления для групп -->
+                    <Button Content="Удалить выбранное" Command="{Binding DeleteCurrentCommand}" 
+                            Style="{StaticResource DangerButtonStyle}"
+                            IsEnabled="{Binding CanDeleteGroup}"
+                            Visibility="{Binding CurrentTab, Converter={StaticResource TabVisibilityConverter}, ConverterParameter=Group}"/>
+                </StackPanel>
                 <Button Content="Сохранить изменения" Command="{Binding SaveCurrentCommand}" 
-                        Style="{StaticResource PrimaryButtonStyle}" Width="200" Height="36"/>
-            </StackPanel>
+                        Style="{StaticResource PrimaryButtonStyle}" Width="200" Height="36" HorizontalAlignment="Right"/>
+            </Grid>
         </Border>
     </Grid>
 </UserControl>

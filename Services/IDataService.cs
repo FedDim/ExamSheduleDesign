@@ -26,5 +26,8 @@ namespace ExamSheduleDesign.Services
         Task ReconnectAsync();
         Task<bool> CheckServerConnectionAsync();
         Task<int> GetTotalExamsCountAsync();
+        Task DeleteTeacherAsync(int id);
+        Task DeleteDisciplineAsync(int id);
+        Task DeleteGroupAsync(int id);
     }
 }

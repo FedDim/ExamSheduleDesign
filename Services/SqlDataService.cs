@@ -416,5 +416,38 @@ namespace ExamSheduleDesign.Services
             var count = await GetTotalExamsCountAsync();
             _examCountNotifier.UpdateCount(count);
         }
+
+        public async Task DeleteTeacherAsync(int id)
+        {
+            if (await _teacherRepo.HasExamsAsync(id))
+            {
+                _notificationService.Show("Невозможно удалить преподавателя: за ним закреплены экзамены.", NotificationType.Warning);
+                return;
+            }
+            await _teacherRepo.DeleteAsync(id);
+            _notificationService.Show("Преподаватель успешно удалён.", NotificationType.Success);
+        }
+
+        public async Task DeleteDisciplineAsync(int id)
+        {
+            if (await _disciplineRepo.HasExamsAsync(id))
+            {
+                _notificationService.Show("Невозможно удалить дисциплину: она используется в экзаменах.", NotificationType.Warning);
+                return;
+            }
+            await _disciplineRepo.DeleteAsync(id);
+            _notificationService.Show("Дисциплина успешно удалена.", NotificationType.Success);
+        }
+
+        public async Task DeleteGroupAsync(int id)
+        {
+            if (await _groupRepo.HasExamsAsync(id))
+            {
+                _notificationService.Show("Невозможно удалить группу: за ней закреплены экзамены.", NotificationType.Warning);
+                return;
+            }
+            await _groupRepo.DeleteAsync(id);
+            _notificationService.Show("Группа успешно удалена.", NotificationType.Success);
+        }
     }
 }
