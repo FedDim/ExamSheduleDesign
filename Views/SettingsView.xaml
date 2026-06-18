@@ -10,8 +10,13 @@
     <Border Style="{StaticResource CardStyle}" Margin="20">
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
             <TextBlock Style="{StaticResource CardHeaderStyle}" Margin="0,0,0,16" TextAlignment="Center">
-                Настройки подключения
+                Настройки
             </TextBlock>
+
+            <CheckBox Content="Включить проверку формата группы (буквы-цифры)" 
+                      IsChecked="{Binding IsGroupValidationEnabled}" 
+                      Margin="0,0,0,16"/>
+
             <Button Content="Переподключиться к серверу" 
                     Command="{Binding ReconnectCommand}" 
                     Style="{StaticResource PrimaryButtonStyle}" 

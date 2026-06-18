@@ -5,6 +5,7 @@ using ExamSheduleDesign.Models;
 using ExamSheduleDesign.Services;
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ExamSheduleDesign.ViewModels
@@ -13,6 +14,7 @@ namespace ExamSheduleDesign.ViewModels
     {
         private readonly IDataService _dataService;
         private readonly INotificationService _notificationService;
+        private readonly ISettingsService _settingsService;
 
         [ObservableProperty]
         private string _currentTab = "Teacher";
@@ -27,22 +29,23 @@ namespace ExamSheduleDesign.ViewModels
         private object? _selectedGroup;
 
         [ObservableProperty]
-        private bool _canDeleteTeacher;   // true если выбран преподаватель
+        private bool _canDeleteTeacher;
 
         [ObservableProperty]
-        private bool _canDeleteDiscipline; // true если выбрана дисциплина
+        private bool _canDeleteDiscipline;
 
         [ObservableProperty]
-        private bool _canDeleteGroup;     // true если выбрана группа
+        private bool _canDeleteGroup;
 
         public ObservableCollection<Teacher> Teachers { get; set; } = new();
         public ObservableCollection<Discipline> Disciplines { get; set; } = new();
         public ObservableCollection<Group> Groups { get; set; } = new();
 
-        public EditDataViewModel(IDataService dataService, INotificationService notificationService)
+        public EditDataViewModel(IDataService dataService, INotificationService notificationService, ISettingsService settingsService)
         {
             _dataService = dataService;
             _notificationService = notificationService;
+            _settingsService = settingsService;
         }
 
         public async Task LoadDataAsync()
@@ -67,20 +70,9 @@ namespace ExamSheduleDesign.ViewModels
             }
         }
 
-        partial void OnSelectedTeacherChanged(object? value)
-        {
-            CanDeleteTeacher = value != null;
-        }
-
-        partial void OnSelectedDisciplineChanged(object? value)
-        {
-            CanDeleteDiscipline = value != null;
-        }
-
-        partial void OnSelectedGroupChanged(object? value)
-        {
-            CanDeleteGroup = value != null;
-        }
+        partial void OnSelectedTeacherChanged(object? value) => CanDeleteTeacher = value != null;
+        partial void OnSelectedDisciplineChanged(object? value) => CanDeleteDiscipline = value != null;
+        partial void OnSelectedGroupChanged(object? value) => CanDeleteGroup = value != null;
 
         [RelayCommand]
         private void SwitchTab(string tab) => CurrentTab = tab;
@@ -88,6 +80,28 @@ namespace ExamSheduleDesign.ViewModels
         [RelayCommand]
         private async Task SaveTeachersAsync()
         {
+            // Проверка на пустые имена
+            foreach (var teacher in Teachers)
+            {
+                if (string.IsNullOrWhiteSpace(teacher.Name))
+                {
+                    _notificationService.Show("Имя преподавателя не может быть пустым.", NotificationType.Warning);
+                    return;
+                }
+            }
+
+            // Проверка дубликатов (регистронезависимо)
+            var duplicateNames = Teachers
+                .GroupBy(t => t.Name, StringComparer.OrdinalIgnoreCase)
+                .Where(g => g.Count() > 1)
+                .Select(g => g.Key)
+                .ToList();
+            if (duplicateNames.Any())
+            {
+                _notificationService.Show($"Обнаружены дубликаты преподавателей: {string.Join(", ", duplicateNames)}", NotificationType.Warning);
+                return;
+            }
+
             try
             {
                 await _dataService.UpdateTeachersAsync(Teachers);
@@ -102,6 +116,28 @@ namespace ExamSheduleDesign.ViewModels
         [RelayCommand]
         private async Task SaveDisciplinesAsync()
         {
+            // Проверка на пустые названия
+            foreach (var discipline in Disciplines)
+            {
+                if (string.IsNullOrWhiteSpace(discipline.FullName))
+                {
+                    _notificationService.Show("Полное название дисциплины не может быть пустым.", NotificationType.Warning);
+                    return;
+                }
+            }
+
+            // Проверка дубликатов (регистронезависимо)
+            var duplicateNames = Disciplines
+                .GroupBy(d => d.FullName, StringComparer.OrdinalIgnoreCase)
+                .Where(g => g.Count() > 1)
+                .Select(g => g.Key)
+                .ToList();
+            if (duplicateNames.Any())
+            {
+                _notificationService.Show($"Обнаружены дубликаты дисциплин: {string.Join(", ", duplicateNames)}", NotificationType.Warning);
+                return;
+            }
+
             try
             {
                 await _dataService.UpdateDisciplinesAsync(Disciplines);
@@ -116,6 +152,42 @@ namespace ExamSheduleDesign.ViewModels
         [RelayCommand]
         private async Task SaveGroupsAsync()
         {
+            // Проверка на пустые названия
+            foreach (var group in Groups)
+            {
+                if (string.IsNullOrWhiteSpace(group.Name))
+                {
+                    _notificationService.Show("Название группы не может быть пустым.", NotificationType.Warning);
+                    return;
+                }
+            }
+
+            // Проверка дубликатов (регистронезависимо)
+            var duplicateNames = Groups
+                .GroupBy(g => g.Name, StringComparer.OrdinalIgnoreCase)
+                .Where(g => g.Count() > 1)
+                .Select(g => g.Key)
+                .ToList();
+            if (duplicateNames.Any())
+            {
+                _notificationService.Show($"Обнаружены дубликаты групп: {string.Join(", ", duplicateNames)}", NotificationType.Warning);
+                return;
+            }
+
+            // Проверка формата группы (если валидация включена)
+            if (_settingsService.IsGroupValidationEnabled)
+            {
+                var invalidGroups = Groups
+                    .Where(g => !IsGroupNameValid(g.Name))
+                    .Select(g => g.Name)
+                    .ToList();
+                if (invalidGroups.Any())
+                {
+                    _notificationService.Show($"Названия групп не соответствуют формату (буквы-цифры): {string.Join(", ", invalidGroups)}", NotificationType.Warning);
+                    return;
+                }
+            }
+
             try
             {
                 await _dataService.UpdateGroupsAsync(Groups);
@@ -125,6 +197,11 @@ namespace ExamSheduleDesign.ViewModels
             {
                 _notificationService.Show($"Ошибка при сохранении групп: {ex.Message}", NotificationType.Error);
             }
+        }
+
+        private bool IsGroupNameValid(string name)
+        {
+            return System.Text.RegularExpressions.Regex.IsMatch(name, @"^[А-ЯЁ]{2}-\d{2}$");
         }
 
         [RelayCommand]

@@ -14,6 +14,7 @@ namespace ExamSheduleDesign.ViewModels
     {
         private readonly IDataService _dataService;
         private readonly INotificationService _notificationService;
+        private readonly ISettingsService _settingsService;
 
         [ObservableProperty]
         private string _currentTab = "Teacher";
@@ -50,10 +51,11 @@ namespace ExamSheduleDesign.ViewModels
         public ObservableCollection<Discipline> Disciplines { get; set; } = new();
         public ObservableCollection<Group> Groups { get; set; } = new();
 
-        public AddDataViewModel(IDataService dataService, INotificationService notificationService)
+        public AddDataViewModel(IDataService dataService, INotificationService notificationService, ISettingsService settingsService)
         {
             _dataService = dataService;
             _notificationService = notificationService;
+            _settingsService = settingsService;
         }
 
         public async Task LoadDataAsync()
@@ -94,6 +96,14 @@ namespace ExamSheduleDesign.ViewModels
                 _notificationService.Show("Введите ФИО преподавателя.", NotificationType.Warning);
                 return;
             }
+
+            // Проверка дубликата
+            if (Teachers.Any(t => string.Equals(t.Name, NewTeacherFullName.Trim(), StringComparison.OrdinalIgnoreCase)))
+            {
+                _notificationService.Show("Преподаватель с таким именем уже существует.", NotificationType.Warning);
+                return;
+            }
+
             var teacher = new Teacher
             {
                 Name = NewTeacherFullName.Trim(),
@@ -123,6 +133,14 @@ namespace ExamSheduleDesign.ViewModels
                 _notificationService.Show("Введите полное название дисциплины.", NotificationType.Warning);
                 return;
             }
+
+            // Проверка дубликата
+            if (Disciplines.Any(d => string.Equals(d.FullName, NewDisciplineFullName.Trim(), StringComparison.OrdinalIgnoreCase)))
+            {
+                _notificationService.Show("Дисциплина с таким названием уже существует.", NotificationType.Warning);
+                return;
+            }
+
             var discipline = new Discipline
             {
                 FullName = NewDisciplineFullName.Trim(),
@@ -154,9 +172,26 @@ namespace ExamSheduleDesign.ViewModels
                 _notificationService.Show("Введите название группы.", NotificationType.Warning);
                 return;
             }
+
+            var groupName = NewGroupName.Trim();
+
+            // Проверка формата (если валидация включена)
+            if (_settingsService.IsGroupValidationEnabled && !IsGroupNameValid(groupName))
+            {
+                _notificationService.Show("Название группы должно соответствовать формату: две заглавные буквы, дефис, две цифры (например, КИ-35).", NotificationType.Warning);
+                return;
+            }
+
+            // Проверка дубликата
+            if (Groups.Any(g => string.Equals(g.Name, groupName, StringComparison.OrdinalIgnoreCase)))
+            {
+                _notificationService.Show("Группа с таким названием уже существует.", NotificationType.Warning);
+                return;
+            }
+
             var group = new Group
             {
-                Name = NewGroupName.Trim(),
+                Name = groupName,
                 Department = NewGroupDepartment?.Trim() ?? ""
             };
             try
@@ -173,6 +208,13 @@ namespace ExamSheduleDesign.ViewModels
             {
                 _notificationService.Show($"Ошибка при добавлении группы: {ex.Message}", NotificationType.Error);
             }
+        }
+
+        // Вспомогательный метод проверки формата группы
+        private bool IsGroupNameValid(string name)
+        {
+            // Формат: две заглавные русские буквы, дефис, две цифры
+            return System.Text.RegularExpressions.Regex.IsMatch(name, @"^[А-ЯЁ]{2}-\d{2}$");
         }
 
         [RelayCommand]

@@ -34,6 +34,7 @@ namespace ExamSheduleDesign
             services.AddSingleton<IConnectionStringProvider, ConnectionStringProvider>();
             services.AddSingleton<IBufferService, BufferService>();
             services.AddSingleton<IExamCountNotifier, ExamCountNotifier>();
+            services.AddSingleton<ISettingsService, SettingsService>();
 
             // Репозитории
             services.AddSingleton<ITeacherRepository, TeacherRepository>();
@@ -41,7 +42,7 @@ namespace ExamSheduleDesign
             services.AddSingleton<IGroupRepository, GroupRepository>();
             services.AddSingleton<IExamRepository, ExamRepository>();
 
-            // ViewModels – теперь Singleton для сохранения состояния
+            // ViewModels
             services.AddSingleton<MainWindowViewModel>();
             services.AddSingleton<MainViewModel>();
             services.AddSingleton<ScheduleViewModel>();
@@ -50,7 +51,7 @@ namespace ExamSheduleDesign
             services.AddSingleton<DevViewModel>();
             services.AddSingleton<SettingsViewModel>();
 
-            // Views – оставляем Transient (они создаются каждый раз)
+            // Views
             services.AddTransient<MainWindow>();
             services.AddTransient<MainView>();
             services.AddTransient<ScheduleView>();

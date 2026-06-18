@@ -11,11 +11,29 @@ namespace ExamSheduleDesign.ViewModels
     {
         private readonly IDataService _dataService;
         private readonly INotificationService _notificationService;
+        private readonly ISettingsService _settingsService;
 
-        public SettingsViewModel(IDataService dataService, INotificationService notificationService)
+        [ObservableProperty]
+        private bool _isGroupValidationEnabled;
+
+        public SettingsViewModel(IDataService dataService, INotificationService notificationService, ISettingsService settingsService)
         {
             _dataService = dataService;
             _notificationService = notificationService;
+            _settingsService = settingsService;
+            _ = LoadSettingsAsync();
+        }
+
+        private async Task LoadSettingsAsync()
+        {
+            await _settingsService.LoadAsync();
+            IsGroupValidationEnabled = _settingsService.IsGroupValidationEnabled;
+        }
+
+        partial void OnIsGroupValidationEnabledChanged(bool value)
+        {
+            _settingsService.IsGroupValidationEnabled = value;
+            _ = _settingsService.SaveAsync();
         }
 
         [RelayCommand]
